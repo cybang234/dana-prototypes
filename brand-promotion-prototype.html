@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>기획전 기본형 프로토타입</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Pretendard:wght@400;500;600;700&family=Figtree:wght@500&display=swap" rel="stylesheet">
+
+<!-- ODS Design Tokens -->
+<style>
+:root {
+  --foreground: #141414;
+  --foregroundWeak: #8c8c8c;
+  --foregroundBrand: #00a1ff;
+  --foregroundDisabled: #c1c1c1;
+  --background: #ffffff;
+  --accent-red: #fd3d4a;
+  --border-thumbnail: rgba(0,0,0,0.05);
+  --purple: #7f7dff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #e8e8e8;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 32px;
+  padding: 32px 0 80px;
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+/* ──────────────────────────────────
+   SIDE PANEL
+────────────────────────────────── */
+.side-panel {
+  width: 240px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  padding: 20px;
+  position: sticky;
+  top: 32px;
+  flex-shrink: 0;
+}
+.side-panel h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #8c8c8c;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.panel-section { margin-bottom: 20px; }
+.panel-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #141414;
+  letter-spacing: -0.3px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.panel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.panel-label { font-size: 13px; color: #141414; letter-spacing: -0.3px; }
+.panel-label.sub { font-size: 12px; color: #8c8c8c; }
+
+.toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+.toggle-switch input { display: none; }
+.toggle-track {
+  position: absolute; inset: 0; background: #d4d4d4;
+  border-radius: 11px; cursor: pointer; transition: background 0.2s;
+}
+.toggle-track::after {
+  content: ''; position: absolute; left: 3px; top: 3px;
+  width: 16px; height: 16px; background: #fff; border-radius: 50%;
+  transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-switch input:checked + .toggle-track { background: #141414; }
+.toggle-switch input:checked + .toggle-track::after { transform: translateX(18px); }
+
+.panel-select {
+  width: 100%; height: 32px;
+  border: 1px solid rgba(0,0,0,0.15); border-radius: 6px;
+  background: #fff; font-size: 13px; font-family: 'Pretendard', sans-serif;
+  color: #141414; letter-spacing: -0.3px; padding: 0 8px;
+  cursor: pointer; outline: none; margin-top: 6px;
+}
+
+/* ──────────────────────────────────
+   PHONE FRAME
+────────────────────────────────── */
+.phone {
+  width: 375px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+  border-radius: 40px;
+  flex-shrink: 0;
+}
+
+/* STATUS BAR */
+.status-bar {
+  height: 44px;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* TOP NAV */
+.top-nav {
+  height: 44px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  position: relative;
+}
+.nav-icon-btn {
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+}
+.nav-icon-btn img { width: 24px; height: 24px; display: block; }
+.nav-title-wrap {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; align-items: center; gap: 6px;
+}
+.nav-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2f3438;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  line-height: 20px;
+}
+
+/* SCROLL AREA */
+.scroll-area {
+  height: 724px;
+  overflow-y: auto;
+  background: #fff;
+}
+.scroll-area::-webkit-scrollbar { display: none; }
+
+/* ──────────────────────────────────
+   HERO (KV)
+────────────────────────────────── */
+.hero { background: #fff; position: relative; }
+
+/* KV Image 타입 */
+.hero-image {
+  width: 375px; height: 375px;
+  position: relative; overflow: hidden; display: block;
+}
+.hero-image > .kv-photo {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block; position: absolute; inset: 0;
+}
+.kv-dim {
+  position: absolute; bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 375px; height: 284px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 100%);
+  mix-blend-mode: multiply;
+}
+.kv-img-content {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+.kv-img-top .kv-date-img {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px; font-weight: 500;
+  color: #fff; line-height: 18px;
+}
+.kv-img-bottom { display: flex; flex-direction: column; gap: 6px; }
+.kv-logo { display: block; margin-bottom: 0; }
+.kv-title-img {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 26px; font-weight: 700;
+  color: #fff; line-height: 34px;
+  letter-spacing: -0.1px;
+}
+.kv-sub-img {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px; font-weight: 400;
+  color: #fff; line-height: 20px;
+  letter-spacing: -0.3px;
+}
+
+/* KV Text 타입 */
+.hero-text {
+  padding: 20px 16px;
+  background: #fff;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+.kv-date-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px; font-weight: 500;
+  color: var(--foreground); line-height: 18px;
+}
+.kv-text-content { display: flex; flex-direction: column; gap: 8px; }
+.kv-title-text {
+  font-size: 32px; font-weight: 700;
+  color: var(--foreground); line-height: 42px;
+  letter-spacing: -0.3px;
+}
+.kv-sub-text {
+  font-size: 15px; font-weight: 400;
+  color: var(--foreground); line-height: 24px;
+  letter-spacing: -0.3px;
+  display: flex; align-items: center; height: 14px;
+  overflow: visible;
+}
+
+/* ──────────────────────────────────
+   BRAND HOME CTA
+────────────────────────────────── */
+.brand-cta {
+  background: #fff;
+  padding: 12px 16px;
+  display: flex;
+  gap: 10px;
+}
+.brand-cta.hidden { display: none; }
+
+.btn-outlined {
+  flex: 1; height: 44px;
+  border: 1.5px solid #141414;
+  border-radius: 8px;
+  background: #fff;
+  color: #141414;
+  font-size: 15px; font-weight: 500;
+  font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.3px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px;
+  padding: 0 14px;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.btn-outlined:hover { background: rgba(0,0,0,0.04); }
+
+/* ──────────────────────────────────
+   DIVIDER
+────────────────────────────────── */
+.divider { height: 12px; background: #f5f5f5; }
+
+/* ──────────────────────────────────
+   BENEFIT
+────────────────────────────────── */
+.benefit-section {
+  background: #fff;
+  padding: 20px 16px;
+}
+.benefit-section.hidden { display: none; }
+
+.benefit-title {
+  font-size: 24px; font-weight: 700;
+  color: #000; line-height: 32px;
+  letter-spacing: -0.3px;
+  width: 100%;
+}
+
+/* 쿠폰 타입 */
+.benefit-coupon-type { display: block; }
+.benefit-detail-type { display: none; }
+
+.benefit-timer-wrap {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.benefit-timer {
+  font-size: 14px; font-weight: 500;
+  color: var(--accent-red); line-height: 18px;
+  letter-spacing: -0.3px;
+}
+.benefit-slider {
+  display: grid; place-items: start; width: 100%;
+  position: relative; height: 1.5px;
+}
+.slider-bg {
+  position: absolute; inset: 0;
+  background: var(--foregroundDisabled);
+  border-radius: 1px; width: 100%;
+}
+.slider-fill {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: var(--foreground);
+  border-radius: 1px;
+  width: 49.69%;
+  transition: width 1s linear;
+}
+
+/* 쿠폰 카드 */
+.coupon-card-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; width: 100%;
+}
+.coupon-card {
+  width: 343px; height: 106px;
+  position: relative; overflow: hidden;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.coupon-bg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+  object-fit: cover;
+}
+.coupon-dashes {
+  position: absolute;
+  left: calc(80.03% + 0px);
+  top: calc(50% - 39.5px);
+  width: 1px; height: 79px;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0, transparent 4px,
+    rgba(255,255,255,0.3) 4px, rgba(255,255,255,0.3) 7px
+  );
+}
+.coupon-content {
+  position: absolute;
+  inset: 0;
+  width: 343px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+}
+.coupon-left {
+  width: 275px; padding: 0 20px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.coupon-amount-row {
+  display: flex; align-items: center; gap: 0;
+}
+.coupon-tilde { height: 8px; width: 16px; display: block; flex-shrink: 0; margin-right: 2px; }
+.coupon-num {
+  font-family: 'Figtree', sans-serif;
+  font-size: 30px; font-weight: 500;
+  color: #fff; line-height: 16px;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+.coupon-unit {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 28px; font-weight: 500;
+  color: #fff; line-height: normal;
+  letter-spacing: -0.3px;
+  margin-left: 2px;
+  white-space: nowrap;
+}
+.coupon-sub {
+  font-size: 12px; font-weight: 500;
+  color: rgba(255,255,255,0.8);
+  line-height: 16px; letter-spacing: -0.3px;
+  max-width: 140px; width: 120px;
+  height: 24px;
+  vertical-align: middle;
+}
+.coupon-sub br { vertical-align: middle; }
+.coupon-right {
+  width: 68px; height: 62px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px 10px 12px;
+  flex-shrink: 0;
+}
+.download-icon-wrap {
+  width: 24px; height: 24px;
+  overflow: hidden; position: relative; flex-shrink: 0;
+  cursor: pointer;
+}
+.dl-arrow-up {
+  position: absolute;
+  left: 50%; top: 3.8px;
+  transform: translateX(-50%);
+  width: 6.6px; height: 9.4px;
+  transform-origin: center;
+}
+.dl-arrow-up img { width: 100%; height: 100%; display: block; transform: scaleY(-1); }
+.dl-arrow-bar {
+  position: absolute;
+  left: 50%; top: 14.3px;
+  transform: translateX(-50%);
+  width: 16.36px; height: 5.7px;
+}
+.dl-arrow-bar img { width: 100%; height: 100%; display: block; }
+
+/* 쿠폰형 inner layout */
+.benefit-coupon-inner {
+  display: flex; flex-direction: column; gap: 28px;
+}
+.benefit-title-section {
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+/* 서술형 타입 */
+.benefit-detail-inner {
+  display: flex; flex-direction: column; gap: 20px;
+}
+.benefit-detail-title-section {
+  display: flex; flex-direction: column; gap: 20px;
+}
+.benefit-full-slider {
+  height: 1.5px;
+  background: var(--foreground);
+  width: 100%; border-radius: 1px;
+}
+.benefit-items-list {
+  display: flex; flex-direction: column; gap: 20px;
+}
+.benefit-item-wrap {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.benefit-num {
+  font-size: 13px; font-weight: 500;
+  color: var(--purple); line-height: 18px;
+  letter-spacing: -0.3px;
+}
+.benefit-item-title {
+  font-size: 18px; font-weight: 600;
+  color: var(--foreground); line-height: 24px;
+  letter-spacing: -0.3px; white-space: nowrap;
+}
+.benefit-item-desc {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px; font-weight: 400;
+  color: var(--foregroundWeak); line-height: 18px;
+  letter-spacing: -0.3px;
+  height: 18px; width: 323px;
+  margin-top: 4px;
+}
+.benefit-item-divider { height: 1px; background: rgba(0,0,0,0.08); }
+
+/* 서술형 세부 카드: 쿠폰 */
+.detail-coupon-card {
+  width: 343px; height: 73px;
+  position: relative; overflow: hidden;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.detail-coupon-bg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; display: block; object-fit: cover;
+}
+.detail-coupon-dashes {
+  position: absolute;
+  left: calc(80.03%);
+  top: calc(50% - 21.5px);
+  width: 1px; height: 43px;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0, transparent 4px,
+    rgba(255,255,255,0.3) 4px, rgba(255,255,255,0.3) 7px
+  );
+}
+.detail-coupon-content {
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 343px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.detail-coupon-left {
+  width: 275px; height: 73px;
+  padding: 0 20px 4px;
+  display: flex; flex-direction: column; gap: 7px;
+  align-items: flex-start; justify-content: center;
+  color: #fff;
+}
+.detail-coupon-amount {
+  font-size: 18px; font-weight: 600;
+  color: #fff; line-height: 22px;
+  letter-spacing: -0.5px;
+  max-width: 170px;
+  font-family: 'Pretendard', sans-serif;
+}
+.detail-coupon-sub {
+  font-size: 12px; font-weight: 500;
+  color: rgba(255,255,255,0.8);
+  line-height: 16px; max-width: 120px;
+  font-family: 'Pretendard', sans-serif;
+}
+.detail-coupon-right {
+  width: 68px; height: 73px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px 10px 12px;
+}
+
+/* 카카오페이 결제 카드 */
+.payment-card {
+  background: #f5f5f5;
+  border-radius: 6px;
+  height: 48px;
+  width: 343px;
+  display: flex;
+  align-items: center; justify-content: space-between;
+  padding: 10px 18px 10px 20px;
+}
+.payment-text {
+  font-size: 13px; font-weight: 400;
+  color: rgba(0,0,0,0.8); line-height: 20px;
+  letter-spacing: -0.3px; white-space: nowrap;
+}
+.kakao-logo {
+  height: 19px; width: auto;
+  display: block; flex-shrink: 0;
+}
+
+/* 사은품 카드 */
+.gift-card {
+  width: 343px; height: 86px;
+  display: flex; flex-shrink: 0;
+}
+.gift-text {
+  width: 240px; height: 86px;
+  background: #f5f5f5;
+  border-radius: 8px 0 0 8px;
+  display: flex; align-items: center; justify-content: flex-start;
+  padding: 0 20px;
+  flex-shrink: 0;
+}
+.gift-text-inner {
+  font-size: 14px; font-weight: 400;
+  color: rgba(0,0,0,0.8); line-height: 20px;
+  letter-spacing: -0.3px; opacity: 0.8;
+}
+.gift-img-wrap {
+  flex: 1; height: 86px;
+  background: #f5f5f5;
+  border-radius: 0 8px 8px 0;
+  position: relative; overflow: hidden;
+}
+.gift-product {
+  position: absolute;
+  left: 40px; top: 50%;
+  transform: translateY(-50%);
+  width: 35px; height: 54px;
+  object-fit: cover;
+}
+
+/* ──────────────────────────────────
+   PRODUCT LIST
+────────────────────────────────── */
+.product-section { background: #fff; }
+
+.chip-strip {
+  display: flex; gap: 6px;
+  padding: 12px 16px 20px;
+  overflow-x: auto; background: #fff;
+  position: sticky; top: 0; z-index: 10;
+}
+.chip-strip::-webkit-scrollbar { display: none; }
+
+.chip {
+  height: 32px; padding: 0 12px;
+  border-radius: 16px;
+  font-size: 13px; font-weight: 500;
+  font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.3px;
+  cursor: pointer; white-space: nowrap;
+  border: none; transition: all 0.15s; flex-shrink: 0;
+  line-height: 32px;
+}
+.chip.active { background: var(--foreground); color: #fff; }
+.chip.normal {
+  background: transparent; color: var(--foreground);
+  border: 1px solid rgba(0,0,0,0.15);
+}
+
+.product-grid { padding: 0; }
+.product-row {
+  display: flex; gap: 2px;
+  margin-bottom: 20px; padding: 0;
+}
+.product-card { flex: 1; position: relative; }
+.product-img-wrap {
+  position: relative; width: 100%; aspect-ratio: 1;
+}
+.product-img {
+  width: 100%; aspect-ratio: 1;
+  object-fit: cover; display: block;
+  border: 1px solid var(--border-thumbnail);
+}
+.scrap-btn {
+  position: absolute;
+  right: 8px; bottom: 8px;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 2px 10px rgba(63,71,77,0.25);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: none; padding: 0;
+}
+.scrap-btn img { width: 24px; height: 24px; display: block; opacity: 0.7; }
+
+.product-info { padding: 8px 9px 0; }
+.product-brand {
+  font-size: 12px; font-weight: 400;
+  color: var(--foregroundWeak); line-height: 16px;
+  letter-spacing: -0.3px; margin-bottom: 2px;
+}
+.product-name {
+  font-size: 13px; font-weight: 400;
+  color: var(--foreground); line-height: 18px;
+  letter-spacing: -0.3px;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+  margin-bottom: 4px; height: 36px;
+}
+.price-row {
+  display: flex; align-items: baseline;
+  gap: 4px; margin-bottom: 2px;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 18px; font-weight: 700;
+  line-height: 24px; letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+.price-discount { color: var(--foregroundBrand); }
+.price-amount { color: var(--foreground); }
+.review-row {
+  display: flex; align-items: center; gap: 4px;
+}
+.star-icon {
+  width: 12px; height: 12px; display: block;
+}
+.review-score {
+  font-size: 12px; font-weight: 600;
+  color: var(--foreground); line-height: 16px;
+  letter-spacing: -0.3px;
+}
+.review-count {
+  font-size: 12px; font-weight: 400;
+  color: var(--foregroundWeak); line-height: 16px;
+  letter-spacing: -0.3px;
+}
+</style>
+</head>
+<body>
+
+<!-- ─── SIDE PANEL ─────────────────────── -->
+<div class="side-panel">
+  <h3>편집 옵션</h3>
+
+  <div class="panel-section">
+    <div class="panel-section-title">히어로</div>
+    <div class="panel-row">
+      <span class="panel-label">KV 이미지 사용</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="kvTogglePanel" checked onchange="toggleKV()">
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+    <div class="panel-row">
+      <span class="panel-label">로고 노출</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="logoToggle" checked onchange="toggleLogo()">
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">브랜드홈 CTA</div>
+    <div class="panel-row">
+      <span class="panel-label">모듈 노출</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="ctaToggle" checked onchange="toggleModule('brandCta', this)">
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">혜택</div>
+    <div class="panel-row">
+      <span class="panel-label">모듈 노출</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="benefitToggle" checked onchange="toggleModule('benefitSection', this)">
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+    <div class="panel-row" style="margin-top: 4px;">
+      <span class="panel-label">혜택 타입</span>
+    </div>
+    <select class="panel-select" onchange="setBenefitType(this.value)">
+      <option value="coupon">쿠폰형</option>
+      <option value="detail">서술형</option>
+    </select>
+  </div>
+
+  <div class="panel-section">
+    <div class="panel-section-title">상품리스트</div>
+    <div class="panel-row">
+      <span class="panel-label sub">필터 타입</span>
+    </div>
+    <select class="panel-select" onchange="setFilterType(this.value)">
+      <option value="category">카테고리 필터</option>
+      <option value="brand">브랜드 필터</option>
+    </select>
+  </div>
+</div>
+
+<!-- ─── PHONE ──────────────────────────── -->
+<div class="phone">
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:375px; height:44px; overflow:hidden;">
+      <!-- Time: left=21 top=13 width=54 height=21 -->
+      <div style="position:absolute; left:21px; top:13px; width:54px; height:21px; display:flex; align-items:center; justify-content:center;">
+        <span style="font-family:-apple-system,'SF Pro Text',sans-serif; font-size:14px; font-weight:600; color:#000; letter-spacing:-0.28px;">9:41</span>
+      </div>
+      <!-- Cellular: left=293.66 top=17.67 width=16.99 height=10.66 -->
+      <img src="https://www.figma.com/api/mcp/asset/aa019665-ff91-4578-b88a-7b3753ed9cba"
+           style="position:absolute; left:293.66px; top:17.67px; width:16.99px; height:10.66px; display:block;" alt="">
+      <!-- Wifi: left=315.68 top=17.33 width=15.3 height=11 -->
+      <img src="https://www.figma.com/api/mcp/asset/5822beb8-bf77-486f-a5e9-5043ab5ceadd"
+           style="position:absolute; left:315.68px; top:17.33px; width:15.3px; height:11px; display:block;" alt="">
+      <!-- Battery: right=14.67 top=17.33 width=24.328 height=11.333 -->
+      <img src="https://www.figma.com/api/mcp/asset/0f5a1504-23e1-4708-affd-711a9d9f794a"
+           style="position:absolute; right:14.67px; top:17.33px; width:24.328px; height:11.333px; display:block;" alt="">
+    </div>
+  </div>
+
+  <!-- TOP NAV -->
+  <div class="top-nav">
+    <div class="nav-icon-btn">
+      <img src="https://www.figma.com/api/mcp/asset/0302be9f-66ee-4566-b93a-1f3afdca55ec" alt="">
+    </div>
+    <div class="nav-title-wrap">
+      <span class="nav-title">살림의달인ㅣ오늘의집 쇼핑</span>
+    </div>
+    <div class="nav-icon-btn">
+      <img src="https://www.figma.com/api/mcp/asset/5de92380-a320-4ce4-85ec-909c9c4b6dd1" alt="">
+    </div>
+  </div>
+
+  <!-- SCROLL AREA -->
+  <div class="scroll-area">
+
+    <!-- HERO -->
+    <div class="hero" id="heroSection">
+
+      <!-- KV Image 타입 -->
+      <div class="hero-image" id="heroImage">
+        <img class="kv-photo" src="https://www.figma.com/api/mcp/asset/fcd28c9e-cc78-49e0-a8a3-382986035586" alt="KV">
+        <div class="kv-dim"></div>
+        <div class="kv-img-content">
+          <div class="kv-img-top">
+            <div class="kv-date-img">4.30 - 5.2</div>
+          </div>
+          <div class="kv-img-bottom">
+            <div class="kv-logo" id="kvLogo">
+              <span style="font-family:'Pretendard',sans-serif; font-size:11px; font-weight:700; color:#fff; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.4); padding:3px 8px; border-radius:4px; letter-spacing:0.5px; white-space:nowrap;">오늘의집 LIVE</span>
+            </div>
+            <div class="kv-title-img">오늘의집<br>원하는날도착</div>
+            <div class="kv-sub-img">전국 무료 배송, 설치는 기본.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KV Text 타입 -->
+      <div class="hero-text" id="heroText">
+        <div class="kv-date-text">4.30 - 5.2</div>
+        <div class="kv-text-content">
+          <div class="kv-title-text">오늘의집<br>원하는날도착</div>
+          <div class="kv-sub-text">전국 무료 배송, 설치는 기본.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BRAND HOME CTA -->
+    <div class="brand-cta" id="brandCta">
+      <button class="btn-outlined">
+        <!-- ODS [Icon] Bookmark outline — mask 15.6×18.3px at (4.2, 3) in 24×24 -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4.5 3.5C4.5 3.22386 4.72386 3 5 3H19C19.2761 3 19.5 3.22386 19.5 3.5V20.382C19.5 20.7607 19.0724 20.9822 18.7764 20.7584L12 16.9338L5.22361 20.7584C4.92757 20.9822 4.5 20.7607 4.5 20.382V3.5Z" stroke="#141414" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        브랜드 스크랩
+      </button>
+      <button class="btn-outlined">
+        <img src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" style="width:24px; height:24px; border-radius:50%; object-fit:cover; flex-shrink:0;" alt="">
+        브랜드홈
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 17L17 7" stroke="#141414" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M8 7H17V16" stroke="#141414" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- BENEFIT -->
+    <div class="benefit-section" id="benefitSection">
+
+      <!-- 쿠폰 타입 -->
+      <div id="benefitCouponType" class="benefit-coupon-type">
+        <div class="benefit-coupon-inner">
+          <div class="benefit-title-section">
+            <div class="benefit-title">Benefit</div>
+            <div class="benefit-timer-wrap">
+              <div class="benefit-timer" id="timerText">종료까지 0일 3시간 22분 14초 남음</div>
+              <div class="benefit-slider" style="height:1.5px; position:relative;">
+                <div class="slider-bg"></div>
+                <div class="slider-fill" id="progressFill"></div>
+              </div>
+            </div>
+          </div>
+          <div class="coupon-card-wrap">
+            <div class="coupon-card">
+              <img class="coupon-bg" src="https://www.figma.com/api/mcp/asset/bc5c7f2d-5650-4811-8f3a-7a5866681955" alt="">
+              <div class="coupon-dashes"></div>
+              <div class="coupon-content">
+                <div class="coupon-left">
+                  <div class="coupon-amount-row">
+                    <img class="coupon-tilde" src="https://www.figma.com/api/mcp/asset/66518fec-0433-480c-b8c9-1f6aa90a1cd9" alt="~">
+                    <span class="coupon-num">10,000</span>
+                    <span class="coupon-unit">원</span>
+                  </div>
+                  <div class="coupon-sub">상품쿠폰<br>5만원 구매 시 적용 가능</div>
+                </div>
+                <div class="coupon-right">
+                  <div class="download-icon-wrap">
+                    <div class="dl-arrow-up" style="position:absolute; left:50%; top:3.8px; transform:translateX(-50%); width:6.6px; height:9.4px;">
+                      <img src="https://www.figma.com/api/mcp/asset/63f9fce3-f335-41a8-8288-c33ad3eaef8e" style="width:100%; height:100%; display:block; transform:scaleY(-1);" alt="">
+                    </div>
+                    <div style="position:absolute; left:50%; top:14.3px; transform:translateX(-50%); width:16.36px; height:5.7px;">
+                      <img src="https://www.figma.com/api/mcp/asset/169b0ed8-4eea-48f4-a001-187f0bc916d4" style="width:100%; height:100%; display:block;" alt="">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 서술형 타입 -->
+      <div id="benefitDetailType" class="benefit-detail-type">
+        <div class="benefit-detail-inner">
+          <div class="benefit-detail-title-section">
+            <div class="benefit-title">Benefit</div>
+            <div class="benefit-full-slider"></div>
+          </div>
+          <div class="benefit-items-list">
+
+            <!-- 01 -->
+            <div class="benefit-item-wrap">
+              <div class="benefit-num">01</div>
+              <div style="height: fit-content;">
+                <div class="benefit-item-title">상품 한정 최대 10% 할인</div>
+                <div class="benefit-item-desc">기획전 상품 대상</div>
+              </div>
+            </div>
+            <div class="benefit-item-divider"></div>
+
+            <!-- 02 -->
+            <div class="benefit-item-wrap">
+              <div class="benefit-num">02</div>
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                  <div class="benefit-item-title">기간 한정 쿠폰팩</div>
+                  <div class="benefit-item-desc">1만원 이상, 최대 100만원</div>
+                </div>
+                <!-- 서술형 쿠폰 카드 -->
+                <div class="detail-coupon-card">
+                  <img class="detail-coupon-bg" src="https://www.figma.com/api/mcp/asset/84e1ccf3-e9f5-474a-9219-5c3012fa14fc" alt="">
+                  <div class="detail-coupon-dashes"></div>
+                  <div class="detail-coupon-content">
+                    <div class="detail-coupon-left">
+                      <div class="detail-coupon-amount">최대 10% 할인</div>
+                      <div class="detail-coupon-sub">5만원 구매 시 적용 가능</div>
+                    </div>
+                    <div class="detail-coupon-right">
+                      <div class="download-icon-wrap">
+                        <div style="position:absolute; left:50%; top:3.8px; transform:translateX(-50%); width:6.6px; height:9.4px;">
+                          <img src="https://www.figma.com/api/mcp/asset/63f9fce3-f335-41a8-8288-c33ad3eaef8e" style="width:100%; height:100%; display:block; transform:scaleY(-1);" alt="">
+                        </div>
+                        <div style="position:absolute; left:50%; top:14.3px; transform:translateX(-50%); width:16.36px; height:5.7px;">
+                          <img src="https://www.figma.com/api/mcp/asset/169b0ed8-4eea-48f4-a001-187f0bc916d4" style="width:100%; height:100%; display:block;" alt="">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="benefit-item-divider"></div>
+
+            <!-- 03 -->
+            <div class="benefit-item-wrap">
+              <div class="benefit-num">03</div>
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                  <div class="benefit-item-title">카카오페이 7% 할인</div>
+                  <div class="benefit-item-desc">3만원 이상, 최대 5만원</div>
+                </div>
+                <div class="payment-card">
+                  <span class="payment-text">카카오페이 9만원 이상 결제 시 1만원 할인</span>
+                  <img class="kakao-logo" src="https://www.figma.com/api/mcp/asset/f1374f90-716a-4cc6-bcda-039252ca4e93" alt="kakaopay">
+                </div>
+              </div>
+            </div>
+            <div class="benefit-item-divider"></div>
+
+            <!-- 04 -->
+            <div class="benefit-item-wrap">
+              <div class="benefit-num">04</div>
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div>
+                  <div class="benefit-item-title">사은품 증정</div>
+                  <div class="benefit-item-desc">신상품 포토리뷰 작성 시, 5명 추첨</div>
+                </div>
+                <div class="gift-card">
+                  <div class="gift-text">
+                    <div class="gift-text-inner">포토리뷰 작성 이벤트<br>에어스트레이트 증정</div>
+                  </div>
+                  <div class="gift-img-wrap">
+                    <img class="gift-product" src="https://www.figma.com/api/mcp/asset/910057f2-c260-4081-bd11-4fe134ca5b37" alt="사은품">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- DIVIDER -->
+    <div class="divider"></div>
+
+    <!-- PRODUCT LIST -->
+    <div class="product-section">
+
+      <!-- 칩 필터 -->
+      <div class="chip-strip" id="chipStrip">
+        <button class="chip active" onclick="selectChip(this)">전체</button>
+        <button class="chip normal" onclick="selectChip(this)">소파</button>
+        <button class="chip normal" onclick="selectChip(this)">침대</button>
+        <button class="chip normal" onclick="selectChip(this)">테이블</button>
+        <button class="chip normal" onclick="selectChip(this)">수납</button>
+      </div>
+
+      <!-- 상품 그리드 -->
+      <div class="product-grid" id="productGrid">
+        <!-- Row 1 -->
+        <div class="product-row">
+          <div class="product-card">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
+              <button class="scrap-btn">
+                <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 1.5C1 1.22386 1.22386 1 1.5 1H13.5C13.7761 1 14 1.22386 14 1.5V16.6624C14 16.9685 13.6805 17.1614 13.4164 17.0129L7.5 13.75L1.58359 17.0129C1.31952 17.1614 1 16.9685 1 16.6624V1.5Z" stroke="#141414" stroke-width="1.2"/>
+                </svg>
+              </button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">까사마루</div>
+              <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+              <div class="price-row">
+                <span class="price-discount">42%</span>
+                <span class="price-amount">33,200</span>
+              </div>
+              <div class="review-row">
+                <img class="star-icon" src="https://www.figma.com/api/mcp/asset/ea193f56-0e9b-4462-bba0-2ff719bef8eb" alt="★">
+                <span class="review-score">4.6</span>
+                <span class="review-count">리뷰 392</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
+              <button class="scrap-btn">
+                <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 1.5C1 1.22386 1.22386 1 1.5 1H13.5C13.7761 1 14 1.22386 14 1.5V16.6624C14 16.9685 13.6805 17.1614 13.4164 17.0129L7.5 13.75L1.58359 17.0129C1.31952 17.1614 1 16.9685 1 16.6624V1.5Z" stroke="#141414" stroke-width="1.2"/>
+                </svg>
+              </button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">까사마루</div>
+              <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+              <div class="price-row">
+                <span class="price-discount">35%</span>
+                <span class="price-amount">659,000</span>
+              </div>
+              <div class="review-row">
+                <img class="star-icon" src="https://www.figma.com/api/mcp/asset/ea193f56-0e9b-4462-bba0-2ff719bef8eb" alt="★">
+                <span class="review-score">4.8</span>
+                <span class="review-count">리뷰 1,204</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Row 2 -->
+        <div class="product-row">
+          <div class="product-card">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
+              <button class="scrap-btn">
+                <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 1.5C1 1.22386 1.22386 1 1.5 1H13.5C13.7761 1 14 1.22386 14 1.5V16.6624C14 16.9685 13.6805 17.1614 13.4164 17.0129L7.5 13.75L1.58359 17.0129C1.31952 17.1614 1 16.9685 1 16.6624V1.5Z" stroke="#141414" stroke-width="1.2"/>
+                </svg>
+              </button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">까사마루</div>
+              <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+              <div class="price-row">
+                <span class="price-discount">42%</span>
+                <span class="price-amount">33,200</span>
+              </div>
+              <div class="review-row">
+                <img class="star-icon" src="https://www.figma.com/api/mcp/asset/ea193f56-0e9b-4462-bba0-2ff719bef8eb" alt="★">
+                <span class="review-score">4.6</span>
+                <span class="review-count">리뷰 392</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
+              <button class="scrap-btn">
+                <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 1.5C1 1.22386 1.22386 1 1.5 1H13.5C13.7761 1 14 1.22386 14 1.5V16.6624C14 16.9685 13.6805 17.1614 13.4164 17.0129L7.5 13.75L1.58359 17.0129C1.31952 17.1614 1 16.9685 1 16.6624V1.5Z" stroke="#141414" stroke-width="1.2"/>
+                </svg>
+              </button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">까사마루</div>
+              <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+              <div class="price-row">
+                <span class="price-discount">35%</span>
+                <span class="price-amount">659,000</span>
+              </div>
+              <div class="review-row">
+                <img class="star-icon" src="https://www.figma.com/api/mcp/asset/ea193f56-0e9b-4462-bba0-2ff719bef8eb" alt="★">
+                <span class="review-score">4.8</span>
+                <span class="review-count">리뷰 1,204</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Row 3 -->
+        <div class="product-row">
+          <div class="product-card">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
+              <button class="scrap-btn">
+                <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 1.5C1 1.22386 1.22386 1 1.5 1H13.5C13.7761 1 14 1.22386 14 1.5V16.6624C14 16.9685 13.6805 17.1614 13.4164 17.0129L7.5 13.75L1.58359 17.0129C1.31952 17.1614 1 16.9685 1 16.6624V1.5Z" stroke="#141414" stroke-width="1.2"/>
+                </svg>
+              </button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">까사마루</div>
+              <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+              <div class="price-row">
+                <span class="price-discount">42%</span>
+                <span class="price-amount">33,200</span>
+              </div>
+              <div class="review-row">
+                <img class="star-icon" src="https://www.figma.com/api/mcp/asset/ea193f56-0e9b-4462-bba0-2ff719bef8eb" alt="★">
+                <span class="review-score">4.6</span>
+                <span class="review-count">리뷰 392</span>
+              </div>
+            </div>
+          </div>
+          <div class="product-card">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
+              <button class="scrap-btn">
+                <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 1.5C1 1.22386 1.22386 1 1.5 1H13.5C13.7761 1 14 1.22386 14 1.5V16.6624C14 16.9685 13.6805 17.1614 13.4164 17.0129L7.5 13.75L1.58359 17.0129C1.31952 17.1614 1 16.9685 1 16.6624V1.5Z" stroke="#141414" stroke-width="1.2"/>
+                </svg>
+              </button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">까사마루</div>
+              <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+              <div class="price-row">
+                <span class="price-discount">35%</span>
+                <span class="price-amount">659,000</span>
+              </div>
+              <div class="review-row">
+                <img class="star-icon" src="https://www.figma.com/api/mcp/asset/ea193f56-0e9b-4462-bba0-2ff719bef8eb" alt="★">
+                <span class="review-score">4.8</span>
+                <span class="review-count">리뷰 1,204</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end product-section -->
+
+  </div><!-- end scroll-area -->
+</div><!-- end phone -->
+
+<script>
+  // ─── 로고 토글 ────────────────────────
+  function toggleLogo() {
+    const el = document.getElementById('kvLogo');
+    el.style.display = document.getElementById('logoToggle').checked ? 'block' : 'none';
+  }
+
+  // ─── KV 이미지/텍스트 토글 ─────────────
+  function toggleKV() {
+    const checked = document.getElementById('kvTogglePanel').checked;
+    document.getElementById('heroImage').style.display = checked ? 'block' : 'none';
+    const ht = document.getElementById('heroText');
+    ht.style.display = checked ? 'none' : 'flex';
+  }
+
+  // ─── 모듈 토글 ─────────────────────────
+  function toggleModule(moduleId, toggleEl) {
+    document.getElementById(moduleId).style.display = toggleEl.checked ? '' : 'none';
+  }
+
+  // ─── 혜택 타입 ─────────────────────────
+  function setBenefitType(value) {
+    document.getElementById('benefitCouponType').style.display = value === 'coupon' ? 'block' : 'none';
+    document.getElementById('benefitDetailType').style.display = value === 'detail' ? 'block' : 'none';
+  }
+
+  // ─── 칩 필터 ───────────────────────────
+  const categoryChips = ['전체', '소파', '침대', '테이블', '수납'];
+  const brandChips = ['전체', '까사마루', '일룸', '한샘', '시디즈'];
+
+  function setFilterType(value) {
+    const strip = document.getElementById('chipStrip');
+    const chips = value === 'category' ? categoryChips : brandChips;
+    strip.innerHTML = chips.map((label, i) =>
+      `<button class="chip ${i === 0 ? 'active' : 'normal'}" onclick="selectChip(this)">${label}</button>`
+    ).join('');
+  }
+
+  function selectChip(el) {
+    document.querySelectorAll('.chip').forEach(c => { c.className = 'chip normal'; });
+    el.className = 'chip active';
+  }
+
+  // ─── 카운트다운 타이머 ──────────────────
+  const endTime = Date.now() + (3 * 3600 + 22 * 60 + 14) * 1000;
+  const totalDuration = (3 * 3600 + 22 * 60 + 14) * 1000;
+
+  function updateTimer() {
+    const remaining = Math.max(0, endTime - Date.now());
+    const s = Math.floor(remaining / 1000);
+    const d = Math.floor(s / 86400);
+    const h = Math.floor((s % 86400) / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    const el = document.getElementById('timerText');
+    if (el) el.textContent = `종료까지 ${d}일 ${h}시간 ${m}분 ${sec}초 남음`;
+    const fill = document.getElementById('progressFill');
+    const pct = Math.min(100, (1 - remaining / totalDuration) * 100);
+    if (fill) fill.style.width = pct + '%';
+  }
+
+  setInterval(updateTimer, 1000);
+  updateTimer();
+</script>
+</body>
+</html>
