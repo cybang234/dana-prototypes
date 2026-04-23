@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>CLOVA eKYC 케이스별 화면</title>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+body { font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; background: #1a1a1a; display: flex; flex-wrap: wrap; gap: 24px; padding: 24px; justify-content: flex-start; }
+
+.device-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.device-label { color: #fff; font-size: 11px; opacity: 0.6; text-align: center; }
+.device { width: 375px; height: 812px; background: #222; border-radius: 44px; overflow: hidden; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.5); flex-shrink: 0; }
+
+/* Camera bg */
+.camera-bg { position: absolute; inset: 0; background: #2a2a2a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='375' height='812'%3E%3Crect width='375' height='812' fill='%23242424'/%3E%3Ccircle cx='187' cy='300' r='120' fill='%23303030'/%3E%3C/svg%3E") center/cover; }
+
+/* Status Bar */
+.status-bar { position: relative; z-index: 10; height: 50px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 20px 8px; }
+.time { font-size: 15px; font-weight: 600; color: #fff; }
+.icons { display: flex; gap: 6px; }
+.icon-signal { width: 16px; height: 12px; fill: #fff; }
+
+/* Top Nav */
+.top-nav { position: relative; z-index: 10; height: 44px; display: flex; align-items: center; padding: 0 16px; }
+.nav-close { color: #fff; font-size: 20px; cursor: pointer; padding: 8px; line-height: 1; }
+.nav-title { flex: 1; text-align: center; font-size: 16px; font-weight: 600; color: #fff; }
+.nav-right { width: 36px; }
+
+/* Bottom Sheet */
+.bottom-sheet { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; border-radius: 20px 20px 0 0; padding-bottom: 0; z-index: 20; }
+.drag-handle { width: 36px; height: 4px; background: #e0e0e0; border-radius: 2px; margin: 12px auto 8px; }
+.sheet-header { display: flex; align-items: center; padding: 4px 16px 16px; border-bottom: 1px solid #f0f0f0; }
+.sheet-title { flex: 1; font-size: 16px; font-weight: 700; color: #1a1a1a; }
+.sheet-close { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+/* Fields */
+.fields { padding: 0 16px; }
+.field { padding: 16px 0; border-bottom: 1px solid #f5f5f5; }
+.field:last-child { border-bottom: none; }
+.field-label { font-size: 12px; color: #888; margin-bottom: 8px; }
+.field-input { width: 100%; height: 40px; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 0 12px; font-size: 15px; color: #1a1a1a; display: flex; align-items: center; background: #fff; position: relative; }
+.field-input.active { border-color: #1a73e8; }
+.field-input .clear-btn { position: absolute; right: 10px; width: 20px; height: 20px; background: #bbb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; cursor: pointer; }
+.mask { color: #1a1a1a; letter-spacing: 1px; }
+.input-row { display: flex; gap: 8px; }
+.input-row .field-input { flex: 1; }
+
+/* Keyboard area */
+.keyboard-area { background: #d1d5db; padding: 6px 0 20px; }
+.kb-toolbar { display: flex; justify-content: flex-end; padding: 6px 16px; background: #d1d5db; }
+.kb-done { font-size: 16px; color: #1a73e8; font-weight: 500; cursor: pointer; }
+.kb-nav { display: flex; gap: 16px; align-items: center; }
+.kb-nav-btn { color: #666; font-size: 18px; }
+.kb-rows { padding: 0 4px; }
+.kb-row { display: flex; gap: 6px; margin-bottom: 6px; justify-content: center; }
+.key { flex: 1; max-width: 110px; height: 46px; background: #fff; border-radius: 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 1px 0 rgba(0,0,0,0.3); cursor: pointer; }
+.key .sub { font-size: 9px; color: #888; margin-top: 1px; }
+.key.fn { background: #adb5bd; color: #fff; font-size: 14px; }
+.key.zero { max-width: 110px; }
+
+/* Manual input tag */
+.manual-tag { display: inline-flex; align-items: center; gap: 4px; background: #FFF3CD; border: 1px solid #FFD93D; border-radius: 6px; padding: 4px 8px; font-size: 11px; color: #856404; margin-bottom: 6px; }
+
+/* Error overlay */
+.error-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 30; display: flex; align-items: center; justify-content: center; }
+.error-dialog { width: 300px; background: #fff; border-radius: 16px; overflow: hidden; }
+.error-icon { font-size: 32px; text-align: center; padding: 24px 0 8px; }
+.error-title { font-size: 16px; font-weight: 700; color: #1a1a1a; text-align: center; padding: 0 24px 8px; }
+.error-desc { font-size: 13px; color: #666; text-align: center; line-height: 1.6; padding: 0 24px 20px; }
+.error-code { display: inline-block; background: #f5f5f5; border-radius: 4px; padding: 2px 8px; font-size: 11px; color: #888; font-family: monospace; margin-bottom: 4px; }
+.error-btns { display: flex; border-top: 1px solid #f0f0f0; }
+.error-btn { flex: 1; height: 52px; font-size: 15px; font-weight: 500; border: none; background: none; cursor: pointer; color: #666; }
+.error-btn.primary { color: #1a73e8; font-weight: 600; border-left: 1px solid #f0f0f0; }
+.error-btn.danger { color: #e53935; font-weight: 600; border-left: 1px solid #f0f0f0; }
+</style>
+</head>
+<body>
+
+<!-- 1. IC 주민등록증 -->
+<div class="device-wrap">
+  <div class="device-label">IC · 주민등록증</div>
+  <div class="device">
+    <div class="camera-bg"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="icons"><svg class="icon-signal" viewBox="0 0 17 12"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3.5" height="12" rx="1" opacity="0.3"/></svg></div>
+    </div>
+    <div class="top-nav">
+      <span class="nav-close">✕</span>
+      <div class="nav-title">신분증 촬영</div>
+      <div class="nav-right"></div>
+    </div>
+    <div class="bottom-sheet">
+      <div class="drag-handle"></div>
+      <div class="sheet-header">
+        <div class="sheet-title">스캔 정보</div>
+        <div class="sheet-close">✕</div>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <div class="field-label">이름</div>
+          <div class="field-input">방채영</div>
+        </div>
+        <div class="field">
+          <div class="field-label">주민등록번호</div>
+          <div class="input-row">
+            <div class="field-input">990101</div>
+            <div class="field-input"><span class="mask">●●●●●●●</span></div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">발급일자</div>
+          <div class="field-input active">
+            <span style="color:#bbb;">●●●●.●●.●●</span>
+            <span class="clear-btn">✕</span>
+          </div>
+        </div>
+      </div>
+      <div class="keyboard-area">
+        <div class="kb-toolbar">
+          <div class="kb-nav"><span class="kb-nav-btn">∧</span><span class="kb-nav-btn">∨</span></div>
+          <span style="flex:1"></span>
+          <span class="kb-done">완료</span>
+        </div>
+        <div class="kb-rows">
+          <div class="kb-row"><div class="key">1</div><div class="key">2<div class="sub">ABC</div></div><div class="key">3<div class="sub">DEF</div></div></div>
+          <div class="kb-row"><div class="key">4<div class="sub">GHI</div></div><div class="key">5<div class="sub">JKL</div></div><div class="key">6<div class="sub">MNO</div></div></div>
+          <div class="kb-row"><div class="key">7<div class="sub">PQRS</div></div><div class="key">8<div class="sub">TUV</div></div><div class="key">9<div class="sub">WXYZ</div></div></div>
+          <div class="kb-row"><div class="key fn">+ * #</div><div class="key zero">0</div><div class="key fn">⌫</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. DL 운전면허증 -->
+<div class="device-wrap">
+  <div class="device-label">DL · 운전면허증</div>
+  <div class="device">
+    <div class="camera-bg"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="icons"><svg class="icon-signal" viewBox="0 0 17 12"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3.5" height="12" rx="1" opacity="0.3"/></svg></div>
+    </div>
+    <div class="top-nav">
+      <span class="nav-close">✕</span>
+      <div class="nav-title">신분증 촬영</div>
+      <div class="nav-right"></div>
+    </div>
+    <div class="bottom-sheet">
+      <div class="drag-handle"></div>
+      <div class="sheet-header">
+        <div class="sheet-title">스캔 정보</div>
+        <div class="sheet-close">✕</div>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <div class="field-label">이름</div>
+          <div class="field-input">방채영</div>
+        </div>
+        <div class="field">
+          <div class="field-label">생년월일</div>
+          <div class="field-input">990101</div>
+        </div>
+        <div class="field">
+          <div class="field-label">면허번호</div>
+          <div class="input-row">
+            <div class="field-input" style="max-width:80px;">12-34</div>
+            <div class="field-input"><span class="mask">●●●●●●●●</span></div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">암호일련번호</div>
+          <div class="field-input active">
+            <span style="color:#bbb;">숫자 6자리 입력</span>
+            <span class="clear-btn">✕</span>
+          </div>
+        </div>
+      </div>
+      <div class="keyboard-area">
+        <div class="kb-toolbar">
+          <div class="kb-nav"><span class="kb-nav-btn">∧</span><span class="kb-nav-btn">∨</span></div>
+          <span style="flex:1"></span>
+          <span class="kb-done">완료</span>
+        </div>
+        <div class="kb-rows">
+          <div class="kb-row"><div class="key">1</div><div class="key">2<div class="sub">ABC</div></div><div class="key">3<div class="sub">DEF</div></div></div>
+          <div class="kb-row"><div class="key">4<div class="sub">GHI</div></div><div class="key">5<div class="sub">JKL</div></div><div class="key">6<div class="sub">MNO</div></div></div>
+          <div class="kb-row"><div class="key">7<div class="sub">PQRS</div></div><div class="key">8<div class="sub">TUV</div></div><div class="key">9<div class="sub">WXYZ</div></div></div>
+          <div class="kb-row"><div class="key fn">+ * #</div><div class="key zero">0</div><div class="key fn">⌫</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. PP 여권 -->
+<div class="device-wrap">
+  <div class="device-label">PP · 여권</div>
+  <div class="device">
+    <div class="camera-bg"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="icons"><svg class="icon-signal" viewBox="0 0 17 12"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3.5" height="12" rx="1" opacity="0.3"/></svg></div>
+    </div>
+    <div class="top-nav">
+      <span class="nav-close">✕</span>
+      <div class="nav-title">신분증 촬영</div>
+      <div class="nav-right"></div>
+    </div>
+    <div class="bottom-sheet">
+      <div class="drag-handle"></div>
+      <div class="sheet-header">
+        <div class="sheet-title">스캔 정보</div>
+        <div class="sheet-close">✕</div>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <div class="field-label">한글성명</div>
+          <div class="field-input">방채영</div>
+        </div>
+        <div class="field">
+          <div class="field-label">여권번호</div>
+          <div class="field-input"><span class="mask">●●●●●●●●●</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">생년월일</div>
+          <div class="field-input">01 FEB 1999</div>
+        </div>
+        <div class="field">
+          <div class="field-label">발급일자 <span style="color:#1a73e8;font-size:11px;">마스킹 없음</span></div>
+          <div class="field-input active">2019.02.20<span class="clear-btn">✕</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">만료일자</div>
+          <div class="field-input">2029.02.19</div>
+        </div>
+      </div>
+      <div class="keyboard-area" style="padding-bottom:8px;">
+        <div class="kb-toolbar">
+          <div class="kb-nav"><span class="kb-nav-btn">∧</span><span class="kb-nav-btn">∨</span></div>
+          <span style="flex:1"></span>
+          <span class="kb-done">완료</span>
+        </div>
+        <div class="kb-rows">
+          <div class="kb-row"><div class="key">1</div><div class="key">2<div class="sub">ABC</div></div><div class="key">3<div class="sub">DEF</div></div></div>
+          <div class="kb-row"><div class="key">4<div class="sub">GHI</div></div><div class="key">5<div class="sub">JKL</div></div><div class="key">6<div class="sub">MNO</div></div></div>
+          <div class="kb-row"><div class="key">7<div class="sub">PQRS</div></div><div class="key">8<div class="sub">TUV</div></div><div class="key">9<div class="sub">WXYZ</div></div></div>
+          <div class="kb-row"><div class="key fn">+ * #</div><div class="key zero">0</div><div class="key fn">⌫</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. AC 외국인등록증 -->
+<div class="device-wrap">
+  <div class="device-label">AC · 외국인등록증</div>
+  <div class="device">
+    <div class="camera-bg"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="icons"><svg class="icon-signal" viewBox="0 0 17 12"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3.5" height="12" rx="1" opacity="0.3"/></svg></div>
+    </div>
+    <div class="top-nav">
+      <span class="nav-close">✕</span>
+      <div class="nav-title">신분증 촬영</div>
+      <div class="nav-right"></div>
+    </div>
+    <div class="bottom-sheet">
+      <div class="drag-handle"></div>
+      <div class="sheet-header">
+        <div class="sheet-title">스캔 정보</div>
+        <div class="sheet-close">✕</div>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <div class="field-label">이름</div>
+          <div class="field-input">MARIA GARCIA</div>
+        </div>
+        <div class="field">
+          <div class="field-label">외국인등록번호</div>
+          <div class="input-row">
+            <div class="field-input">990101</div>
+            <div class="field-input"><span class="mask">●●●●●●●</span></div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">발급일자</div>
+          <div class="field-input"><span class="mask">●●●●.●●.●●</span></div>
+        </div>
+        <div class="field">
+          <div class="field-label">일련번호 (후면)</div>
+          <div class="manual-tag">✏️ 직접 입력 필요 — OCR 자동 인식 불가</div>
+          <div class="field-input active">
+            <span style="color:#bbb;">후면 일련번호 입력</span>
+            <span class="clear-btn">✕</span>
+          </div>
+        </div>
+      </div>
+      <div class="keyboard-area">
+        <div class="kb-toolbar">
+          <div class="kb-nav"><span class="kb-nav-btn">∧</span><span class="kb-nav-btn">∨</span></div>
+          <span style="flex:1"></span>
+          <span class="kb-done">완료</span>
+        </div>
+        <div class="kb-rows">
+          <div class="kb-row"><div class="key">1</div><div class="key">2<div class="sub">ABC</div></div><div class="key">3<div class="sub">DEF</div></div></div>
+          <div class="kb-row"><div class="key">4<div class="sub">GHI</div></div><div class="key">5<div class="sub">JKL</div></div><div class="key">6<div class="sub">MNO</div></div></div>
+          <div class="kb-row"><div class="key">7<div class="sub">PQRS</div></div><div class="key">8<div class="sub">TUV</div></div><div class="key">9<div class="sub">WXYZ</div></div></div>
+          <div class="kb-row"><div class="key fn">+ * #</div><div class="key zero">0</div><div class="key fn">⌫</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. 에러 0511 - 입력값 오류 -->
+<div class="device-wrap">
+  <div class="device-label">오류 0511 · 입력값 불일치</div>
+  <div class="device">
+    <div class="camera-bg"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="icons"><svg class="icon-signal" viewBox="0 0 17 12"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3.5" height="12" rx="1" opacity="0.3"/></svg></div>
+    </div>
+    <div class="top-nav">
+      <span class="nav-close">✕</span>
+      <div class="nav-title">신분증 촬영</div>
+      <div class="nav-right"></div>
+    </div>
+    <div class="bottom-sheet" style="opacity:0.4; pointer-events:none;">
+      <div class="drag-handle"></div>
+      <div class="sheet-header"><div class="sheet-title">스캔 정보</div></div>
+      <div class="fields">
+        <div class="field"><div class="field-label">이름</div><div class="field-input">방채영</div></div>
+        <div class="field"><div class="field-label">주민등록번호</div><div class="field-input">990101-<span class="mask">●●●●●●●</span></div></div>
+        <div class="field"><div class="field-label">발급일자</div><div class="field-input">2019.02.20</div></div>
+      </div>
+    </div>
+    <div class="error-overlay">
+      <div class="error-dialog">
+        <div class="error-icon">⚠️</div>
+        <div class="error-title">신분증 정보를 확인해 주세요</div>
+        <div class="error-desc">
+          <div class="error-code">0511</div><br>
+          입력하신 정보가 신분증 내용과 일치하지 않아요. 정보를 다시 확인해 주세요.
+        </div>
+        <div class="error-btns">
+          <button class="error-btn">취소</button>
+          <button class="error-btn primary">다시 입력</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. 에러 0512 - 신분증 만료/분실 -->
+<div class="device-wrap">
+  <div class="device-label">오류 0512 · 만료 또는 분실 신고</div>
+  <div class="device">
+    <div class="camera-bg"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="icons"><svg class="icon-signal" viewBox="0 0 17 12"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3.5" height="12" rx="1" opacity="0.3"/></svg></div>
+    </div>
+    <div class="top-nav">
+      <span class="nav-close">✕</span>
+      <div class="nav-title">신분증 촬영</div>
+      <div class="nav-right"></div>
+    </div>
+    <div class="error-overlay" style="background:rgba(0,0,0,0.7);">
+      <div class="error-dialog">
+        <div class="error-icon">🚫</div>
+        <div class="error-title">사용할 수 없는 신분증이에요</div>
+        <div class="error-desc">
+          <div class="error-code">0512</div><br>
+          만료되었거나 분실 신고된 신분증은 사용할 수 없어요. 유효한 신분증으로 다시 시도해 주세요.
+        </div>
+        <div class="error-btns">
+          <button class="error-btn">취소</button>
+          <button class="error-btn danger">다시 촬영</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 7. 에러 0510 - 주민등록증 잠금 -->
+<div class="device-wrap">
+  <div class="device-label">오류 0510 · 주민등록증 잠금</div>
+  <div class="device">
+    <div class="camera-bg"></div>
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="icons"><svg class="icon-signal" viewBox="0 0 17 12"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13.5" y="0" width="3.5" height="12" rx="1" opacity="0.3"/></svg></div>
+    </div>
+    <div class="top-nav">
+      <span class="nav-close">✕</span>
+      <div class="nav-title">신분증 촬영</div>
+      <div class="nav-right"></div>
+    </div>
+    <div class="error-overlay" style="background:rgba(0,0,0,0.7);">
+      <div class="error-dialog">
+        <div class="error-icon">🔒</div>
+        <div class="error-title">주민등록증 인증이 잠겼어요</div>
+        <div class="error-desc">
+          <div class="error-code">0510</div><br>
+          발급일자 오류가 5회 이상 발생했어요. 정부24에서 잠금을 해제한 후 다시 시도해 주세요.
+        </div>
+        <div class="error-btns">
+          <button class="error-btn">닫기</button>
+          <button class="error-btn primary">정부24 바로가기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=375, initial-scale=1.0">
+  <title>계좌등록</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: #e5e5ea;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px 0;
+      font-family: 'Pretendard', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .phone {
+      width: 375px;
+      height: 812px;
+      background: #fff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      border-radius: 40px;
+    }
+
+    /* Screen */
+    .screen { display: none; flex-direction: column; height: 100%; position: absolute; inset: 0; background: #fff; }
+    .screen.active { display: flex; }
+
+    /* Status Bar */
+    .status-bar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 21px 0;
+      flex-shrink: 0;
+    }
+    .status-bar .time { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; font-family: -apple-system, sans-serif; }
+    .status-icons { display: flex; align-items: center; gap: 6px; }
+
+    /* Top Nav */
+    .top-nav {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .nav-btn {
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+    }
+    .nav-title {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      font-size: 16px; font-weight: 700; color: #2f3438; letter-spacing: -0.3px;
+    }
+
+    /* Content */
+    .content { flex: 1; overflow-y: auto; padding: 0; }
+    .content::-webkit-scrollbar { display: none; }
+
+    .heading { padding: 24px 16px 32px; }
+    .heading h1 { font-size: 24px; font-weight: 600; color: #2f3438; line-height: 32px; letter-spacing: -0.3px; }
+    .heading p { font-size: 14px; color: #828c94; line-height: 20px; letter-spacing: -0.3px; }
+
+    /* Form */
+    .form { padding: 0 16px 160px; display: flex; flex-direction: column; gap: 30px; }
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field-label { font-size: 14px; font-weight: 500; color: #828c94; letter-spacing: -0.3px; line-height: 18px; }
+
+    /* ODS Input (size=40) */
+    .ods-input {
+      width: 100%; height: 40px;
+      border: 1px solid #e0e0e0; border-radius: 4px;
+      padding: 0 12px;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 16px; font-weight: 400; line-height: 24px;
+      color: #2f3438; letter-spacing: -0.3px;
+      outline: none; background: #fff;
+      transition: border-color 0.15s;
+    }
+    .ods-input:focus { border-color: #0aa5ff; }
+    .ods-input::placeholder { color: #828c94; }
+    .ods-input:read-only { background: #f5f5f5; color: #c1c1c1; cursor: default; }
+    .ods-input:read-only:focus { border-color: #e0e0e0; }
+
+    /* ODS Dropdown */
+    .ods-dropdown {
+      width: 100%; height: 40px;
+      border: 1px solid #e0e0e0; border-radius: 4px;
+      padding: 0 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; background: #fff;
+      transition: border-color 0.15s;
+    }
+    .ods-dropdown:active { border-color: #0aa5ff; }
+    .ods-dropdown-text { font-size: 16px; font-weight: 400; line-height: 24px; color: #828c94; letter-spacing: -0.3px; }
+    .ods-dropdown-text.selected { color: #2f3438; }
+    .ods-dropdown-icon { display: flex; align-items: center; flex-shrink: 0; }
+    .ods-dropdown-icon .dropdown-arrow {
+      width: 16px; height: 16px;
+      background-color: #828c94;
+      -webkit-mask: url('https://www.figma.com/api/mcp/asset/1a233e00-34b0-498a-a54d-f28d4ef2f595') center/16px no-repeat;
+      mask: url('https://www.figma.com/api/mcp/asset/1a233e00-34b0-498a-a54d-f28d4ef2f595') center/16px no-repeat;
+    }
+
+    /* PayChip */
+    .pay-chips { display: none; gap: 8px; flex-wrap: wrap; margin-top: 0; }
+    .pay-chips.visible { display: flex; }
+    .pay-chip {
+      display: flex; align-items: center; gap: 4px;
+      height: 32px; padding: 0 12px;
+      border-radius: 50px; border: 1px solid #e6e6e6;
+      background: #fff; cursor: pointer;
+      font-size: 14px; font-weight: 400; color: #2f3438;
+      letter-spacing: -0.3px; line-height: 18px;
+      white-space: nowrap; transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .pay-chip.active {
+      background: #2f3438; color: #fff; border-color: #2f3438;
+    }
+    .chip-logo {
+      width: 16px; height: 16px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8px; font-weight: 700; flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    /* Bank Bottom Sheet */
+    .sheet-overlay {
+      position: absolute; inset: 0;
+      background: rgba(33,38,41,0.5);
+      z-index: 50; display: none;
+    }
+    .sheet-overlay.open { display: block; }
+    .bank-sheet {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: #fff; border-radius: 20px 20px 0 0;
+      max-height: 80%; overflow: hidden;
+      display: flex; flex-direction: column;
+      transform: translateY(100%); transition: transform 0.3s ease;
+    }
+    .bank-sheet.open { transform: translateY(0); }
+    .sheet-grabber { padding: 8px 0 0; display: flex; justify-content: center; flex-shrink: 0; }
+    .grabber-bar { width: 36px; height: 4px; background: #eaedef; border-radius: 100px; }
+    .sheet-header {
+      display: flex; align-items: center; justify-content: center;
+      position: relative; height: 52px; padding: 0 16px; flex-shrink: 0;
+    }
+    .sheet-title {
+      font-size: 16px; font-weight: 700; color: #2f3438;
+      letter-spacing: -0.3px; line-height: 20px;
+    }
+    .sheet-close {
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .sheet-scroll { overflow-y: auto; padding: 0 16px 34px; }
+    .sheet-scroll::-webkit-scrollbar { display: none; }
+    .bank-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .bank-item {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 12px 8px; gap: 4px; border-radius: 8px;
+      background: #f7f9fa; cursor: pointer;
+      transition: background 0.1s;
+    }
+    .bank-item:active { background: #eaedef; }
+    .bank-logo-wrap {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; flex-shrink: 0; position: relative;
+    }
+    .bank-logo-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .bank-name {
+      font-size: 16px; font-weight: 500; color: #2f3438;
+      letter-spacing: -0.3px; line-height: 28px;
+      text-align: center; white-space: nowrap;
+    }
+
+    /* ARS screen */
+    .ars-main {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 20px; text-align: center; padding: 16px;
+    }
+    .ars-heading {
+      font-size: 20px; font-weight: 600; color: #2f3438;
+      line-height: 28px; letter-spacing: -0.3px;
+    }
+    .ars-number {
+      font-size: 72px; font-weight: 700; color: #000;
+      line-height: 1; letter-spacing: -0.5px;
+    }
+    .ars-info {
+      padding: 20px 16px;
+    }
+    .ars-info ul {
+      list-style: disc; padding-left: 16px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .ars-info li {
+      font-size: 14px; font-weight: 400; color: #828c94;
+      line-height: 20px; letter-spacing: -0.3px;
+    }
+    .ars-info li strong { font-weight: 600; }
+    .cta-dual { display: flex; gap: 8px; padding: 8px 16px; background: #fff; }
+    .btn-secondary {
+      flex: 1; height: 44px; border-radius: 8px;
+      border: 1px solid #dadde0; background: #fff;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 16px; font-weight: 600; line-height: 20px; letter-spacing: -0.3px;
+      color: #2f3438; cursor: pointer;
+    }
+    .btn-cta.flex1 { flex: 1; }
+
+    /* 1원 인증 screen */
+    .cert-heading { padding: 24px 16px 32px; }
+    .cert-heading h1 { font-size: 24px; font-weight: 600; color: #2f3438; line-height: 32px; letter-spacing: -0.3px; margin-bottom: 10px; }
+    .cert-heading p { font-size: 14px; font-weight: 400; color: #828c94; line-height: 20px; letter-spacing: -0.3px; }
+    .cert-body { padding: 0 16px; display: flex; flex-direction: column; gap: 40px; }
+    .cert-card {
+      background: #f5f5f5; border-radius: 8px;
+      padding: 20px 16px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .cert-card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; font-weight: 500; color: #828c94;
+      line-height: 16px; letter-spacing: -0.3px;
+    }
+    .cert-card-content {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .cert-card-sender { display: flex; align-items: center; gap: 4px; }
+    .cert-card-name { font-size: 18px; font-weight: 600; color: #2f3438; line-height: 24px; letter-spacing: -0.3px; }
+    .cert-boxes { display: flex; gap: 4px; }
+    .cert-box {
+      width: 24px; height: 24px; border-radius: 4px;
+      background: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: #2f3438; line-height: 1;
+    }
+    .cert-amount { font-size: 18px; font-weight: 600; color: #2f3438; line-height: 24px; letter-spacing: -0.3px; }
+    .cert-input-wrap { display: flex; flex-direction: column; gap: 8px; }
+    .cert-input-label { font-size: 14px; font-weight: 400; color: #828c94; line-height: 20px; letter-spacing: -0.3px; }
+
+    /* Success */
+    .success-wrap {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 0 32px;
+    }
+    .success-icon {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: #e8f5e9;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px;
+    }
+    .success-title { font-size: 22px; font-weight: 700; color: #2f3438; letter-spacing: -0.3px; text-align: center; margin-bottom: 12px; }
+    .success-desc { font-size: 14px; color: #828c94; letter-spacing: -0.3px; text-align: center; line-height: 20px; }
+
+    /* CTA */
+    .cta-area {
+      position: absolute; bottom: 34px; left: 0; right: 0;
+      background: #fff;
+    }
+
+    /* ODS TermsAgreementSet */
+    .terms-agreement {
+      padding: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .terms-touch {
+      display: flex; align-items: center; gap: 8px;
+      flex: 1; cursor: pointer;
+    }
+    /* ODS Checkbox */
+    .ods-checkbox {
+      width: 20px; height: 20px; min-width: 20px;
+      border-radius: 4px;
+      border: 1.5px solid #d0d5da;
+      background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.15s, border-color 0.15s;
+    }
+    .ods-checkbox.checked { background: #0aa5ff; border-color: #0aa5ff; }
+    .ods-checkbox svg { display: none; }
+    .ods-checkbox.checked svg { display: block; }
+    .terms-label {
+      font-size: 16px; font-weight: 600; line-height: 20px;
+      color: #2f3438; letter-spacing: -0.3px;
+    }
+    .terms-chevron {
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+    }
+
+    /* ODS BoxButton (size=44) */
+    .cta-bar {
+      padding: 8px 16px;
+      background: #fff;
+    }
+    .btn-cta {
+      width: 100%; height: 44px; border-radius: 8px; border: none;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 16px; font-weight: 600; line-height: 20px; letter-spacing: -0.3px;
+      background: #ededed; color: #c1c1c1;
+      cursor: not-allowed; transition: background 0.15s, color 0.15s;
+    }
+    .btn-cta.active { background: #0aa5ff; color: #fff; cursor: pointer; }
+    .btn-cta.green { background: #00c853; color: #fff; cursor: pointer; }
+
+    .home-ind {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 34px; display: flex; align-items: center; justify-content: center;
+      background: #fff;
+    }
+    .home-bar { width: 134px; height: 5px; background: #1a1a1a; border-radius: 3px; }
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ── Screen 1: 계좌 입력 ───────────────────────────── -->
+  <div class="screen active" id="s1">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="9" width="3" height="3" rx="1" fill="black"/><rect x="4.5" y="6" width="3" height="6" rx="1" fill="black"/><rect x="9" y="3" width="3" height="9" rx="1" fill="black"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="black"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10.3 2.4 12.4 3.4 13.8 5L15.2 3.6C13.4 1.7 10.8 0.5 8 0.5C5.2 0.5 2.6 1.7 0.8 3.6L2.2 5C3.6 3.4 5.7 2.4 8 2.4Z" fill="black"/><path d="M8 5.2C9.5 5.2 10.9 5.8 11.9 6.9L13.3 5.5C11.9 4.1 10 3.3 8 3.3C6 3.3 4.1 4.1 2.7 5.5L4.1 6.9C5.1 5.8 6.5 5.2 8 5.2Z" fill="black"/><circle cx="8" cy="10" r="1.5" fill="black"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="black" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="black"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.4 24.5 6C24.5 5.6 23.8 4.8 23 4.5Z" fill="black" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <div class="top-nav">
+      <div class="nav-btn" onclick="history.back()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#2f3438" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="nav-title">계좌등록</span>
+    </div>
+    <div class="content">
+      <div class="heading">
+        <h1>계좌를 등록하고<br>간편하게 결제하세요</h1>
+      </div>
+      <div class="form">
+        <div class="field">
+          <div class="field-label">계좌번호</div>
+          <input class="ods-input" id="accountNum" type="text" inputmode="numeric"
+            placeholder="- 없이 숫자만 입력"
+            oninput="checkS1()">
+        </div>
+        <div class="field">
+          <div class="field-label">은행</div>
+          <div class="ods-dropdown" id="bankBtn" onclick="openBankSheet()">
+            <span class="ods-dropdown-text" id="bankText">은행 선택</span>
+            <span class="ods-dropdown-icon"><div class="dropdown-arrow"></div></span>
+          </div>
+          <div class="pay-chips" id="payChips">
+            <div class="pay-chip" id="chip-신한은행" onclick="selectBankChip('신한은행')">
+              <div class="chip-logo" style="position:relative;background:transparent;">
+                <img src="https://www.figma.com/api/mcp/asset/f0bc1a5f-eff3-4864-86c9-a5f6e3386efb" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                <img src="https://www.figma.com/api/mcp/asset/8a49521f-07b7-405e-96c4-b5e85119020f" style="position:relative;width:100%;height:100%;object-fit:contain;padding:2px;">
+              </div>
+              신한은행
+            </div>
+            <div class="pay-chip" id="chip-NH 농협" onclick="selectBankChip('NH 농협')">
+              <div class="chip-logo" style="background:transparent;">
+                <img src="https://www.figma.com/api/mcp/asset/1091258c-9ecf-487e-bc83-523224adff8b" style="width:100%;height:100%;object-fit:contain;">
+              </div>
+              NH 농협
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">예금주</div>
+          <input class="ods-input" id="accountHolder" value="김오늘" readonly>
+          <p style="font-size:12px; font-weight:400; line-height:16px; color:#828c94; letter-spacing:-0.3px; margin-top:4px;">본인 명의 계좌만 추가 가능합니다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="cta-area">
+      <div class="terms-agreement">
+        <div class="terms-touch" onclick="toggleTerms()">
+          <div class="ods-checkbox" id="termsCheck">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M2 6L5 9L10 3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="terms-label">필수 약관 모두 동의</span>
+        </div>
+        <div class="terms-chevron">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4L10 8L6 12" stroke="#828c94" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="cta-bar">
+        <button class="btn-cta" id="s1Cta" onclick="goS2()">동의하고 ARS 요청</button>
+      </div>
+    </div>
+    <div class="home-ind"><div class="home-bar"></div></div>
+
+    <!-- Bank Sheet -->
+    <div class="sheet-overlay" id="bankOverlay" onclick="closeBankSheet()">
+      <div class="bank-sheet" id="bankSheet" onclick="event.stopPropagation()">
+        <div class="sheet-grabber"><div class="grabber-bar"></div></div>
+        <div class="sheet-header">
+          <span class="sheet-title">은행 선택</span>
+          <div class="sheet-close" onclick="closeBankSheet()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#2f3438" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <div class="sheet-scroll">
+          <div class="bank-grid">
+            <div class="bank-item" onclick="selectBank('NH 농협')">
+              <div class="bank-logo-wrap"><img src="https://www.figma.com/api/mcp/asset/1091258c-9ecf-487e-bc83-523224adff8b" alt="NH 농협"></div>
+              <span class="bank-name">NH 농협</span>
+            </div>
+            <div class="bank-item" onclick="selectBank('국민은행')">
+              <div class="bank-logo-wrap"><img src="https://www.figma.com/api/mcp/asset/26f5d1ba-3984-4fec-992c-e49c1ab0d010" alt="국민은행"></div>
+              <span class="bank-name">국민은행</span>
+            </div>
+            <div class="bank-item" onclick="selectBank('카카오뱅크')">
+              <div class="bank-logo-wrap"><img src="https://www.figma.com/api/mcp/asset/880b8d28-bfc7-4f2b-bc12-7ea2529aadce" alt="카카오뱅크"></div>
+              <span class="bank-name">카카오뱅크</span>
+            </div>
+            <div class="bank-item" onclick="selectBank('신한은행')">
+              <div class="bank-logo-wrap">
+                <img src="https://www.figma.com/api/mcp/asset/f0bc1a5f-eff3-4864-86c9-a5f6e3386efb" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+                <img src="https://www.figma.com/api/mcp/asset/8a49521f-07b7-405e-96c4-b5e85119020f" alt="신한은행" style="position:relative;z-index:1;">
+              </div>
+              <span class="bank-name">신한은행</span>
+            </div>
+            <div class="bank-item" onclick="selectBank('우리은행')">
+              <div class="bank-logo-wrap"><img src="https://www.figma.com/api/mcp/asset/2f18cd04-0548-4137-83ad-04dfca5d60c6" alt="우리은행"></div>
+              <span class="bank-name">우리은행</span>
+            </div>
+            <div class="bank-item" onclick="selectBank('하나은행')">
+              <div class="bank-logo-wrap"><img src="https://www.figma.com/api/mcp/asset/4cdaf8d0-3f35-4a3c-b478-9c92d4b60259" alt="하나은행"></div>
+              <span class="bank-name">하나은행</span>
+            </div>
+            <div class="bank-item" onclick="selectBank('토스뱅크')">
+              <div class="bank-logo-wrap"><img src="https://www.figma.com/api/mcp/asset/398e24c4-00e7-4325-a4bc-dd79677255c9" alt="토스뱅크"></div>
+              <span class="bank-name">토스뱅크</span>
+            </div>
+            <div class="bank-item" onclick="selectBank('기업은행')">
+              <div class="bank-logo-wrap"><img src="https://www.figma.com/api/mcp/asset/d7332ef4-b0ea-443d-999a-f90981b664c6" alt="기업은행"></div>
+              <span class="bank-name">기업은행</span>
+            </div>
+            <div class="bank-item" onclick="selectBank('iM뱅크')">
+              <div class="bank-logo-wrap"><img src="https://www.figma.com/api/mcp/asset/6f341666-4483-49d4-b44b-de386e9944e7" alt="iM뱅크"></div>
+              <span class="bank-name">iM뱅크</span>
+            </div>
+            <div class="bank-item" onclick="selectBank('새마을금고')">
+              <div class="bank-logo-wrap"><img src="https://www.figma.com/api/mcp/asset/a4ba34e0-41b5-4896-b076-e0d4bd9bb5a6" alt="새마을금고"></div>
+              <span class="bank-name">새마을금고</span>
+            </div>
+            <div class="bank-item" onclick="selectBank('부산은행')">
+              <div class="bank-logo-wrap"><img src="https://www.figma.com/api/mcp/asset/a03182c4-5ae5-4d20-a5ef-099d4fd13d16" alt="부산은행"></div>
+              <span class="bank-name">부산은행</span>
+            </div>
+            <div class="bank-item" onclick="selectBank('우체국')">
+              <div class="bank-logo-wrap"><img src="https://www.figma.com/api/mcp/asset/38c67082-4ee7-4f72-a160-e9b1deb8b9cc" alt="우체국"></div>
+              <span class="bank-name">우체국</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Screen 2: ARS 전화인증 ───────────────────────── -->
+  <div class="screen" id="s2">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="9" width="3" height="3" rx="1" fill="black"/><rect x="4.5" y="6" width="3" height="6" rx="1" fill="black"/><rect x="9" y="3" width="3" height="9" rx="1" fill="black"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="black"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10.3 2.4 12.4 3.4 13.8 5L15.2 3.6C13.4 1.7 10.8 0.5 8 0.5C5.2 0.5 2.6 1.7 0.8 3.6L2.2 5C3.6 3.4 5.7 2.4 8 2.4Z" fill="black"/><path d="M8 5.2C9.5 5.2 10.9 5.8 11.9 6.9L13.3 5.5C11.9 4.1 10 3.3 8 3.3C6 3.3 4.1 4.1 2.7 5.5L4.1 6.9C5.1 5.8 6.5 5.2 8 5.2Z" fill="black"/><circle cx="8" cy="10" r="1.5" fill="black"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="black" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="black"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.4 24.5 6C24.5 5.6 23.8 4.8 23 4.5Z" fill="black" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <div class="top-nav">
+      <div class="nav-btn" onclick="showScreen('s1')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#2f3438" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="nav-title">계좌등록</span>
+    </div>
+    <div class="content" style="display:flex; flex-direction:column;">
+      <div class="ars-main">
+        <p class="ars-heading">전화가 오면 안내에 따라<br>아래 숫자를 입력해주세요</p>
+        <p class="ars-number">23</p>
+      </div>
+      <div class="ars-info">
+        <ul>
+          <li>ARS 통화 종료 후 <strong>ARS 인증 완료</strong> 버튼을 눌러주세요.</li>
+          <li>혹시 전화가 오지 않는다면 오늘의집 고객센터 <strong>1670-0876</strong> 번호가 차단되었는지 확인해주세요.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="cta-area">
+      <div class="cta-dual">
+        <button class="btn-secondary" onclick="showScreen('s1')">ARS 재요청</button>
+        <button class="btn-cta active flex1" onclick="goS3()">ARS 인증 완료</button>
+      </div>
+    </div>
+    <div class="home-ind"><div class="home-bar"></div></div>
+  </div>
+
+  <!-- ── Screen 3: 1원 인증 ────────────────────────────── -->
+  <div class="screen" id="s3">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="9" width="3" height="3" rx="1" fill="black"/><rect x="4.5" y="6" width="3" height="6" rx="1" fill="black"/><rect x="9" y="3" width="3" height="9" rx="1" fill="black"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="black"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10.3 2.4 12.4 3.4 13.8 5L15.2 3.6C13.4 1.7 10.8 0.5 8 0.5C5.2 0.5 2.6 1.7 0.8 3.6L2.2 5C3.6 3.4 5.7 2.4 8 2.4Z" fill="black"/><path d="M8 5.2C9.5 5.2 10.9 5.8 11.9 6.9L13.3 5.5C11.9 4.1 10 3.3 8 3.3C6 3.3 4.1 4.1 2.7 5.5L4.1 6.9C5.1 5.8 6.5 5.2 8 5.2Z" fill="black"/><circle cx="8" cy="10" r="1.5" fill="black"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="black" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="black"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.4 24.5 6C24.5 5.6 23.8 4.8 23 4.5Z" fill="black" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <div class="top-nav">
+      <div class="nav-btn" onclick="showScreen('s2')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="#2f3438" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="nav-title">계좌등록</span>
+    </div>
+    <div class="content">
+      <div class="cert-heading">
+        <h1>본인 계좌 인증을 위해<br>1원을 보냈어요</h1>
+        <p id="certAccountInfo">—</p>
+      </div>
+      <div class="cert-body">
+        <div class="cert-card">
+          <div class="cert-card-header">
+            <span>입금자명</span>
+            <span>입금</span>
+          </div>
+          <div class="cert-card-content">
+            <div class="cert-card-sender">
+              <span class="cert-card-name">오늘의집페이</span>
+              <div class="cert-boxes">
+                <div class="cert-box">*</div>
+                <div class="cert-box">*</div>
+                <div class="cert-box">*</div>
+                <div class="cert-box">*</div>
+              </div>
+            </div>
+            <span class="cert-amount">1원</span>
+          </div>
+        </div>
+        <div class="cert-input-wrap">
+          <p class="cert-input-label">'오늘의집페이' 뒤에 적힌 숫자 4자리를 입력해주세요.</p>
+          <input class="ods-input" id="certCode" type="text" inputmode="numeric"
+            maxlength="4" placeholder="숫자 4자리 입력"
+            oninput="checkS3()">
+        </div>
+      </div>
+    </div>
+    <div class="cta-area">
+      <div class="cta-bar">
+        <button class="btn-cta" id="s3Cta" onclick="goS4()">인증 완료</button>
+      </div>
+    </div>
+    <div class="home-ind"><div class="home-bar"></div></div>
+  </div>
+
+  <!-- ── Screen 4: 등록 완료 ───────────────────────────── -->
+  <div class="screen" id="s4">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="9" width="3" height="3" rx="1" fill="black"/><rect x="4.5" y="6" width="3" height="6" rx="1" fill="black"/><rect x="9" y="3" width="3" height="9" rx="1" fill="black"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="black"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10.3 2.4 12.4 3.4 13.8 5L15.2 3.6C13.4 1.7 10.8 0.5 8 0.5C5.2 0.5 2.6 1.7 0.8 3.6L2.2 5C3.6 3.4 5.7 2.4 8 2.4Z" fill="black"/><path d="M8 5.2C9.5 5.2 10.9 5.8 11.9 6.9L13.3 5.5C11.9 4.1 10 3.3 8 3.3C6 3.3 4.1 4.1 2.7 5.5L4.1 6.9C5.1 5.8 6.5 5.2 8 5.2Z" fill="black"/><circle cx="8" cy="10" r="1.5" fill="black"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="black" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="black"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.4 24.5 6C24.5 5.6 23.8 4.8 23 4.5Z" fill="black" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <div class="top-nav">
+      <span class="nav-title">계좌 등록</span>
+    </div>
+    <div class="content" style="display:flex; flex-direction:column;">
+      <div class="success-wrap">
+        <div class="success-icon">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none"><path d="M8 18L15 25L28 11" stroke="#2e7d32" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="success-title">계좌가 등록됐어요</div>
+        <div class="success-desc" id="successDesc">이제 오늘의집페이 머니를<br>충전할 수 있어요</div>
+      </div>
+    </div>
+    <div class="cta-area">
+      <button class="btn-cta green" onclick="location.href='charge.html'">충전하러 가기</button>
+    </div>
+    <div class="home-ind"><div class="home-bar"></div></div>
+  </div>
+
+</div>
+
+<script>
+  let selectedBank = '';
+  let termsAgreed = false;
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function toggleTerms() {
+    termsAgreed = !termsAgreed;
+    document.getElementById('termsCheck').classList.toggle('checked', termsAgreed);
+    checkS1();
+  }
+
+  // Bank sheet
+  function openBankSheet() {
+    document.getElementById('bankOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('bankSheet').classList.add('open'), 10);
+  }
+  function closeBankSheet() {
+    document.getElementById('bankSheet').classList.remove('open');
+    setTimeout(() => document.getElementById('bankOverlay').classList.remove('open'), 300);
+  }
+  function selectBank(name) {
+    selectedBank = name;
+    const textEl = document.getElementById('bankText');
+    textEl.textContent = name;
+    textEl.classList.add('selected');
+    // sync PayChip active state
+    document.querySelectorAll('.pay-chip').forEach(c => c.classList.remove('active'));
+    const chip = document.getElementById('chip-' + name);
+    if (chip) chip.classList.add('active');
+    closeBankSheet();
+    checkS1();
+  }
+
+  function selectBankChip(name) {
+    selectedBank = name;
+    const textEl = document.getElementById('bankText');
+    textEl.textContent = name;
+    textEl.classList.add('selected');
+    document.querySelectorAll('.pay-chip').forEach(c => c.classList.remove('active'));
+    const chip = document.getElementById('chip-' + name);
+    if (chip) chip.classList.add('active');
+    checkS1();
+  }
+
+  function checkS1() {
+    const num = document.getElementById('accountNum').value.trim();
+    document.getElementById('payChips').classList.toggle('visible', num.length >= 10);
+    const ok = num.length >= 10 && selectedBank && termsAgreed;
+    document.getElementById('s1Cta').classList.toggle('active', ok);
+  }
+
+  function goS2() {
+    if (!document.getElementById('s1Cta').classList.contains('active')) return;
+    showScreen('s2');
+  }
+
+  function goS3() {
+    // s2 → s3: 계좌 정보 세팅
+    const num = document.getElementById('accountNum').value.trim();
+    document.getElementById('certAccountInfo').textContent = selectedBank + ' ' + num;
+    showScreen('s3');
+  }
+
+  function checkS3() {
+    const code = document.getElementById('certCode').value.trim();
+    document.getElementById('s3Cta').classList.toggle('active', code.length === 4);
+  }
+
+  function goS4() {
+    if (!document.getElementById('s3Cta').classList.contains('active')) return;
+    location.href = 'charge.html';
+  }
+</script>
+</body>
+</html>

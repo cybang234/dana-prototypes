@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=375, initial-scale=1.0">
+  <title>충전하기</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: #e5e5ea;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px 0;
+      font-family: 'Pretendard', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .phone {
+      width: 375px;
+      height: 812px;
+      background: #fff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      border-radius: 40px;
+    }
+
+    /* ── Shared ── */
+    .status-bar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 21px 0;
+      flex-shrink: 0;
+      background: #fff;
+    }
+    .status-bar .time { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; font-family: -apple-system, sans-serif; }
+    .status-icons { display: flex; align-items: center; gap: 6px; }
+
+    .top-nav {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      flex-shrink: 0;
+      position: relative;
+      background: #fff;
+    }
+    .nav-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .nav-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 16px;
+      font-weight: 700;
+      color: #2f3438;
+      letter-spacing: -0.3px;
+    }
+
+    .home-bar-wrap {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+    }
+    .home-bar { width: 134px; height: 5px; background: #1a1a1a; border-radius: 3px; }
+
+    /* ── Screen manager ── */
+    .screen {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      border-radius: 40px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .screen.active { transform: translateX(0); }
+
+    /* ── Charge Screen ── */
+    #screenCharge {
+      transform: translateX(0); /* default active */
+    }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 120px;
+    }
+    .content::-webkit-scrollbar { display: none; }
+
+    .heading { padding: 24px 16px 32px; }
+    .heading h1 {
+      font-size: 24px; font-weight: 600; color: #2f3438;
+      line-height: 32px; letter-spacing: -0.3px; margin-bottom: 8px;
+    }
+    .heading .balance {
+      font-size: 14px; font-weight: 400; color: #828c94;
+      line-height: 20px; letter-spacing: -0.3px;
+    }
+
+    .fields { padding: 0 16px; display: flex; flex-direction: column; gap: 32px; }
+
+    .amount-field { display: flex; flex-direction: column; gap: 12px; }
+    .amount-input-wrap {
+      border-bottom: 2px solid #e6e6e6;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      transition: border-color 0.15s;
+      cursor: text;
+    }
+    .amount-input-wrap.active { border-color: #00a1ff; }
+    .amount-display {
+      font-size: 20px; font-weight: 400; color: #c2c8cc;
+      line-height: 28px; letter-spacing: -0.3px; flex: 1;
+    }
+    .amount-display.has-value { color: #2f3438; }
+
+    /* Chips — Stroke Round */
+    .chips { display: flex; gap: 8px; }
+    .chip {
+      height: 32px; padding: 0 12px;
+      background: transparent; border: 1px solid #dadde0; border-radius: 100px;
+      font-family: 'Pretendard', sans-serif; font-size: 13px; font-weight: 500;
+      color: #2f3438; letter-spacing: -0.3px; cursor: pointer;
+    }
+    .chip:active { background: #f2f3f5; }
+
+    .account-field { display: flex; flex-direction: column; gap: 10px; }
+    .field-label {
+      font-size: 14px; font-weight: 500; color: #828c94;
+      line-height: 18px; letter-spacing: -0.3px;
+    }
+    .account-card {
+      border: 1px solid #e6e6e6; border-radius: 8px;
+      padding: 14px; display: flex; align-items: center; gap: 12px; cursor: pointer;
+    }
+    .account-logo {
+      width: 40px; height: 40px; overflow: hidden; flex-shrink: 0; position: relative;
+    }
+    .account-logo img.logo-bg {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    }
+    .account-logo img.logo-symbol {
+      position: relative; width: 100%; height: 100%; object-fit: contain;
+    }
+    .account-logo img.logo-full {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+    }
+    .account-info { flex: 1; }
+    .account-name {
+      font-size: 14px; font-weight: 600; color: #2f3438;
+      line-height: 18px; letter-spacing: -0.3px;
+    }
+    .account-number {
+      font-size: 12px; font-weight: 400; color: #828c94;
+      line-height: 16px; letter-spacing: -0.3px; margin-top: 4px;
+    }
+
+    /* Arrow Triangle Down (Figma asset via CSS mask) */
+    .dropdown-arrow {
+      width: 24px; height: 24px; flex-shrink: 0;
+      background-color: #8c8c8c;
+      -webkit-mask: url('https://www.figma.com/api/mcp/asset/1a233e00-34b0-498a-a54d-f28d4ef2f595') center/24px no-repeat;
+      mask: url('https://www.figma.com/api/mcp/asset/1a233e00-34b0-498a-a54d-f28d4ef2f595') center/24px no-repeat;
+    }
+
+    /* Number Pad (iOS style) */
+    .numpad-area {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: #d1d5db;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+    .numpad-area.open { transform: translateY(0); }
+    .numpad-toolbar {
+      height: 44px; background: #adb5bd;
+      display: flex; align-items: center; justify-content: flex-end; padding: 0 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    .numpad-done {
+      font-family: -apple-system, sans-serif; font-size: 17px; font-weight: 600;
+      color: #007aff; background: none; border: none; cursor: pointer;
+    }
+    .numpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #adb5bd; }
+    .numpad-key {
+      height: 54px; background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: -apple-system, sans-serif; font-size: 24px; font-weight: 400;
+      color: #000; cursor: pointer; user-select: none;
+    }
+    .numpad-key:active { background: #c8c8c8; }
+    .numpad-key.del { background: #adb5bd; font-size: 18px; }
+    .numpad-key.del:active { background: #9ea5ac; }
+    .numpad-home { height: 34px; background: #d1d5db; display: flex; align-items: center; justify-content: center; }
+    .numpad-home-bar { width: 134px; height: 5px; background: rgba(0,0,0,0.35); border-radius: 3px; }
+
+    /* CTA */
+    .cta-area {
+      position: absolute; bottom: 34px; left: 0; right: 0;
+      padding: 8px 16px; background: #fff;
+    }
+    .btn-cta {
+      width: 100%; height: 52px; border-radius: 8px; border: none;
+      font-family: 'Pretendard', sans-serif; font-size: 16px; font-weight: 600;
+      letter-spacing: -0.3px; cursor: not-allowed;
+      background: #ededed; color: #c1c1c1;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-cta.active { background: #00a1ff; color: #fff; cursor: pointer; }
+
+    /* ── Bottom Sheet ── */
+    .sheet-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 200;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .sheet-overlay.open { opacity: 1; pointer-events: all; }
+
+    .account-sheet {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: #fff; border-radius: 16px 16px 0 0;
+      z-index: 210;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      padding-bottom: 34px;
+    }
+    .account-sheet.open { transform: translateY(0); }
+
+    .sheet-grabber { height: 20px; display: flex; align-items: center; justify-content: center; padding-top: 8px; }
+    .sheet-grabber-bar { width: 36px; height: 4px; background: #dadde0; border-radius: 100px; }
+
+    .sheet-header {
+      height: 52px; display: flex; align-items: center; justify-content: center;
+      padding: 0 52px; /* equal padding = centered title */
+      position: relative;
+    }
+    .sheet-title { font-size: 16px; font-weight: 700; color: #2f3438; letter-spacing: -0.3px; }
+    .sheet-close {
+      position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+      width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+      background: none; border: none; cursor: pointer;
+    }
+
+    .sheet-body { padding: 8px 16px; display: flex; flex-direction: column; gap: 12px; }
+
+    .sheet-account-item {
+      border: 1px solid #e6e6e6; border-radius: 8px; padding: 14px;
+      display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.1s;
+    }
+    .sheet-account-item:active { background: #f7f8fa; }
+    .sheet-account-item.selected { border-color: #2f3438; }
+
+    .sheet-logo {
+      width: 40px; height: 40px; overflow: hidden; flex-shrink: 0; position: relative;
+    }
+    .sheet-logo img.logo-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .sheet-logo img.logo-symbol { position: relative; width: 100%; height: 100%; object-fit: contain; }
+    .sheet-logo img.logo-full { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+
+    .sheet-account-info { flex: 1; }
+    .sheet-account-name { font-size: 14px; font-weight: 600; color: #2f3438; line-height: 18px; letter-spacing: -0.3px; }
+    .sheet-account-number { font-size: 12px; font-weight: 400; color: #828c94; line-height: 16px; letter-spacing: -0.3px; margin-top: 4px; }
+
+    .sheet-check { width: 24px; height: 24px; flex-shrink: 0; display: none; align-items: center; justify-content: center; }
+    .sheet-account-item.selected .sheet-check { display: flex; }
+
+    .sheet-add-btn {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      height: 44px; cursor: pointer;
+      font-size: 16px; font-weight: 500; color: #0aa5ff; letter-spacing: -0.3px;
+    }
+    .sheet-add-btn:active { opacity: 0.7; }
+
+    /* ── Password Screen ── */
+    #screenPassword { flex-direction: column; }
+
+    .pw-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 80px;
+    }
+    .pw-heading {
+      font-size: 20px; font-weight: 600; color: #2f3438;
+      line-height: 28px; letter-spacing: -0.3px; text-align: center;
+      margin-bottom: 28px;
+    }
+    .pw-dots {
+      display: flex; gap: 16px; margin-bottom: 20px;
+    }
+    .pw-dot {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 1px solid #141414; background: transparent;
+      transition: background 0.1s;
+    }
+    .pw-dot.filled { background: #141414; }
+
+    .pw-reset-btn {
+      font-size: 14px; font-weight: 500; color: #828c94;
+      letter-spacing: -0.3px; background: none; border: none; cursor: pointer;
+      display: flex; align-items: center; gap: 2px;
+    }
+
+    /* Password Keypad */
+    .pw-keypad { flex-shrink: 0; background: #fff; padding-bottom: 34px; }
+    .pw-keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      padding: 8px 16px;
+      row-gap: 4px;
+    }
+    .pw-key {
+      height: 52px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 500; color: #141414;
+      cursor: pointer; user-select: none;
+      font-family: 'Pretendard', sans-serif; letter-spacing: -0.3px;
+      border-radius: 8px;
+    }
+    .pw-key:active { background: #f2f3f5; }
+    .pw-key.blank { pointer-events: none; }
+    .pw-key.del { color: #8c8c8c; }
+
+    /* ── Success Screen ── */
+    #screenSuccess { flex-direction: column; }
+
+    .success-container {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 80px 16px 0;
+    }
+    .success-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 32px; width: 100%;
+    }
+    .success-banner {
+      display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%;
+    }
+    .success-title {
+      font-size: 20px; font-weight: 600; color: #2f3438;
+      line-height: 28px; letter-spacing: -0.3px; text-align: center;
+    }
+
+    .success-card {
+      border: 1px solid #e6e6e6; border-radius: 8px; padding: 16px;
+      display: flex; flex-direction: column; gap: 12px; width: 100%;
+    }
+    .success-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 14px; line-height: 18px; letter-spacing: -0.3px;
+    }
+    .success-row .s-label { font-weight: 400; color: #2f3438; }
+    .success-row .s-value { font-weight: 600; color: #2f3438; }
+    .success-row .s-value.blue { color: #0aa5ff; }
+
+    .success-cta-area {
+      position: absolute; bottom: 34px; left: 0; right: 0;
+      padding: 8px 16px; background: #fff;
+    }
+    .btn-confirm {
+      width: 100%; height: 52px; border-radius: 8px; border: none;
+      font-family: 'Pretendard', sans-serif; font-size: 16px; font-weight: 600;
+      letter-spacing: -0.3px; cursor: pointer;
+      background: #00a1ff; color: #fff;
+    }
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ══ Screen: Charge ══ -->
+  <div class="screen active" id="screenCharge">
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="9" width="3" height="3" rx="1" fill="black"/><rect x="4.5" y="6" width="3" height="6" rx="1" fill="black"/><rect x="9" y="3" width="3" height="9" rx="1" fill="black"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="black"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10.3 2.4 12.4 3.4 13.8 5L15.2 3.6C13.4 1.7 10.8 0.5 8 0.5C5.2 0.5 2.6 1.7 0.8 3.6L2.2 5C3.6 3.4 5.7 2.4 8 2.4Z" fill="black"/><path d="M8 5.2C9.5 5.2 10.9 5.8 11.9 6.9L13.3 5.5C11.9 4.1 10 3.3 8 3.3C6 3.3 4.1 4.1 2.7 5.5L4.1 6.9C5.1 5.8 6.5 5.2 8 5.2Z" fill="black"/><circle cx="8" cy="10" r="1.5" fill="black"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="black" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="black"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.4 24.5 6C24.5 5.6 23.8 4.8 23 4.5Z" fill="black" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <!-- Top Nav -->
+    <div class="top-nav">
+      <div class="nav-btn" onclick="history.back()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="#2f3438" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <span class="nav-title">충전하기</span>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="heading">
+        <h1>오늘의집페이 머니에<br>얼마를 충전할까요?</h1>
+        <p class="balance">보유 잔액 0원</p>
+      </div>
+      <div class="fields">
+        <!-- 금액 입력 -->
+        <div class="amount-field">
+          <div class="amount-input-wrap" id="amountWrap" onclick="openNumpad()">
+            <span class="amount-display" id="amountDisplay">충전할 금액을 입력해주세요</span>
+          </div>
+          <div class="chips">
+            <button class="chip" onclick="addAmount(50000)">+ 5만</button>
+            <button class="chip" onclick="addAmount(100000)">+ 10만</button>
+            <button class="chip" onclick="addAmount(300000)">+ 30만</button>
+            <button class="chip" onclick="setMax()">+ 최대</button>
+          </div>
+        </div>
+        <!-- 충전 계좌 선택 -->
+        <div class="account-field">
+          <p class="field-label">충전 계좌 선택</p>
+          <div class="account-card" id="mainAccountCard" onclick="openAccountSheet()">
+            <div class="account-logo" id="mainAccountLogo">
+              <img class="logo-bg" src="https://www.figma.com/api/mcp/asset/a6fa687c-37e4-48d2-947c-fc592298159c" alt="">
+              <img class="logo-symbol" src="https://www.figma.com/api/mcp/asset/141ea848-9bda-44f1-9d20-f434ed0a7c54" alt="">
+            </div>
+            <div class="account-info">
+              <div class="account-name" id="mainAccountName">내 신한 계좌</div>
+              <div class="account-number" id="mainAccountNumber">110*******4123</div>
+            </div>
+            <div class="dropdown-arrow"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- iOS Numpad -->
+    <div class="numpad-area" id="numpad">
+      <div class="numpad-toolbar">
+        <button class="numpad-done" onclick="closeNumpad()">완료</button>
+      </div>
+      <div class="numpad-grid">
+        <div class="numpad-key" onclick="inputNum('1')">1</div>
+        <div class="numpad-key" onclick="inputNum('2')">2</div>
+        <div class="numpad-key" onclick="inputNum('3')">3</div>
+        <div class="numpad-key" onclick="inputNum('4')">4</div>
+        <div class="numpad-key" onclick="inputNum('5')">5</div>
+        <div class="numpad-key" onclick="inputNum('6')">6</div>
+        <div class="numpad-key" onclick="inputNum('7')">7</div>
+        <div class="numpad-key" onclick="inputNum('8')">8</div>
+        <div class="numpad-key" onclick="inputNum('9')">9</div>
+        <div class="numpad-key" style="background:#d1d5db;"></div>
+        <div class="numpad-key" onclick="inputNum('0')">0</div>
+        <div class="numpad-key del" onclick="delNum()">⌫</div>
+      </div>
+      <div class="numpad-home"><div class="numpad-home-bar"></div></div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-area">
+      <button class="btn-cta" id="btnCta" onclick="onCharge()">충전하기</button>
+    </div>
+    <div class="home-bar-wrap"><div class="home-bar"></div></div>
+
+    <!-- 계좌 선택 Overlay + Sheet -->
+    <div class="sheet-overlay" id="sheetOverlay" onclick="closeAccountSheet()"></div>
+    <div class="account-sheet" id="accountSheet">
+      <div class="sheet-grabber"><div class="sheet-grabber-bar"></div></div>
+      <div class="sheet-header">
+        <span class="sheet-title">계좌 선택</span>
+        <button class="sheet-close" onclick="closeAccountSheet()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6L18 18" stroke="#2f3438" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="sheet-body">
+        <!-- 신한 계좌 -->
+        <div class="sheet-account-item selected" id="sheet-shinhan" onclick="selectAccount('shinhan')">
+          <div class="sheet-logo">
+            <img class="logo-bg" src="https://www.figma.com/api/mcp/asset/a6fa687c-37e4-48d2-947c-fc592298159c" alt="">
+            <img class="logo-symbol" src="https://www.figma.com/api/mcp/asset/141ea848-9bda-44f1-9d20-f434ed0a7c54" alt="">
+          </div>
+          <div class="sheet-account-info">
+            <div class="sheet-account-name">내 신한 계좌</div>
+            <div class="sheet-account-number">110*******4123</div>
+          </div>
+          <div class="sheet-check">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12.5L9.5 17L19 7" stroke="#2f3438" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <!-- 국민 계좌 -->
+        <div class="sheet-account-item" id="sheet-kookmin" onclick="selectAccount('kookmin')">
+          <div class="sheet-logo">
+            <img class="logo-full" src="https://www.figma.com/api/mcp/asset/26f5d1ba-3984-4fec-992c-e49c1ab0d010" alt="">
+          </div>
+          <div class="sheet-account-info">
+            <div class="sheet-account-name">내 국민 계좌</div>
+            <div class="sheet-account-number">198******1024</div>
+          </div>
+          <div class="sheet-check">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12.5L9.5 17L19 7" stroke="#2f3438" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <!-- 계좌 추가 — Filled circle + icon -->
+        <div class="sheet-add-btn" onclick="location.href='account.html'">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="10" fill="#0aa5ff"/>
+            <path d="M10 6V14M6 10H14" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          계좌 추가하기
+        </div>
+      </div>
+    </div>
+  </div><!-- /screenCharge -->
+
+
+  <!-- ══ Screen: Password ══ -->
+  <div class="screen" id="screenPassword">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="9" width="3" height="3" rx="1" fill="black"/><rect x="4.5" y="6" width="3" height="6" rx="1" fill="black"/><rect x="9" y="3" width="3" height="9" rx="1" fill="black"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="black"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10.3 2.4 12.4 3.4 13.8 5L15.2 3.6C13.4 1.7 10.8 0.5 8 0.5C5.2 0.5 2.6 1.7 0.8 3.6L2.2 5C3.6 3.4 5.7 2.4 8 2.4Z" fill="black"/><path d="M8 5.2C9.5 5.2 10.9 5.8 11.9 6.9L13.3 5.5C11.9 4.1 10 3.3 8 3.3C6 3.3 4.1 4.1 2.7 5.5L4.1 6.9C5.1 5.8 6.5 5.2 8 5.2Z" fill="black"/><circle cx="8" cy="10" r="1.5" fill="black"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="black" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="black"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.4 24.5 6C24.5 5.6 23.8 4.8 23 4.5Z" fill="black" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <div class="top-nav">
+      <div class="nav-btn" onclick="goBack()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="#2f3438" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="nav-title">비밀번호 입력</span>
+    </div>
+
+    <!-- Instruction + dots -->
+    <div class="pw-content">
+      <p class="pw-heading">결제 비밀번호 6자리를<br>입력해주세요</p>
+      <div class="pw-dots">
+        <div class="pw-dot" id="dot0"></div>
+        <div class="pw-dot" id="dot1"></div>
+        <div class="pw-dot" id="dot2"></div>
+        <div class="pw-dot" id="dot3"></div>
+        <div class="pw-dot" id="dot4"></div>
+        <div class="pw-dot" id="dot5"></div>
+      </div>
+      <button class="pw-reset-btn">
+        비밀번호 재설정
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3L9 7L5 11" stroke="#828c94" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <!-- Keypad -->
+    <div class="pw-keypad">
+      <div class="pw-keypad-grid">
+        <!-- Scrambled: 1,7,3 / 5,8,4 / 6,2,9 / blank,0,del -->
+        <div class="pw-key" onclick="pwInput('1')">1</div>
+        <div class="pw-key" onclick="pwInput('7')">7</div>
+        <div class="pw-key" onclick="pwInput('3')">3</div>
+        <div class="pw-key" onclick="pwInput('5')">5</div>
+        <div class="pw-key" onclick="pwInput('8')">8</div>
+        <div class="pw-key" onclick="pwInput('4')">4</div>
+        <div class="pw-key" onclick="pwInput('6')">6</div>
+        <div class="pw-key" onclick="pwInput('2')">2</div>
+        <div class="pw-key" onclick="pwInput('9')">9</div>
+        <div class="pw-key blank"></div>
+        <div class="pw-key" onclick="pwInput('0')">0</div>
+        <div class="pw-key del" onclick="pwDel()">
+          <svg width="22" height="17" viewBox="0 0 22 17" fill="none">
+            <path d="M8 1H20C20.6 1 21 1.4 21 2V15C21 15.6 20.6 16 20 16H8L1 8.5L8 1Z" stroke="#8c8c8c" stroke-width="1.4" stroke-linejoin="round"/>
+            <path d="M11 5.5L15.5 11.5M15.5 5.5L11 11.5" stroke="#8c8c8c" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screenPassword -->
+
+
+  <!-- ══ Screen: Success ══ -->
+  <div class="screen" id="screenSuccess">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="9" width="3" height="3" rx="1" fill="black"/><rect x="4.5" y="6" width="3" height="6" rx="1" fill="black"/><rect x="9" y="3" width="3" height="9" rx="1" fill="black"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="black"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10.3 2.4 12.4 3.4 13.8 5L15.2 3.6C13.4 1.7 10.8 0.5 8 0.5C5.2 0.5 2.6 1.7 0.8 3.6L2.2 5C3.6 3.4 5.7 2.4 8 2.4Z" fill="black"/><path d="M8 5.2C9.5 5.2 10.9 5.8 11.9 6.9L13.3 5.5C11.9 4.1 10 3.3 8 3.3C6 3.3 4.1 4.1 2.7 5.5L4.1 6.9C5.1 5.8 6.5 5.2 8 5.2Z" fill="black"/><circle cx="8" cy="10" r="1.5" fill="black"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="black" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="black"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.4 24.5 6C24.5 5.6 23.8 4.8 23 4.5Z" fill="black" opacity="0.4"/></svg>
+      </div>
+    </div>
+    <div class="top-nav">
+      <div class="nav-btn" onclick="location.href='entry.html'">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="#2f3438" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+
+    <div class="success-container">
+      <div class="success-wrap">
+        <!-- Check Circle Filled -->
+        <div class="success-banner">
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <circle cx="28" cy="28" r="28" fill="#0aa5ff"/>
+            <path d="M16 29L24 37L40 19" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="success-title">충전을 완료했어요</p>
+        </div>
+        <!-- Summary -->
+        <div class="success-card">
+          <div class="success-row">
+            <span class="s-label">충전 금액</span>
+            <span class="s-value blue" id="successAmount">—</span>
+          </div>
+          <div class="success-row">
+            <span class="s-label">보유 잔액</span>
+            <span class="s-value" id="successBalance">—</span>
+          </div>
+          <div class="success-row">
+            <span class="s-label">출금 계좌</span>
+            <span class="s-value" id="successAccount">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="success-cta-area">
+      <button class="btn-confirm" onclick="location.href='entry.html'">확인</button>
+    </div>
+    <div class="home-bar-wrap"><div class="home-bar"></div></div>
+  </div><!-- /screenSuccess -->
+
+</div><!-- /phone -->
+
+<script>
+  /* ── Charge screen ── */
+  let amount = 0;
+  let selectedAccountId = 'shinhan';
+
+  const accounts = {
+    shinhan: {
+      name: '내 신한 계좌', number: '110*******4123',
+      bankLabel: '신한', type: 'layered',
+      logoBg: 'https://www.figma.com/api/mcp/asset/a6fa687c-37e4-48d2-947c-fc592298159c',
+      logoSymbol: 'https://www.figma.com/api/mcp/asset/141ea848-9bda-44f1-9d20-f434ed0a7c54'
+    },
+    kookmin: {
+      name: '내 국민 계좌', number: '198******1024',
+      bankLabel: '국민', type: 'full',
+      logoFull: 'https://www.figma.com/api/mcp/asset/26f5d1ba-3984-4fec-992c-e49c1ab0d010'
+    }
+  };
+
+  function fmt(n) { return n.toLocaleString('ko-KR') + '원'; }
+
+  function updateDisplay() {
+    const d = document.getElementById('amountDisplay');
+    const btn = document.getElementById('btnCta');
+    if (amount > 0) {
+      d.textContent = fmt(amount); d.classList.add('has-value');
+      btn.classList.add('active');
+    } else {
+      d.textContent = '충전할 금액을 입력해주세요'; d.classList.remove('has-value');
+      btn.classList.remove('active');
+    }
+  }
+
+  function openNumpad() {
+    document.getElementById('numpad').classList.add('open');
+    document.getElementById('amountWrap').classList.add('active');
+  }
+  function closeNumpad() {
+    document.getElementById('numpad').classList.remove('open');
+    document.getElementById('amountWrap').classList.remove('active');
+  }
+  function inputNum(n) {
+    const str = amount === 0 ? n : String(amount) + n;
+    const val = parseInt(str);
+    if (val <= 2000000) amount = val;
+    updateDisplay();
+  }
+  function delNum() {
+    const s = String(amount);
+    amount = s.length <= 1 ? 0 : parseInt(s.slice(0, -1));
+    updateDisplay();
+  }
+  function addAmount(n) { amount = Math.min(amount + n, 2000000); updateDisplay(); }
+  function setMax() { amount = 2000000; updateDisplay(); }
+
+  function onCharge() {
+    if (amount <= 0) return;
+    closeNumpad();
+    pwCode = '';
+    updateDots();
+    document.getElementById('screenPassword').classList.add('active');
+  }
+
+  /* Account sheet */
+  function openAccountSheet() {
+    document.getElementById('sheetOverlay').classList.add('open');
+    document.getElementById('accountSheet').classList.add('open');
+  }
+  function closeAccountSheet() {
+    document.getElementById('sheetOverlay').classList.remove('open');
+    document.getElementById('accountSheet').classList.remove('open');
+  }
+  function selectAccount(id) {
+    selectedAccountId = id;
+    const acc = accounts[id];
+    document.getElementById('mainAccountName').textContent = acc.name;
+    document.getElementById('mainAccountNumber').textContent = acc.number;
+    const logo = document.getElementById('mainAccountLogo');
+    if (acc.type === 'layered') {
+      logo.innerHTML = `<img class="logo-bg" src="${acc.logoBg}" alt=""><img class="logo-symbol" src="${acc.logoSymbol}" alt="">`;
+    } else {
+      logo.innerHTML = `<img class="logo-full" src="${acc.logoFull}" alt="">`;
+    }
+    document.querySelectorAll('.sheet-account-item').forEach(el => el.classList.remove('selected'));
+    document.getElementById('sheet-' + id).classList.add('selected');
+    setTimeout(closeAccountSheet, 150);
+  }
+
+  /* ── Password screen ── */
+  let pwCode = '';
+
+  function pwInput(n) {
+    if (pwCode.length >= 6) return;
+    pwCode += n;
+    updateDots();
+    if (pwCode.length === 6) {
+      setTimeout(onPwConfirm, 150);
+    }
+  }
+  function pwDel() {
+    if (pwCode.length === 0) return;
+    pwCode = pwCode.slice(0, -1);
+    updateDots();
+    document.getElementById('pwConfirm').classList.remove('show');
+  }
+  function updateDots() {
+    for (let i = 0; i < 6; i++) {
+      document.getElementById('dot' + i).classList.toggle('filled', i < pwCode.length);
+    }
+  }
+  function goBack() {
+    document.getElementById('screenPassword').classList.remove('active');
+    pwCode = '';
+    updateDots();
+  }
+  function onPwConfirm() {
+    const acc = accounts[selectedAccountId];
+    document.getElementById('successAmount').textContent = fmt(amount);
+    document.getElementById('successBalance').textContent = fmt(amount);
+    document.getElementById('successAccount').textContent = acc.bankLabel + ' ' + acc.number;
+    document.getElementById('screenSuccess').classList.add('active');
+  }
+</script>
+</body>
+</html>

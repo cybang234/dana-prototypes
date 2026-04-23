@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script>
+    if (!location.search.includes('flow=')) {
+      location.replace('entry.html');
+    }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=375, initial-scale=1.0">
+  <title>고객정보등록</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+  <style>
+    :root {
+      --fg: #141414;
+      --fg-2: #2f3438;
+      --fg-weak: #8c8c8c;
+      --fg-dis: #c1c1c1;
+      --placeholder: #c1c1c1;
+      --border: #e0e0e0;
+      --input-bg: #f5f5f5;
+      --brand: #00a1ff;
+      --disabled-bg: #ededed;
+      --dim: rgba(33,38,41,0.5);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background: #e5e5ea;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px 0;
+      font-family: 'Pretendard', sans-serif;
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ─── Phone ──────────────────────────────────────── */
+    .phone {
+      width: 375px;
+      height: 812px;
+      background: #fff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      border-radius: 40px;
+    }
+
+    /* ─── Status Bar ─────────────────────────────────── */
+    .status-bar {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 21px 0 21px;
+      background: #fff;
+      position: relative;
+      z-index: 1;
+    }
+    .status-bar .time {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: #000;
+      font-family: -apple-system, 'SF Pro Text', sans-serif;
+    }
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ─── Top Nav ────────────────────────────────────── */
+    .top-nav {
+      height: 44px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      position: relative;
+      z-index: 1;
+    }
+    .nav-title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--fg-2);
+      letter-spacing: -0.3px;
+      line-height: 20px;
+      white-space: nowrap;
+    }
+    .nav-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+    }
+    .icon-x {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-x img {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+    .nav-spacer { width: 32px; }
+
+    /* ─── Scrollable Content ─────────────────────────── */
+    .content {
+      position: absolute;
+      top: 88px;
+      left: 0;
+      right: 0;
+      bottom: 170px;
+      overflow-y: auto;
+      background: #fff;
+    }
+    .content::-webkit-scrollbar { display: none; }
+
+    .heading { padding: 24px 16px 32px; }
+    .heading h1 {
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 32px;
+      letter-spacing: -0.3px;
+      color: var(--fg-2);
+    }
+
+    /* ─── Form ───────────────────────────────────────── */
+    .form { padding: 0 16px; display: flex; flex-direction: column; gap: 30px; }
+    .form-bottom-pad { height: 40px; }
+
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field-label {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 18px;
+      letter-spacing: -0.3px;
+      color: var(--fg-weak);
+    }
+
+    /* ─── Extra section for high-risk ───────────────── */
+    .field-extra {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.4s ease, opacity 0.3s ease;
+      opacity: 0;
+    }
+    .field-extra.visible {
+      display: flex;
+      max-height: 200px;
+      opacity: 1;
+    }
+
+    /* ─── Input ──────────────────────────────────────── */
+    .input-box {
+      width: 100%;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      background: #fff;
+    }
+    .input-box.bg-filled {
+      background: var(--input-bg);
+      border-color: var(--border);
+    }
+    .input-box.bg-filled .input-ph,
+    .input-box.bg-filled .input-val { color: #c1c1c1; }
+    .input-ph {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
+      letter-spacing: -0.3px;
+      color: var(--fg-weak);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+    .input-val {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
+      letter-spacing: -0.3px;
+      color: var(--fg-2);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 100%;
+    }
+
+    /* editable inputs */
+    input.real-input {
+      width: 100%;
+      height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 12px;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: -0.3px;
+      color: var(--fg-2);
+      outline: none;
+      background: #fff;
+      transition: border-color 0.15s;
+    }
+    input.real-input::placeholder { color: var(--fg-weak); }
+    input.real-input:focus { border-color: var(--brand); }
+
+    /* Address row */
+    .addr-row { display: flex; gap: 8px; align-items: stretch; }
+    .addr-row .input-box { flex: 1; }
+    .btn-search {
+      flex-shrink: 0;
+      height: 40px;
+      padding: 0 14px;
+      border: 1.5px solid var(--brand);
+      border-radius: 4px;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 20px;
+      letter-spacing: -0.3px;
+      color: var(--brand);
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn-search:active { background: rgba(0,161,255,0.08); }
+
+    /* Name row */
+    .name-row { display: flex; gap: 8px; }
+    .name-row input.real-input { flex: 1; }
+
+    /* Select / dropdown */
+    .select-box {
+      width: 100%;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      background: #fff;
+      transition: border-color 0.15s;
+    }
+    .select-box:active { border-color: var(--brand); }
+    .select-box.disabled {
+      background: var(--input-bg);
+      border-color: var(--border);
+      cursor: default;
+      pointer-events: none;
+    }
+    .select-box .sel-text { font-size: 16px; font-weight: 400; line-height: 24px; letter-spacing: -0.3px; }
+    .select-box .sel-text.ph { color: var(--fg-weak); }
+    .select-box .sel-text.val { color: var(--fg-2); }
+    .select-box .sel-text.pre { color: #c1c1c1 !important; }
+    .arrow-icon { display: flex; align-items: center; flex-shrink: 0; color: var(--fg-weak); }
+    .select-box.disabled .arrow-icon { color: var(--fg-dis); }
+
+    /* ─── Sticky Bottom ──────────────────────────────── */
+    .sticky-bottom {
+      position: absolute;
+      bottom: 34px;
+      left: 0;
+      right: 0;
+      background: #fff;
+    }
+
+    .checkbox-row {
+      padding: 16px 16px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .cb-box {
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      margin-top: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .cb-box.on { background: var(--brand); border-color: var(--brand); }
+    .cb-check { display: none; }
+    .cb-box.on .cb-check { display: block; }
+    .cb-text-wrap { flex: 1; }
+    .cb-main { font-size: 16px; font-weight: 600; line-height: 20px; letter-spacing: -0.3px; color: var(--fg); }
+    .cb-sub { font-size: 12px; font-weight: 400; line-height: 20px; letter-spacing: -0.3px; color: var(--fg-dis); margin-top: 4px; }
+
+    .cta-bar { height: 60px; padding: 8px 16px; display: flex; }
+    .btn-cta {
+      flex: 1;
+      height: 44px;
+      border-radius: 4px;
+      border: none;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 20px;
+      letter-spacing: -0.3px;
+      background: var(--disabled-bg);
+      color: var(--fg-dis);
+      cursor: not-allowed;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-cta.on { background: var(--brand); color: #fff; cursor: pointer; }
+
+    /* ─── Home Indicator ─────────────────────────────── */
+    .home-ind {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 34px;
+      background: #fff;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 8px;
+    }
+    .home-bar {
+      width: 134px;
+      height: 5px;
+      background: #000;
+      border-radius: 100px;
+    }
+
+    /* ─── Overlay ────────────────────────────────────── */
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--dim);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .overlay.on { opacity: 1; pointer-events: auto; }
+
+    /* ─── Bottom Sheet Base ──────────────────────────── */
+    .bsheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 375px;
+      background: #fff;
+      border-radius: 16px 16px 0 0;
+      z-index: 201;
+      transform: translateY(100%);
+      transition: transform 0.36s cubic-bezier(0.32,0.72,0,1);
+      display: flex;
+      flex-direction: column;
+    }
+    .bsheet.open { transform: translateY(0); }
+
+    /* Address search sheet: 90% height */
+    #sheetAddr { height: 730px; }
+
+    /* List sheets: auto height up to 65% */
+    #sheetJob, #sheetFund { max-height: 528px; }
+
+    /* Drag handle */
+    .sheet-handle {
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .handle-bar { width: 32px; height: 4px; background: #eaedef; border-radius: 6px; }
+
+    /* Sheet header */
+    .sheet-head {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      flex-shrink: 0;
+    }
+    .sheet-head .spc { width: 24px; }
+    .sheet-title { font-size: 16px; font-weight: 700; line-height: 20px; letter-spacing: -0.3px; color: var(--fg-2); }
+
+    /* ─── Address Sheet Content ──────────────────────── */
+    .addr-search-wrap {
+      padding: 8px 16px 10px;
+      flex-shrink: 0;
+    }
+    .search-field {
+      height: 38px;
+      background: #f5f5f5;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 11px;
+    }
+    .search-field input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: -0.3px;
+      color: var(--fg);
+      outline: none;
+    }
+    .search-field input::placeholder { color: #8c8c8c; }
+
+    /* address sheet states */
+    .addr-tips { padding: 12px 16px; flex: 0 0 auto; }
+    .addr-tips .tips-title {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
+      letter-spacing: -0.3px;
+      color: var(--fg);
+      margin-bottom: 6px;
+    }
+    .addr-tips ul { list-style: disc; padding-left: 21px; }
+    .addr-tips li { font-size: 14px; font-weight: 400; line-height: 20px; letter-spacing: -0.3px; color: #8c8c8c; }
+
+    .addr-loading {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 60px 16px;
+      flex: 0 0 auto;
+    }
+    .spinner {
+      width: 24px;
+      height: 24px;
+      position: relative;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    .spinner-base {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .spinner-overlay {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 50%;
+      left: 50%;
+    }
+    .spinner-overlay img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .addr-loading p {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
+      letter-spacing: -0.3px;
+      color: var(--fg-weak);
+      white-space: nowrap;
+    }
+
+    .addr-results { display: none; flex-direction: column; flex: 1; overflow-y: auto; min-height: 0; }
+
+    .addr-empty {
+      display: none; flex-direction: column; flex: 1;
+      align-items: center; justify-content: center;
+      gap: 8px; padding: 32px 16px;
+    }
+    .addr-empty-title {
+      font-size: 18px; font-weight: 700; line-height: 26px;
+      letter-spacing: -0.3px; color: var(--fg); text-align: center;
+    }
+    .addr-empty-desc {
+      font-size: 14px; font-weight: 400; line-height: 20px;
+      letter-spacing: -0.3px; color: var(--fg-weak); text-align: center;
+    }
+    .addr-results::-webkit-scrollbar { display: none; }
+    .addr-result-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+    }
+    .addr-result-item:active { background: #f7f9fa; }
+    .addr-result-name {
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 22px;
+      letter-spacing: -0.3px;
+      color: var(--fg-2);
+    }
+    .addr-result-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .addr-result-zip {
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 18px;
+      letter-spacing: -0.3px;
+      color: var(--brand);
+      flex-shrink: 0;
+    }
+    .addr-result-detail {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 18px;
+      letter-spacing: -0.3px;
+      color: var(--fg-weak);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+
+    /* ─── Korean Keyboard ────────────────────────────── */
+    .ko-keyboard {
+      background: #d1d5db;
+      flex-shrink: 0;
+      margin-top: auto;
+      border-top: 0.5px solid #b0b4bc;
+    }
+    .kb-toolbar {
+      height: 44px;
+      background: #f0f1f6;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      border-top: 0.5px solid rgba(0,0,0,0.15);
+      border-bottom: 0.5px solid rgba(0,0,0,0.15);
+    }
+    .kb-toolbar-nav { display: flex; gap: 4px; }
+    .kb-nav-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px 6px;
+      color: #555;
+    }
+    .kb-nav-btn svg { display: block; }
+    .kb-done {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: -apple-system, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--brand);
+      padding: 8px 4px;
+    }
+
+    .kb-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 10px 4px 4px;
+    }
+    .kb-row { display: flex; justify-content: center; gap: 6px; }
+
+    .kb-key {
+      height: 44px;
+      background: #fff;
+      border-radius: 5px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      font-family: -apple-system, 'Apple SD Gothic Neo', sans-serif;
+      font-size: 17px;
+      color: #000;
+      min-width: 32px;
+      flex: 1;
+      max-width: 36px;
+      transition: background 0.05s;
+      -webkit-font-smoothing: antialiased;
+    }
+    .kb-key:active, .kb-key.pressed { background: #adb4be; }
+    .kb-key.special {
+      background: #adb4be;
+      font-size: 14px;
+      font-weight: 500;
+      color: #000;
+      max-width: none;
+      flex: 1.5;
+    }
+    .kb-key.special:active { background: #fff; }
+    .kb-key.space-key {
+      background: #fff;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      color: #555;
+      max-width: none;
+      flex: 4;
+    }
+    .kb-key.return-key {
+      background: #adb4be;
+      font-family: 'Pretendard', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: #000;
+      max-width: none;
+      flex: 2;
+    }
+    .kb-key.delete-key {
+      background: #adb4be;
+      max-width: none;
+      flex: 1.5;
+    }
+    .kb-home {
+      height: 34px;
+      background: #d1d5db;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 8px;
+    }
+    .kb-home .bar { width: 134px; height: 5px; background: #000; border-radius: 100px; }
+
+    /* ─── List Sheet ─────────────────────────────────── */
+    .list-scroll {
+      overflow-y: auto;
+      flex: 1;
+    }
+    .list-scroll::-webkit-scrollbar { display: none; }
+    .list-item {
+      padding: 18px 20px;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: -0.3px;
+      color: var(--fg-2);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .list-item:active { background: #f7f9fa; }
+    .list-item.selected {
+      font-weight: 700;
+      color: var(--fg);
+      background: #f9f9f9;
+    }
+    .list-item.high-risk { color: var(--fg-2); }
+
+    /* ─── Transition animation for extra fields ──────── */
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .field-extra.visible { animation: slideDown 0.3s ease forwards; }
+  </style>
+</head>
+<body>
+<div class="phone" id="phone">
+
+  <!-- ── Status Bar ──────────────────────────────────── -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="status-icons">
+      <!-- Signal -->
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+        <rect x="0"   y="9"  width="3" height="3"  rx="1" fill="black"/>
+        <rect x="4.5" y="6"  width="3" height="6"  rx="1" fill="black"/>
+        <rect x="9"   y="3"  width="3" height="9"  rx="1" fill="black"/>
+        <rect x="13.5" y="0" width="3" height="12" rx="1" fill="black"/>
+      </svg>
+      <!-- WiFi -->
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <path d="M8 9a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" fill="black"/>
+        <path d="M4.8 6.8C5.9 5.7 6.9 5.2 8 5.2s2.1.5 3.2 1.6" stroke="black" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M2 4C4 2 5.9 1.1 8 1.1s4 .9 6 2.9" stroke="black" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <!-- Battery -->
+      <svg width="25" height="13" viewBox="0 0 25 13" fill="none">
+        <rect x="0.5" y="0.5" width="21" height="12" rx="3.5" stroke="black" stroke-opacity="0.35"/>
+        <rect x="2" y="2" width="17" height="9" rx="2" fill="black"/>
+        <path d="M23 4.5v4a2 2 0 000-4z" fill="black" fill-opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ── Top Nav ─────────────────────────────────────── -->
+  <div class="top-nav">
+    <button class="nav-btn" onclick="history.back()" aria-label="닫기">
+      <div class="icon-x"><img src="https://www.figma.com/api/mcp/asset/8b3253d5-5303-46a5-a870-b2f8fca484dd" alt="닫기"></div>
+    </button>
+    <span class="nav-title">정보 등록</span>
+    <div class="nav-spacer"></div>
+  </div>
+
+  <!-- ── Scrollable Content ─────────────────────────── -->
+  <div class="content" id="mainContent">
+    <div class="heading">
+      <h1>안전한 서비스 이용을 위해<br>고객 확인이 필요해요</h1>
+    </div>
+
+    <div class="form">
+
+      <!-- 주소 -->
+      <div class="field">
+        <span class="field-label">주소</span>
+        <div class="addr-row">
+          <div class="input-box bg-filled" id="fldZip">
+            <span class="input-ph" id="zipPh">우편번호</span>
+            <span class="input-val" id="zipVal" style="display:none"></span>
+          </div>
+          <button class="btn-search" id="btnSearch" onclick="openAddrSheet()">주소 검색</button>
+        </div>
+        <div class="input-box bg-filled" id="fldAddr">
+          <span class="input-ph" id="addrPh">도로명 주소</span>
+          <span class="input-val" id="addrVal" style="display:none"></span>
+        </div>
+        <input class="real-input" type="text" id="fldDetail" placeholder="상세주소" autocomplete="off"
+          oninput="onDetailInput()" style="display:none">
+        <div class="input-box" id="fldDetailPlaceholder">
+          <span class="input-ph">상세주소</span>
+        </div>
+      </div>
+
+      <!-- 영문명 -->
+      <div class="field">
+        <span class="field-label">영문명</span>
+        <div class="name-row">
+          <input class="real-input" type="text" id="fldLast" placeholder="성(Last Name)" autocomplete="off" oninput="this.value=this.value.toUpperCase();onNameInput()" style="text-transform:uppercase;">
+          <input class="real-input" type="text" id="fldFirst" placeholder="이름(First Name)" autocomplete="off" oninput="this.value=this.value.toUpperCase();onNameInput()" style="text-transform:uppercase;">
+        </div>
+      </div>
+
+      <!-- 직업 -->
+      <div class="field">
+        <span class="field-label">직업</span>
+        <div class="select-box" id="selJob" onclick="openJobSheet()">
+          <span class="sel-text ph" id="jobText">직업 선택</span>
+          <div class="arrow-icon"><svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0.5L5 5.5L10 0.5H0Z" fill="currentColor"/></svg></div>
+        </div>
+      </div>
+
+      <!-- 이용목적 (고위험고객 only, pre-filled) -->
+      <div class="field field-extra" id="fieldPurpose">
+        <span class="field-label">오늘의집페이 이용 목적</span>
+        <div class="select-box disabled">
+          <span class="sel-text pre">상품 결제</span>
+          <div class="arrow-icon"><svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0.5L5 5.5L10 0.5H0Z" fill="currentColor"/></svg></div>
+        </div>
+      </div>
+
+      <!-- 자금출처 (고위험고객 only) -->
+      <div class="field field-extra" id="fieldFund">
+        <span class="field-label">자금 출처</span>
+        <div class="select-box" id="selFund" onclick="openFundSheet()">
+          <span class="sel-text ph" id="fundText">자금 출처 선택</span>
+          <div class="arrow-icon"><svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 0.5L5 5.5L10 0.5H0Z" fill="currentColor"/></svg></div>
+        </div>
+      </div>
+
+    </div><!-- /form -->
+    <div class="form-bottom-pad"></div>
+  </div><!-- /content -->
+
+  <!-- ── Sticky Bottom ──────────────────────────────── -->
+  <div class="sticky-bottom">
+    <div class="checkbox-row">
+      <div class="cb-box" id="cbOwner" onclick="toggleOwner()">
+        <svg class="cb-check" width="12" height="9" viewBox="0 0 12 9" fill="none">
+          <path d="M1 4l3.5 3.5L11 1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="cb-text-wrap">
+        <div class="cb-main">사용할 자금의 실제 소유자예요</div>
+        <div class="cb-sub">실제 소유자가 아닌 경우, 오늘의집페이머니 사용이 불가합니다.</div>
+      </div>
+    </div>
+    <div class="cta-bar">
+      <button class="btn-cta" id="btnCta" onclick="onCta()">정보 등록하기</button>
+    </div>
+  </div>
+
+  <!-- ── Home Indicator ─────────────────────────────── -->
+  <div class="home-ind"><div class="home-bar"></div></div>
+
+  <!-- ── Overlay ────────────────────────────────────── -->
+  <div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- ── Address Search Bottom Sheet ───────────────── -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="bsheet" id="sheetAddr">
+    <div class="sheet-handle"><div class="handle-bar"></div></div>
+    <div class="sheet-head">
+      <div class="spc"></div>
+      <span class="sheet-title">주소 찾기</span>
+      <button class="nav-btn" onclick="closeAddrSheet()" aria-label="닫기">
+        <div class="icon-x"><img src="https://www.figma.com/api/mcp/asset/8b3253d5-5303-46a5-a870-b2f8fca484dd" alt="닫기"></div>
+      </button>
+    </div>
+
+    <!-- Search input -->
+    <div class="addr-search-wrap">
+      <div class="search-field">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="6.5" cy="6.5" r="4.5" stroke="#8c8c8c" stroke-width="1.5"/>
+          <line x1="9.8" y1="9.8" x2="14" y2="14" stroke="#8c8c8c" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input type="text" id="addrSearchInput" placeholder="도로명, 건물명, 지번검색"
+          oninput="onAddrSearch(this.value)"
+          onkeydown="if(event.key==='Enter') dismissAddrKeyboard()"
+          onfocus="showAddrKeyboard()"
+          autocomplete="off">
+      </div>
+    </div>
+
+    <!-- Tips (default state) -->
+    <div class="addr-tips" id="addrTips">
+      <p class="tips-title">이렇게 검색하면 주소를 더 정확하게 찾을 수 있어요</p>
+      <ul>
+        <li>서초대로74길 4 (도로명 + 건물번호)</li>
+        <li>역삼동 824-10 (동·읍·면·리 + 번지)</li>
+        <li>반포힐스테이트 (건물명, 아파트명)</li>
+      </ul>
+    </div>
+
+    <!-- Loading -->
+    <div class="addr-loading" id="addrLoading">
+      <p>로딩중</p>
+      <div class="spinner">
+        <img class="spinner-base" src="https://www.figma.com/api/mcp/asset/ee8454bc-3dc8-479a-8261-f23683237e9b" alt="">
+        <div class="spinner-overlay"><img src="https://www.figma.com/api/mcp/asset/d747f796-5238-4ee7-8c75-93d5e84b04be" alt=""></div>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div class="addr-empty" id="addrEmpty">
+      <p class="addr-empty-title">검색 결과가 없어요</p>
+      <p class="addr-empty-desc">검색어의 철자나 주소가 정확한지 확인한 뒤<br>다시 검색해주세요.</p>
+    </div>
+
+    <!-- Results -->
+    <div class="addr-results" id="addrResults"></div>
+
+    <!-- Korean Keyboard -->
+    <div class="ko-keyboard" id="koKeyboard">
+      <div class="kb-toolbar">
+        <div class="kb-toolbar-nav">
+          <button class="kb-nav-btn">
+            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+              <path d="M7 2L2 7l5 5M2 7h14" stroke="#555" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="kb-nav-btn">
+            <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+              <path d="M11 2l5 5-5 5M16 7H2" stroke="#555" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <button class="kb-done" onclick="dismissAddrKeyboard()">완료</button>
+      </div>
+      <div class="kb-rows">
+        <!-- Row 1: ㅂㅈㄷㄱㅅ ㅛㅕㅑㅐㅔ -->
+        <div class="kb-row">
+          <div class="kb-key" onclick="typeChar('ㅂ')">ㅂ</div>
+          <div class="kb-key" onclick="typeChar('ㅈ')">ㅈ</div>
+          <div class="kb-key" onclick="typeChar('ㄷ')">ㄷ</div>
+          <div class="kb-key" onclick="typeChar('ㄱ')">ㄱ</div>
+          <div class="kb-key" onclick="typeChar('ㅅ')">ㅅ</div>
+          <div class="kb-key" onclick="typeChar('ㅛ')">ㅛ</div>
+          <div class="kb-key" onclick="typeChar('ㅕ')">ㅕ</div>
+          <div class="kb-key" onclick="typeChar('ㅑ')">ㅑ</div>
+          <div class="kb-key" onclick="typeChar('ㅐ')">ㅐ</div>
+          <div class="kb-key" onclick="typeChar('ㅔ')">ㅔ</div>
+        </div>
+        <!-- Row 2: ㅁㄴㅇㄹㅎ ㅗㅓㅏㅣ -->
+        <div class="kb-row" style="padding: 0 18px;">
+          <div class="kb-key" onclick="typeChar('ㅁ')">ㅁ</div>
+          <div class="kb-key" onclick="typeChar('ㄴ')">ㄴ</div>
+          <div class="kb-key" onclick="typeChar('ㅇ')">ㅇ</div>
+          <div class="kb-key" onclick="typeChar('ㄹ')">ㄹ</div>
+          <div class="kb-key" onclick="typeChar('ㅎ')">ㅎ</div>
+          <div class="kb-key" onclick="typeChar('ㅗ')">ㅗ</div>
+          <div class="kb-key" onclick="typeChar('ㅓ')">ㅓ</div>
+          <div class="kb-key" onclick="typeChar('ㅏ')">ㅏ</div>
+          <div class="kb-key" onclick="typeChar('ㅣ')">ㅣ</div>
+        </div>
+        <!-- Row 3: shift ㅋㅌㅊㅍ ㅠㅜㅡ delete -->
+        <div class="kb-row">
+          <div class="kb-key special" onclick="toggleShift()">
+            <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
+              <path d="M10 1L2 9h4v6h8V9h4L10 1z" stroke="#000" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </div>
+          <div class="kb-key" onclick="typeChar('ㅋ')">ㅋ</div>
+          <div class="kb-key" onclick="typeChar('ㅌ')">ㅌ</div>
+          <div class="kb-key" onclick="typeChar('ㅊ')">ㅊ</div>
+          <div class="kb-key" onclick="typeChar('ㅍ')">ㅍ</div>
+          <div class="kb-key" onclick="typeChar('ㅠ')">ㅠ</div>
+          <div class="kb-key" onclick="typeChar('ㅜ')">ㅜ</div>
+          <div class="kb-key" onclick="typeChar('ㅡ')">ㅡ</div>
+          <div class="kb-key delete-key" onclick="deleteLast()">
+            <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
+              <path d="M8 0.5H20.5C21.3 0.5 22 1.2 22 2V14C22 14.8 21.3 15.5 20.5 15.5H8L0.5 8L8 0.5Z" fill="#adb4be" stroke="none"/>
+              <line x1="9.5" y1="5.5" x2="15.5" y2="11.5" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="15.5" y1="5.5" x2="9.5" y2="11.5" stroke="#000" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+        <!-- Row 4: 123 space return -->
+        <div class="kb-row">
+          <div class="kb-key special" style="font-size:14px">123</div>
+          <div class="kb-key space-key" onclick="typeChar(' ')">스페이스</div>
+          <div class="kb-key return-key" onclick="closeAddrSheet()">완료</div>
+        </div>
+      </div>
+      <div class="kb-home"><div class="bar"></div></div>
+    </div><!-- /ko-keyboard -->
+  </div><!-- /sheetAddr -->
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- ── Job Selection Bottom Sheet ────────────────── -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="bsheet" id="sheetJob">
+    <div class="sheet-handle"><div class="handle-bar"></div></div>
+    <div class="sheet-head">
+      <div class="spc"></div>
+      <span class="sheet-title">직업</span>
+      <button class="nav-btn" onclick="closeJobSheet()" aria-label="닫기">
+        <div class="icon-x"><img src="https://www.figma.com/api/mcp/asset/8b3253d5-5303-46a5-a870-b2f8fca484dd" alt="닫기"></div>
+      </button>
+    </div>
+    <div class="list-scroll">
+      <div class="list-item" onclick="selectJob('직장인 (급여소득자)', false)">직장인 (급여소득자)</div>
+      <div class="list-item" onclick="selectJob('개인사업자, 자영업자, 프리랜서', false)">개인사업자, 자영업자, 프리랜서</div>
+      <div class="list-item" onclick="selectJob('전문직 (변호사, 의사, 회계사 등)', false)">전문직 (변호사, 의사, 회계사 등)</div>
+      <div class="list-item" onclick="selectJob('주부, 학생, 무직', false)">주부, 학생, 무직</div>
+      <div class="list-item" onclick="selectJob('연금 수혜자', false)">연금 수혜자</div>
+      <div class="list-item" onclick="selectJob('임대, 배당, 이자 소득자', false)">임대, 배당, 이자 소득자</div>
+      <div class="list-item" onclick="selectJob('귀금속 판매업', true)">귀금속 판매업</div>
+      <div class="list-item" onclick="selectJob('카지노업, 환전업, 대부업', true)">카지노업, 환전업, 대부업</div>
+      <div class="list-item" onclick="selectJob('소액해외송금업', true)">소액해외송금업</div>
+      <div class="list-item" onclick="selectJob('가상자산관련 종사자', true)">가상자산관련 종사자</div>
+      <div class="list-item" onclick="selectJob('신탁업 종사자', true)">신탁업 종사자</div>
+      <div class="list-item" onclick="selectJob('고위공무원, 정치인, 정당인', true)">고위공무원, 정치인, 정당인</div>
+      <div class="list-item" onclick="selectJob('비영리단체 및 종교관련', true)">비영리단체 및 종교관련</div>
+    </div>
+    <div class="kb-home" style="background:#fff"><div class="bar"></div></div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════ -->
+  <!-- ── Fund Source Bottom Sheet ──────────────────── -->
+  <!-- ════════════════════════════════════════════════ -->
+  <div class="bsheet" id="sheetFund">
+    <div class="sheet-handle"><div class="handle-bar"></div></div>
+    <div class="sheet-head">
+      <div class="spc"></div>
+      <span class="sheet-title">자금 출처</span>
+      <button class="nav-btn" onclick="closeFundSheet()" aria-label="닫기">
+        <div class="icon-x"><img src="https://www.figma.com/api/mcp/asset/8b3253d5-5303-46a5-a870-b2f8fca484dd" alt="닫기"></div>
+      </button>
+    </div>
+    <div class="list-scroll">
+      <div class="list-item" onclick="selectFund('근로 및 연금소득')">근로 및 연금소득</div>
+      <div class="list-item" onclick="selectFund('퇴직소득')">퇴직소득</div>
+      <div class="list-item" onclick="selectFund('금융소득 (이자, 배당)')">금융소득 (이자, 배당)</div>
+      <div class="list-item" onclick="selectFund('사업소득')">사업소득</div>
+      <div class="list-item" onclick="selectFund('상속, 증여')">상속, 증여</div>
+      <div class="list-item" onclick="selectFund('부동산 양도소득')">부동산 양도소득</div>
+      <div class="list-item" onclick="selectFund('부동산 임대소득')">부동산 임대소득</div>
+      <div class="list-item" onclick="selectFund('일시 재산양도 소득')">일시 재산양도 소득</div>
+      <div class="list-item" onclick="selectFund('대출금')">대출금</div>
+    </div>
+    <div class="kb-home" style="background:#fff"><div class="bar"></div></div>
+  </div>
+
+</div><!-- /phone -->
+
+<script>
+// ── State ──────────────────────────────────────────────
+const s = {
+  zip: '', address: '', detail: '',
+  lastName: '', firstName: '',
+  job: null, isHigh: false, isForeign: false,
+  fund: null,
+  owner: false
+};
+
+let searchTimer = null;
+let isShiftOn = false;
+
+// ── Overlay helper ─────────────────────────────────────
+function showOverlay(onclick) {
+  const ov = document.getElementById('overlay');
+  ov.classList.add('on');
+  ov._closeCallback = onclick;
+}
+function hideOverlay() {
+  document.getElementById('overlay').classList.remove('on');
+}
+document.getElementById('overlay').addEventListener('click', function() {
+  if (this._closeCallback) this._closeCallback();
+});
+
+// ── Close all ─────────────────────────────────────────
+function closeAll() {
+  closeAddrSheet();
+  closeJobSheet();
+  closeFundSheet();
+}
+
+// ── Address Sheet ──────────────────────────────────────
+function openAddrSheet() {
+  document.getElementById('sheetAddr').classList.add('open');
+  showOverlay(closeAddrSheet);
+  setTimeout(() => document.getElementById('addrSearchInput').focus(), 360);
+}
+function closeAddrSheet() {
+  document.getElementById('sheetAddr').classList.remove('open');
+  hideOverlay();
+  document.getElementById('addrSearchInput').blur();
+}
+function dismissAddrKeyboard() {
+  document.getElementById('koKeyboard').style.display = 'none';
+  document.getElementById('addrSearchInput').blur();
+}
+function showAddrKeyboard() {
+  document.getElementById('koKeyboard').style.display = '';
+}
+
+const ADDR_DATA = [
+  { zip: '13590', road: '경기도 성남시 분당구 서현로180번길 13', jibun: '서현동 767 서현동, 시범우성' },
+  { zip: '13591', road: '경기도 성남시 분당구 서현로180번길 23', jibun: '서현동 768 서현동, 시범현대' },
+  { zip: '13592', road: '경기도 성남시 분당구 서현로 157', jibun: '서현동 256 서현역' },
+  { zip: '13593', road: '경기도 성남시 분당구 서현로 170', jibun: '서현동 301 분당파인타운' },
+  { zip: '06236', road: '서울특별시 강남구 테헤란로 152', jibun: '역삼동 737 강남파이낸스센터' },
+  { zip: '06241', road: '서울특별시 강남구 테헤란로 521', jibun: '삼성동 143 파르나스타워' },
+  { zip: '06292', road: '서울특별시 강남구 테헤란로8길 24', jibun: '역삼동 648 GS타워' },
+  { zip: '06611', road: '서울특별시 서초구 반포대로 58', jibun: '잠원동 28-4 신반포역 1번 출구' },
+  { zip: '06660', road: '서울특별시 서초구 서초대로74길 4', jibun: '서초동 1306-5 삼성생명서초타워' },
+  { zip: '06732', road: '서울특별시 서초구 강남대로 27', jibun: '서초동 1321-15 AT센터' },
+  { zip: '04524', road: '서울특별시 중구 세종대로 110', jibun: '태평로1가 31 서울시청' },
+  { zip: '03141', road: '서울특별시 종로구 세종대로 209', jibun: '세종로 1-68 정부서울청사' },
+  { zip: '16499', road: '경기도 수원시 팔달구 효원로 1', jibun: '인계동 1182 경기도청' },
+  { zip: '48058', road: '부산광역시 해운대구 해운대해변로 264', jibun: '우동 737 해운대관광특구' },
+];
+
+let addrSearchTimer = null;
+function onAddrSearch(val) {
+  clearTimeout(addrSearchTimer);
+  const tips = document.getElementById('addrTips');
+  const loading = document.getElementById('addrLoading');
+  const results = document.getElementById('addrResults');
+  const empty = document.getElementById('addrEmpty');
+
+  if (!val.trim()) {
+    tips.style.display = '';
+    loading.style.display = 'none';
+    results.style.display = 'none';
+    empty.style.display = 'none';
+    return;
+  }
+
+  tips.style.display = 'none';
+  results.style.display = 'none';
+  empty.style.display = 'none';
+  loading.style.display = 'flex';
+
+  addrSearchTimer = setTimeout(() => {
+    loading.style.display = 'none';
+    const q = val.trim();
+    const matched = ADDR_DATA.filter(d =>
+      d.road.includes(q) || d.jibun.includes(q) || d.zip.includes(q)
+    );
+    if (matched.length === 0) {
+      empty.style.display = 'flex';
+    } else {
+      results.innerHTML = matched.map(d => `
+        <div class="addr-result-item" onclick="selectAddress('${d.zip}','${d.road}')">
+          <div class="addr-result-name">${d.road}</div>
+          <div class="addr-result-meta">
+            <span class="addr-result-zip">${d.zip}</span>
+            <span class="addr-result-detail">${d.jibun}</span>
+          </div>
+        </div>`).join('');
+      results.style.display = 'flex';
+    }
+  }, 800);
+}
+
+function selectAddress(zip, addr) {
+  s.zip = zip; s.address = addr;
+  // Update zip
+  document.getElementById('zipPh').style.display = 'none';
+  document.getElementById('zipVal').style.display = 'block';
+  document.getElementById('zipVal').textContent = zip;
+  // Update address
+  document.getElementById('addrPh').style.display = 'none';
+  document.getElementById('addrVal').style.display = 'block';
+  document.getElementById('addrVal').textContent = addr;
+  // Show detail input
+  document.getElementById('fldDetailPlaceholder').style.display = 'none';
+  document.getElementById('fldDetail').style.display = 'block';
+  setTimeout(() => document.getElementById('fldDetail').focus(), 50);
+
+  closeAddrSheet();
+  updateCTA();
+}
+
+function onDetailInput() {
+  s.detail = document.getElementById('fldDetail').value;
+  updateCTA();
+}
+
+// ── Name inputs ────────────────────────────────────────
+function onNameInput() {
+  s.lastName = document.getElementById('fldLast').value.trim();
+  s.firstName = document.getElementById('fldFirst').value.trim();
+  updateCTA();
+}
+
+// ── Job Sheet ──────────────────────────────────────────
+function openJobSheet() {
+  document.getElementById('sheetJob').classList.add('open');
+  showOverlay(closeJobSheet);
+}
+function closeJobSheet() {
+  document.getElementById('sheetJob').classList.remove('open');
+  hideOverlay();
+}
+
+function selectJob(jobName, isHigh) {
+  s.job = jobName;
+  s.isHigh = isHigh;
+  s.fund = null; // reset fund when job changes
+
+  // Update job select text
+  const jt = document.getElementById('jobText');
+  jt.textContent = jobName;
+  jt.className = 'sel-text val';
+
+  // Toggle high-risk extra fields
+  const fp = document.getElementById('fieldPurpose');
+  const ff = document.getElementById('fieldFund');
+  if (isHigh) {
+    fp.style.display = 'flex';
+    ff.style.display = 'flex';
+    requestAnimationFrame(() => {
+      fp.classList.add('visible');
+      ff.classList.add('visible');
+    });
+    // Reset fund text
+    const ft = document.getElementById('fundText');
+    ft.textContent = '자금 출처 선택';
+    ft.className = 'sel-text ph';
+  } else {
+    fp.classList.remove('visible');
+    ff.classList.remove('visible');
+    setTimeout(() => { fp.style.display = 'none'; ff.style.display = 'none'; }, 350);
+  }
+
+  closeJobSheet();
+  // Scroll to job field
+  setTimeout(() => {
+    document.getElementById('mainContent').scrollTop = 200;
+  }, 200);
+  updateCTA();
+}
+
+// ── Fund Sheet ─────────────────────────────────────────
+function openFundSheet() {
+  if (!s.isHigh) return;
+  document.getElementById('sheetFund').classList.add('open');
+  showOverlay(closeFundSheet);
+}
+function closeFundSheet() {
+  document.getElementById('sheetFund').classList.remove('open');
+  hideOverlay();
+}
+
+function selectFund(fundName) {
+  s.fund = fundName;
+  const ft = document.getElementById('fundText');
+  ft.textContent = fundName;
+  ft.className = 'sel-text val';
+  closeFundSheet();
+  updateCTA();
+}
+
+// ── Owner checkbox ─────────────────────────────────────
+function toggleOwner() {
+  s.owner = !s.owner;
+  document.getElementById('cbOwner').classList.toggle('on', s.owner);
+  updateCTA();
+}
+
+// ── CTA state ──────────────────────────────────────────
+function updateCTA() {
+  const hasAddr = s.zip && s.address;
+  const hasName = s.lastName && s.firstName;
+  const hasJob = !!s.job;
+  const hasFund = !s.isHigh || !!s.fund;
+  const complete = hasAddr && hasName && hasJob && hasFund && s.owner;
+  document.getElementById('btnCta').classList.toggle('on', complete);
+}
+
+function onCta() {
+  const btn = document.getElementById('btnCta');
+  if (!btn.classList.contains('on')) return;
+
+  const flow = new URLSearchParams(location.search).get('flow') || 'new';
+
+  // 고위험고객 또는 저위험 외국인 → 신분증 인증 (flow param 전달)
+  const needsIdVerification = s.isHigh || s.isForeign;
+  if (needsIdVerification) {
+    window.location.href = 'id-verification.html?flow=' + flow;
+    return;
+  }
+
+  // 신분증 인증 불필요 → flow에 따라 다음 화면으로
+  if (flow === 'new') {
+    window.location.href = 'account.html';
+  } else if (flow === 'no-account') {
+    window.location.href = 'terms.html?next=account';
+  } else if (flow === 'has-account') {
+    window.location.href = 'terms.html?next=charge';
+  }
+}
+
+function resetForm() {
+  document.getElementById('zipPh').style.display = '';
+  document.getElementById('zipVal').style.display = 'none';
+  document.getElementById('addrPh').style.display = '';
+  document.getElementById('addrVal').style.display = 'none';
+  document.getElementById('fldDetail').style.display = 'none';
+  document.getElementById('fldDetail').value = '';
+  document.getElementById('fldDetailPlaceholder').style.display = '';
+  document.getElementById('fldLast').value = '';
+  document.getElementById('fldFirst').value = '';
+  const jt = document.getElementById('jobText');
+  jt.textContent = '직업 선택'; jt.className = 'sel-text ph';
+  const fp = document.getElementById('fieldPurpose');
+  const ff = document.getElementById('fieldFund');
+  fp.classList.remove('visible'); ff.classList.remove('visible');
+  fp.style.display = 'none'; ff.style.display = 'none';
+  document.getElementById('cbOwner').classList.remove('on');
+  document.getElementById('mainContent').scrollTop = 0;
+  // Reset addr search
+  document.getElementById('addrSearchInput').value = '';
+  document.getElementById('addrTips').style.display = '';
+  document.getElementById('addrLoading').style.display = 'none';
+  document.getElementById('addrResults').style.display = 'none';
+  document.getElementById('addrEmpty').style.display = 'none';
+  document.getElementById('koKeyboard').style.display = '';
+}
+
+// ── Korean Keyboard ────────────────────────────────────
+function typeChar(ch) {
+  const inp = document.getElementById('addrSearchInput');
+  inp.value += ch;
+  onAddrSearch(inp.value);
+  // Visual press
+  event.currentTarget && event.currentTarget.classList && event.currentTarget.classList.add('pressed');
+  setTimeout(() => {
+    event.currentTarget && event.currentTarget.classList && event.currentTarget.classList.remove('pressed');
+  }, 100);
+}
+
+function deleteLast() {
+  const inp = document.getElementById('addrSearchInput');
+  inp.value = inp.value.slice(0, -1);
+  onAddrSearch(inp.value);
+}
+
+function toggleShift() {
+  isShiftOn = !isShiftOn;
+  // Visual only - in prototype we just toggle appearance
+  const shiftBtn = event.currentTarget;
+  shiftBtn.style.background = isShiftOn ? '#fff' : '';
+}
+
+// ── List item highlight on reopen ─────────────────────
+document.querySelectorAll('#sheetJob .list-item').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('#sheetJob .list-item').forEach(i => i.classList.remove('selected'));
+    this.classList.add('selected');
+  });
+});
+document.querySelectorAll('#sheetFund .list-item').forEach(item => {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('#sheetFund .list-item').forEach(i => i.classList.remove('selected'));
+    this.classList.add('selected');
+  });
+});
+</script>
+
+</body>
+</html>

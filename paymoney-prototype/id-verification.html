@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=375, initial-scale=1.0">
+  <title>신분증 인증</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --fg: #141414;
+      --fg-2: #2f3438;
+      --fg-weak: #8c8c8c;
+      --fg-dis: #c1c1c1;
+      --border: #e0e0e0;
+      --input-bg: #f5f5f5;
+      --brand: #00a1ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: #e5e5ea;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Pretendard', sans-serif;
+    }
+    .phone {
+      width: 375px;
+      height: 812px;
+      background: #fff;
+      position: relative;
+      overflow: hidden;
+      border-radius: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    /* ─── Screen ─────────────────────────────────── */
+    .screen { position: absolute; inset: 0; display: none; flex-direction: column; background: #fff; }
+    .screen.active { display: flex; }
+
+    /* ─── Status Bar ─────────────────────────────── */
+    .status-bar {
+      height: 44px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 21px;
+    }
+    .status-time { font-size: 14px; font-weight: 600; color: #000; letter-spacing: -0.28px; }
+    .status-icons { display: flex; align-items: center; gap: 6px; color: #000; }
+
+    /* ─── Top Nav (customer-info.html 패턴 통일) ─── */
+    .top-nav {
+      height: 44px; background: #fff; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px; position: relative; z-index: 1;
+    }
+    .nav-title {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      font-size: 16px; font-weight: 700; color: var(--fg-2);
+      letter-spacing: -0.3px; line-height: 20px; white-space: nowrap;
+    }
+    .nav-btn {
+      background: none; border: none; cursor: pointer; padding: 4px;
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px;
+    }
+    .icon-x { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+    .icon-x img { width: 18px; height: 18px; display: block; }
+    .nav-spacer { width: 32px; }
+
+    /* ─── Content ────────────────────────────────── */
+    .content { flex: 1; overflow-y: auto; overflow-x: hidden; }
+    #screenGuide .content { display: flex; flex-direction: column; gap: 40px; }
+
+    /* ─── Heading ────────────────────────────────── */
+    .heading { padding: 24px 16px 32px; display: flex; flex-direction: column; gap: 10px; }
+    .heading h1 {
+      font-size: 24px; font-weight: 600; line-height: 32px;
+      letter-spacing: -0.3px; color: var(--fg-2);
+      font-family: 'Pretendard', sans-serif;
+    }
+    .heading p {
+      font-size: 14px; font-weight: 400; line-height: 20px;
+      letter-spacing: -0.3px; color: var(--fg-weak);
+    }
+
+    /* ─── ID Type List ───────────────────────────── */
+    .id-list { padding: 0 16px; display: flex; flex-direction: column; gap: 12px; }
+    .id-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px; border: 1px solid var(--border); border-radius: 8px;
+      cursor: pointer; transition: border-color 0.15s;
+    }
+    .id-item:active { border-color: var(--brand); }
+    .id-item-left { display: flex; align-items: center; gap: 8px; }
+    .id-item-icon {
+      width: 24px; height: 24px; display: flex; align-items: center;
+      justify-content: center; color: var(--fg-2); flex-shrink: 0;
+    }
+    .id-item-label {
+      font-size: 15px; font-weight: 600; line-height: 24px;
+      letter-spacing: -0.3px; color: var(--fg-2);
+    }
+    .id-item-arrow {
+      width: 20px; height: 20px; display: flex; align-items: center;
+      justify-content: center; color: var(--fg-weak);
+    }
+
+    /* ─── Guide: Illustration ────────────────────── */
+    .id-illustration { display: flex; justify-content: center; padding: 0 16px; }
+    .id-illustration img { width: 232px; height: 150px; object-fit: contain; }
+
+    /* ─── Guide: Checklist ───────────────────────── */
+    .checklist { padding: 24px 16px; display: flex; flex-direction: column; gap: 16px; }
+    .check-item { display: flex; flex-direction: column; gap: 2px; }
+    .check-row { display: flex; align-items: center; gap: 6px; }
+    .check-icon {
+      width: 20px; height: 20px; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0; color: var(--fg);
+    }
+    .check-text {
+      font-size: 14px; font-weight: 500; line-height: 18px;
+      letter-spacing: -0.3px; color: var(--fg);
+    }
+    .check-text strong { font-weight: 700; }
+    .check-sub {
+      padding-left: 26px; font-size: 13px; font-weight: 500;
+      line-height: 18px; letter-spacing: -0.3px; color: var(--fg-weak);
+    }
+
+    /* ─── Sticky Bottom ──────────────────────────── */
+    .sticky-bottom {
+      position: absolute; bottom: 34px; left: 0; right: 0;
+      padding: 8px 16px; display: flex; gap: 8px; align-items: center;
+    }
+    .btn-prev {
+      min-width: 88px; height: 44px; background: #fff; color: var(--fg-2);
+      border: 1px solid var(--border); border-radius: 8px; font-family: 'Pretendard', sans-serif;
+      font-size: 16px; font-weight: 600; letter-spacing: -0.3px; cursor: pointer; flex-shrink: 0;
+    }
+    .btn-cta {
+      flex: 1; height: 44px; background: var(--brand); color: #fff;
+      border: none; border-radius: 8px; font-family: 'Pretendard', sans-serif;
+      font-size: 16px; font-weight: 600; letter-spacing: -0.3px; cursor: pointer;
+    }
+
+    /* ─── Home Indicator ─────────────────────────── */
+    .home-indicator {
+      position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+      width: 134px; height: 5px; background: #000; border-radius: 100px;
+    }
+
+    /* ─── Camera Screen ──────────────────────────── */
+    #screenTaking { background: #000; }
+    .camera-bg { position: absolute; inset: 0; overflow: hidden; }
+    .camera-bg img { width: 100%; height: 100%; object-fit: cover; }
+    .camera-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.4);
+      display: flex; flex-direction: column; align-items: center;
+      padding: 198px 20px 0;
+      gap: 20px;
+    }
+    .camera-guide-text {
+      font-size: 16px; font-weight: 500; line-height: 24px;
+      letter-spacing: -0.3px; color: #fff; text-align: center;
+    }
+    .scan-frame {
+      width: 100%; height: 208px;
+      border: 2px solid #fff; border-radius: 8px;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .scan-frame img { width: 100%; height: 100%; object-fit: cover; }
+    .scan-warning { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+    .scan-warning-title { display: flex; align-items: center; gap: 4px; }
+    .warn-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+    .scan-warning-title span {
+      font-size: 13px; font-weight: 500; line-height: 18px;
+      letter-spacing: -0.3px; color: #fff; text-align: center;
+    }
+    .scan-warning-list {
+      list-style: disc; padding-left: 18px;
+      font-size: 12px; font-weight: 400; line-height: 20px;
+      letter-spacing: -0.3px; color: var(--fg-dis); text-align: center;
+    }
+
+    /* taking top nav: absolute, white bg */
+    #screenTaking .top-nav {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+      background: #fff;
+    }
+
+    /* ─── Keyboard ───────────────────────────────── */
+    .kb-container {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 200;
+      background: #d2d3d8; transform: translateY(100%); transition: transform 0.38s ease-out;
+    }
+    .kb-container.show { transform: translateY(0); }
+    .kb-toolbar {
+      height: 44px; background: #f0f0f0; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 4px 0 8px;
+      border-top: 1px solid rgba(0,0,0,0.1);
+    }
+    .kb-nav { display: flex; }
+    .kb-nav-btn, .kb-done-btn {
+      background: none; border: none; cursor: pointer; padding: 8px 10px;
+      color: #3478ff; font-family: 'Pretendard', sans-serif;
+      font-size: 15px; font-weight: 600; letter-spacing: -0.3px;
+    }
+    .kb-nav-btn { font-size: 18px; line-height: 1; }
+    .kb-rows { padding: 8px 6px 4px; display: flex; flex-direction: column; gap: 7px; }
+    .kb-row { display: flex; gap: 6px; align-items: center; }
+    .kb-key {
+      flex: 1; height: 46px; background: #fff; border: none; border-radius: 5px;
+      box-shadow: 0 1px 0 0 rgba(0,0,0,0.3); cursor: pointer;
+      font-family: 'Pretendard', sans-serif; font-size: 16px; font-weight: 400;
+      color: #000; display: flex; align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .kb-key:active { background: #acb3be; }
+    .kb-key.gray { background: #aab0bc; }
+    .kb-key.gray:active { background: #8e949e; }
+    .kb-key.space { flex: 4; font-size: 15px; color: #3c3c43; }
+    .kb-key.sm { font-size: 14px; }
+    .kb-home { height: 21px; display: flex; align-items: center; justify-content: center; padding-bottom: 4px; }
+    .kb-home-bar { width: 134px; height: 5px; background: #000; border-radius: 100px; }
+
+    /* Bottom Sheet shifts up when keyboard open */
+    .bottom-sheet.kb-open { bottom: 286px; }
+
+    /* ─── Bottom Sheet ───────────────────────────── */
+    .bs-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; }
+    .bs-overlay.show { display: block; }
+    .bottom-sheet {
+      position: absolute; left: 0; right: 0; bottom: 0; background: #fff;
+      border-radius: 16px 16px 0 0; z-index: 110;
+      transform: translateY(100%); transition: transform 0.3s ease, bottom 0.38s ease-out;
+      padding-bottom: 34px;
+    }
+    .bottom-sheet.open { transform: translateY(0); }
+    .bs-grabber { width: 36px; height: 4px; background: #e0e0e0; border-radius: 2px; margin: 12px auto 0; }
+    .bs-header {
+      display: flex; align-items: center; justify-content: center;
+      height: 56px; position: relative; padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .bs-title { font-size: 16px; font-weight: 700; line-height: 20px; letter-spacing: -0.3px; color: var(--fg-2); }
+    .bs-close {
+      position: absolute; right: 8px;
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; background: none; border: none; padding: 4px;
+    }
+    .bs-body { padding: 16px 16px 0; display: flex; flex-direction: column; gap: 20px; max-height: 400px; overflow-y: auto; }
+    .bs-field { display: flex; flex-direction: column; gap: 6px; }
+    .bs-field-label { font-size: 14px; font-weight: 500; line-height: 18px; letter-spacing: -0.3px; color: var(--fg-weak); }
+    .bs-input {
+      height: 40px; border: 1px solid var(--border); border-radius: 4px;
+      padding: 0 12px; font-family: 'Pretendard', sans-serif;
+      font-size: 16px; font-weight: 400; letter-spacing: -0.3px; color: var(--fg-2);
+      outline: none; background: #fff; transition: border-color 0.15s; width: 100%;
+    }
+    .bs-input:focus { border-color: var(--brand); }
+    .bs-input::placeholder { color: var(--fg-dis); }
+    .id-num-row { display: flex; align-items: center; gap: 6px; }
+    .id-num-row .bs-input { flex: 1; }
+    .id-num-sep { font-size: 16px; color: var(--fg-weak); flex-shrink: 0; }
+    .id-num-back { display: flex; align-items: center; gap: 4px; flex: 1; }
+    .id-num-back .bs-input.short { flex: 0 0 40px; padding: 0 8px; text-align: center; }
+    .id-mask {
+      display: flex; align-items: center; gap: 4px; flex: 1;
+      height: 40px; padding: 0 4px;
+    }
+    .dot { width: 8px; height: 8px; background: var(--fg-2); border-radius: 50%; flex-shrink: 0; }
+    .bs-input[readonly] {
+      background: var(--input-bg); color: var(--fg-2); cursor: default;
+    }
+    .bs-footer { padding: 16px 16px 0; }
+    .bs-confirm-btn {
+      width: 100%; height: 44px; background: var(--brand); color: #fff;
+      border: none; border-radius: 8px; font-family: 'Pretendard', sans-serif;
+      font-size: 16px; font-weight: 600; letter-spacing: -0.3px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- ── Screen 1: 신분증 선택 ────────────────────── -->
+  <div class="screen active" id="screenSelect">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.4C5.6 2.4 3.4 3.4 1.8 5L0 3.2C2 1.2 4.9 0 8 0s6 1.2 8 3.2L14.2 5C12.6 3.4 10.4 2.4 8 2.4z"/><path d="M8 6c-1.5 0-2.9.6-3.9 1.6L2.3 5.8C3.7 4.4 5.7 3.6 8 3.6s4.3.8 5.7 2.2L11.9 7.6C10.9 6.6 9.5 6 8 6z"/><circle cx="8" cy="10" r="2"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="1.5" y="2.5" width="15" height="7" rx="1"/><path d="M23 4.5v3c.8-.4 1.3-1 1.3-1.5S23.8 4.9 23 4.5z"/></svg>
+      </div>
+    </div>
+    <div class="top-nav">
+      <button class="nav-btn" onclick="goBack()" aria-label="닫기">
+        <div class="icon-x"><img src="https://www.figma.com/api/mcp/asset/8b3253d5-5303-46a5-a870-b2f8fca484dd" alt="닫기"></div>
+      </button>
+      <span class="nav-title">신분증 선택</span>
+      <div class="nav-spacer"></div>
+    </div>
+    <div class="content">
+      <div class="heading">
+        <h1>신분증 인증 방식을<br>선택해주세요</h1>
+        <p>안전한 이용을 위해 본인 확인을 진행합니다.</p>
+      </div>
+      <div class="id-list">
+        <!-- 주민등록증 -->
+        <div class="id-item" onclick="selectIdType('resident')">
+          <div class="id-item-left">
+            <div class="id-item-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M5 19c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="id-item-label">주민등록증</span>
+          </div>
+          <div class="id-item-arrow">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <!-- 운전면허증 -->
+        <div class="id-item" onclick="selectIdType('driver')">
+          <div class="id-item-left">
+            <div class="id-item-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="1" y="8" width="14" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M15 11.5h3.5L21 14.5V17h-6v-5.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                <circle cx="5.5" cy="18" r="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="17.5" cy="18" r="2" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <span class="id-item-label">운전면허증</span>
+          </div>
+          <div class="id-item-arrow">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <!-- 외국인등록증 -->
+        <div class="id-item" onclick="selectIdType('foreign')">
+          <div class="id-item-left">
+            <div class="id-item-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                <ellipse cx="12" cy="12" rx="4.5" ry="9" stroke="currentColor" stroke-width="1.5"/>
+                <line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" stroke-width="1.5"/>
+                <line x1="3" y1="15" x2="21" y2="15" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </div>
+            <span class="id-item-label">외국인등록증</span>
+          </div>
+          <div class="id-item-arrow">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ── Screen 2: 신분증 촬영 안내 ────────────────── -->
+  <div class="screen" id="screenGuide">
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.4C5.6 2.4 3.4 3.4 1.8 5L0 3.2C2 1.2 4.9 0 8 0s6 1.2 8 3.2L14.2 5C12.6 3.4 10.4 2.4 8 2.4z"/><path d="M8 6c-1.5 0-2.9.6-3.9 1.6L2.3 5.8C3.7 4.4 5.7 3.6 8 3.6s4.3.8 5.7 2.2L11.9 7.6C10.9 6.6 9.5 6 8 6z"/><circle cx="8" cy="10" r="2"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="1.5" y="2.5" width="15" height="7" rx="1"/><path d="M23 4.5v3c.8-.4 1.3-1 1.3-1.5S23.8 4.9 23 4.5z"/></svg>
+      </div>
+    </div>
+    <div class="top-nav">
+      <button class="nav-btn" onclick="showScreen('screenSelect')" aria-label="닫기">
+        <div class="icon-x"><img src="https://www.figma.com/api/mcp/asset/8b3253d5-5303-46a5-a870-b2f8fca484dd" alt="닫기"></div>
+      </button>
+      <span class="nav-title">신분증 촬영</span>
+      <div class="nav-spacer"></div>
+    </div>
+    <div class="content">
+      <div class="heading">
+        <h1>본인확인을 위해<br>신분증 원본을 준비해주세요</h1>
+      </div>
+      <div class="id-illustration">
+        <img src="https://www.figma.com/api/mcp/asset/47fcacf8-2815-4b7d-877e-7688e385ffa1" alt="신분증 일러스트">
+      </div>
+      <div class="checklist">
+        <div class="check-item">
+          <div class="check-row">
+            <div class="check-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10l4.5 4.5 7.5-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <span class="check-text"><strong>신분증의 앞면</strong>이 모두 보이게 놓아주세요.</span>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-row">
+            <div class="check-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10l4.5 4.5 7.5-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <span class="check-text">반드시 <strong>신분증 원본</strong>으로 촬영하세요.</span>
+          </div>
+          <p class="check-sub">출력물, 휴대폰 촬영 등은 사용할 수 없어요.</p>
+        </div>
+        <div class="check-item">
+          <div class="check-row">
+            <div class="check-icon">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10l4.5 4.5 7.5-8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <span class="check-text"><strong>빛 반사가 없도록</strong> 각도를 조정해주세요.</span>
+          </div>
+          <p class="check-sub">신분증이 가려지면 정보 확인이 어려워요.</p>
+        </div>
+      </div>
+    </div>
+    <div class="sticky-bottom">
+      <button class="btn-cta" onclick="startCapture()">신분증 촬영하기</button>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ── Screen 3: 신분증 촬영 중 ──────────────────── -->
+  <div class="screen" id="screenTaking">
+    <div class="camera-bg">
+      <img src="https://www.figma.com/api/mcp/asset/c6d71425-e674-491e-a224-93c43e625eff" alt="">
+    </div>
+    <div class="camera-overlay">
+      <p class="camera-guide-text">신분증을 자동으로 촬영할게요.<br>표시된 영역에 신분증을 놓아주세요.</p>
+      <div class="scan-frame">
+        <img src="https://www.figma.com/api/mcp/asset/c6d71425-e674-491e-a224-93c43e625eff" alt="">
+      </div>
+      <div class="scan-warning">
+        <div class="scan-warning-title">
+          <div class="warn-icon">
+            <svg width="16" height="15" viewBox="0 0 16 15" fill="none"><path d="M8 1.5L14.5 13H1.5L8 1.5z" stroke="white" stroke-width="1.2" stroke-linejoin="round"/><line x1="8" y1="6" x2="8" y2="9.5" stroke="white" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="11.5" r="0.75" fill="white"/></svg>
+          </div>
+          <span>다음과 같은 신분증은 사용할 수 없어요</span>
+        </div>
+        <ul class="scan-warning-list">
+          <li>신분증 사본 (예: 출력물, 휴대폰 확인 촬영 등)</li>
+          <li>정보 확인이 어렵거나 훼손된 신분증</li>
+          <li>유효기간이 지난 신분증</li>
+        </ul>
+      </div>
+    </div>
+    <!-- taking top nav: white bg -->
+    <div class="top-nav" style="position:absolute;top:44px;left:0;right:0;z-index:10;">
+      <button class="nav-btn" onclick="showScreen('screenGuide')" aria-label="닫기">
+        <div class="icon-x"><img src="https://www.figma.com/api/mcp/asset/8b3253d5-5303-46a5-a870-b2f8fca484dd" alt="닫기"></div>
+      </button>
+      <span class="nav-title">신분증 촬영</span>
+      <div class="nav-spacer"></div>
+    </div>
+    <!-- status bar overlay -->
+    <div class="status-bar" style="position:absolute;top:0;left:0;right:0;z-index:10;background:#fff;">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.4C5.6 2.4 3.4 3.4 1.8 5L0 3.2C2 1.2 4.9 0 8 0s6 1.2 8 3.2L14.2 5C12.6 3.4 10.4 2.4 8 2.4z"/><path d="M8 6c-1.5 0-2.9.6-3.9 1.6L2.3 5.8C3.7 4.4 5.7 3.6 8 3.6s4.3.8 5.7 2.2L11.9 7.6C10.9 6.6 9.5 6 8 6z"/><circle cx="8" cy="10" r="2"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor"><rect x="0" y="1" width="22" height="10" rx="2" stroke="currentColor" stroke-width="1" fill="none"/><rect x="1.5" y="2.5" width="15" height="7" rx="1"/><path d="M23 4.5v3c.8-.4 1.3-1 1.3-1.5S23.8 4.9 23 4.5z"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Keyboard ─────────────────────────────────── -->
+  <div class="kb-container" id="keyboard">
+    <div class="kb-toolbar">
+      <div class="kb-nav">
+        <button class="kb-nav-btn" onclick="kbNavPrev()">&#8593;</button>
+        <button class="kb-nav-btn" onclick="kbNavNext()">&#8595;</button>
+      </div>
+      <button class="kb-done-btn" onclick="kbDone()">완료</button>
+    </div>
+    <div class="kb-rows">
+      <div class="kb-row">
+        <button class="kb-key" onclick="kbType('ㅂ')">ㅂ</button>
+        <button class="kb-key" onclick="kbType('ㅈ')">ㅈ</button>
+        <button class="kb-key" onclick="kbType('ㄷ')">ㄷ</button>
+        <button class="kb-key" onclick="kbType('ㄱ')">ㄱ</button>
+        <button class="kb-key" onclick="kbType('ㅅ')">ㅅ</button>
+        <button class="kb-key" onclick="kbType('ㅛ')">ㅛ</button>
+        <button class="kb-key" onclick="kbType('ㅕ')">ㅕ</button>
+        <button class="kb-key" onclick="kbType('ㅑ')">ㅑ</button>
+        <button class="kb-key" onclick="kbType('ㅐ')">ㅐ</button>
+        <button class="kb-key" onclick="kbType('ㅔ')">ㅔ</button>
+      </div>
+      <div class="kb-row" style="padding: 0 19px;">
+        <button class="kb-key" onclick="kbType('ㅁ')">ㅁ</button>
+        <button class="kb-key" onclick="kbType('ㄴ')">ㄴ</button>
+        <button class="kb-key" onclick="kbType('ㅇ')">ㅇ</button>
+        <button class="kb-key" onclick="kbType('ㄹ')">ㄹ</button>
+        <button class="kb-key" onclick="kbType('ㅎ')">ㅎ</button>
+        <button class="kb-key" onclick="kbType('ㅗ')">ㅗ</button>
+        <button class="kb-key" onclick="kbType('ㅓ')">ㅓ</button>
+        <button class="kb-key" onclick="kbType('ㅏ')">ㅏ</button>
+        <button class="kb-key" onclick="kbType('ㅣ')">ㅣ</button>
+      </div>
+      <div class="kb-row">
+        <button class="kb-key gray" style="flex:1.4" onclick="kbShift()">⇧</button>
+        <button class="kb-key" onclick="kbType('ㅋ')">ㅋ</button>
+        <button class="kb-key" onclick="kbType('ㅌ')">ㅌ</button>
+        <button class="kb-key" onclick="kbType('ㅊ')">ㅊ</button>
+        <button class="kb-key" onclick="kbType('ㅍ')">ㅍ</button>
+        <button class="kb-key" onclick="kbType('ㅠ')">ㅠ</button>
+        <button class="kb-key" onclick="kbType('ㅜ')">ㅜ</button>
+        <button class="kb-key" onclick="kbType('ㅡ')">ㅡ</button>
+        <button class="kb-key gray" style="flex:1.4" onclick="kbBackspace()">⌫</button>
+      </div>
+      <div class="kb-row" style="padding-bottom:4px">
+        <button class="kb-key gray sm" style="flex:1.5" onclick="kbNum()">123</button>
+        <button class="kb-key space" onclick="kbType(' ')">스페이스</button>
+        <button class="kb-key sm" onclick="kbType('@')">@</button>
+        <button class="kb-key sm" onclick="kbType('.')">.</button>
+        <button class="kb-key gray sm" style="flex:1.5" onclick="kbReturn()">return</button>
+      </div>
+    </div>
+    <div class="kb-home"><div class="kb-home-bar"></div></div>
+  </div>
+
+  <!-- ── Bottom Sheet: 스캔 정보 ────────────────────── -->
+  <div class="bs-overlay" id="bsOverlay" onclick="closeEditSheet()"></div>
+  <div class="bottom-sheet" id="editSheet">
+    <div class="bs-grabber"></div>
+    <div class="bs-header">
+      <span class="bs-title">스캔 정보</span>
+      <button class="bs-close nav-btn" onclick="closeEditSheet()" aria-label="닫기">
+        <div class="icon-x"><img src="https://www.figma.com/api/mcp/asset/8b3253d5-5303-46a5-a870-b2f8fca484dd" alt="닫기"></div>
+      </button>
+    </div>
+    <div class="bs-body">
+
+      <!-- 주민등록증 필드 -->
+      <div id="fieldsResident">
+        <div class="bs-field">
+          <span class="bs-field-label">이름</span>
+          <input class="bs-input" type="text" id="residentName" value="방채영" autocomplete="off">
+        </div>
+        <div class="bs-field" style="margin-top:20px">
+          <span class="bs-field-label">주민등록번호</span>
+          <div class="id-num-row">
+            <input class="bs-input" type="text" id="residentFront" value="990101" maxlength="6" style="flex:1">
+            <span class="id-num-sep">−</span>
+            <div class="id-num-back">
+              <input class="bs-input short" type="text" id="residentBack1" value="2" maxlength="1" style="flex:0 0 40px;text-align:center;">
+              <div class="id-mask">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bs-field" style="margin-top:20px">
+          <span class="bs-field-label">발급일자</span>
+          <input class="bs-input" type="text" id="residentIssue" value="2019.02.20" placeholder="YYYY.MM.DD" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- 운전면허증 필드 -->
+      <div id="fieldsDriver" style="display:none">
+        <div class="bs-field">
+          <span class="bs-field-label">생년월일</span>
+          <input class="bs-input" type="text" id="driverBirth" value="990101" maxlength="6" autocomplete="off">
+        </div>
+        <div class="bs-field" style="margin-top:20px">
+          <span class="bs-field-label">면허번호</span>
+          <div class="id-num-row">
+            <input class="bs-input" type="text" id="driverLicenseFront" value="21-19" style="flex:1">
+            <div class="id-mask" style="flex:1.5">
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              <div class="dot"></div><div class="dot"></div>
+            </div>
+          </div>
+        </div>
+        <div class="bs-field" style="margin-top:20px">
+          <span class="bs-field-label">발급일자</span>
+          <input class="bs-input" type="text" id="driverIssue" value="2019.02.20" placeholder="YYYY.MM.DD" autocomplete="off">
+        </div>
+        <div class="bs-field" style="margin-top:20px">
+          <span class="bs-field-label">암호 일련번호</span>
+          <input class="bs-input" type="text" id="driverSerial" placeholder="후면 일련번호 입력" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- 외국인등록증 필드 -->
+      <div id="fieldsForeign" style="display:none">
+        <div class="bs-field">
+          <span class="bs-field-label">외국인등록번호</span>
+          <div class="id-num-row">
+            <input class="bs-input" type="text" id="foreignFront" value="990101" maxlength="6" style="flex:1">
+            <div class="id-mask" style="flex:1.5">
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+          </div>
+        </div>
+        <div class="bs-field" style="margin-top:20px">
+          <span class="bs-field-label">생년월일</span>
+          <input class="bs-input" type="text" id="foreignBirth" value="990101" maxlength="6" autocomplete="off">
+        </div>
+        <div class="bs-field" style="margin-top:20px">
+          <span class="bs-field-label">일련번호</span>
+          <input class="bs-input" type="text" id="foreignSerial" placeholder="후면 일련번호 입력" autocomplete="off">
+        </div>
+      </div>
+
+    </div>
+    <div class="bs-footer">
+      <button class="bs-confirm-btn" onclick="confirmScan()">확인</button>
+    </div>
+  </div>
+
+</div>
+<script>
+  let currentIdType = 'resident';
+  let activeInput = null;
+  const inputs = () => document.querySelectorAll('.bs-input');
+
+  function initKeyboard() {
+    inputs().forEach(inp => {
+      inp.addEventListener('focus', () => {
+        activeInput = inp;
+        document.getElementById('keyboard').classList.add('show');
+        document.getElementById('editSheet').classList.add('kb-open');
+      });
+    });
+  }
+
+  function kbType(char) {
+    if (!activeInput) return;
+    const s = activeInput.selectionStart, e = activeInput.selectionEnd;
+    const v = activeInput.value;
+    activeInput.value = v.slice(0, s) + char + v.slice(e);
+    activeInput.setSelectionRange(s + 1, s + 1);
+  }
+  function kbBackspace() {
+    if (!activeInput) return;
+    const s = activeInput.selectionStart;
+    if (s > 0) {
+      activeInput.value = activeInput.value.slice(0, s - 1) + activeInput.value.slice(s);
+      activeInput.setSelectionRange(s - 1, s - 1);
+    }
+  }
+  function kbDone() {
+    document.getElementById('keyboard').classList.remove('show');
+    document.getElementById('editSheet').classList.remove('kb-open');
+    if (activeInput) activeInput.blur();
+    activeInput = null;
+  }
+  function kbReturn() { kbDone(); }
+  function kbShift() {}
+  function kbNum() {}
+  function kbNavPrev() {
+    const list = [...inputs()];
+    const i = list.indexOf(activeInput);
+    if (i > 0) { list[i - 1].focus(); activeInput = list[i - 1]; }
+  }
+  function kbNavNext() {
+    const list = [...inputs()];
+    const i = list.indexOf(activeInput);
+    if (i < list.length - 1) { list[i + 1].focus(); activeInput = list[i + 1]; }
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function goBack() {
+    window.history.back();
+  }
+
+  function selectIdType(type) {
+    currentIdType = type;
+    showScreen('screenGuide');
+  }
+
+  function startCapture() {
+    showScreen('screenTaking');
+    setTimeout(openEditSheet, 2500);
+  }
+
+  function openEditSheet() {
+    document.getElementById('fieldsResident').style.display = currentIdType === 'resident' ? '' : 'none';
+    document.getElementById('fieldsDriver').style.display = currentIdType === 'driver' ? '' : 'none';
+    document.getElementById('fieldsForeign').style.display = currentIdType === 'foreign' ? '' : 'none';
+    document.getElementById('bsOverlay').classList.add('show');
+    document.getElementById('editSheet').classList.add('open');
+    setTimeout(initKeyboard, 350);
+  }
+
+  function closeEditSheet() {
+    kbDone();
+    document.getElementById('bsOverlay').classList.remove('show');
+    document.getElementById('editSheet').classList.remove('open');
+    showScreen('screenGuide');
+  }
+
+  function confirmScan() {
+    document.getElementById('bsOverlay').classList.remove('show');
+    document.getElementById('editSheet').classList.remove('open');
+
+    const flow = new URLSearchParams(location.search).get('flow') || 'new';
+    if (flow === 'has-account') {
+      window.location.href = 'charge.html';
+    } else {
+      window.location.href = 'account.html';
+    }
+  }
+</script>
+</body>
+</html>

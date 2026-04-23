@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>오늘의집페이머니 — 시나리오 진입</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+  body {
+    font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    background: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .device {
+    width: 375px;
+    min-height: 812px;
+    background: #fff;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+  }
+
+  /* Status Bar */
+  .status-bar {
+    height: 50px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px 0;
+    flex-shrink: 0;
+  }
+  .status-bar .time { font-size: 15px; font-weight: 600; }
+  .status-bar .icons { display: flex; gap: 6px; align-items: center; }
+
+  /* Top Nav */
+  .top-nav {
+    height: 44px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    flex-shrink: 0;
+  }
+  .top-nav .title {
+    flex: 1;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2f3438;
+    letter-spacing: -0.3px;
+  }
+  .top-nav .placeholder { width: 44px; }
+
+  /* Content */
+  .content {
+    padding: 24px 16px 40px;
+  }
+
+  .content-heading {
+    margin-bottom: 24px;
+  }
+  .content-heading h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #2f3438;
+    line-height: 1.4;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+  .content-heading p {
+    font-size: 14px;
+    color: #828c94;
+    line-height: 1.5;
+    letter-spacing: -0.3px;
+  }
+
+  /* Scenario Cards */
+  .scenario-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .scenario-card {
+    border: 1.5px solid #e6e6e6;
+    border-radius: 12px;
+    padding: 20px 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    text-decoration: none;
+    display: block;
+  }
+  .scenario-card:active {
+    background: #f7f8fa;
+    border-color: #c2c8cc;
+  }
+
+  .card-badge {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    margin-bottom: 10px;
+  }
+  .badge-new { background: #eef2ff; color: #3D5AFE; }
+  .badge-partial { background: #fff3e0; color: #e06c00; }
+  .badge-full { background: #e8f5e9; color: #2e7d32; }
+
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2f3438;
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: #828c94;
+    letter-spacing: -0.3px;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+
+  .card-flow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .flow-step {
+    font-size: 12px;
+    font-weight: 500;
+    color: #2f3438;
+    background: #f2f3f5;
+    border-radius: 4px;
+    padding: 4px 8px;
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+  }
+  .flow-arrow {
+    color: #c2c8cc;
+    font-size: 12px;
+  }
+
+  /* Divider */
+  .section-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #c2c8cc;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    margin-top: 28px;
+  }
+
+  /* Home Indicator */
+  .home-indicator {
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .home-indicator-bar {
+    width: 134px;
+    height: 5px;
+    background: #1a1a1a;
+    border-radius: 3px;
+  }
+</style>
+</head>
+<body>
+<div class="device">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#1a1a1a"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#1a1a1a"/><rect x="9" y="0.5" width="3" height="11.5" rx="1" fill="#1a1a1a"/><rect x="13.5" y="0" width="3" height="12" rx="1" fill="#1a1a1a" opacity="0.3"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 2.4C10.3 2.4 12.4 3.4 13.8 5L15.2 3.6C13.4 1.7 10.8 0.5 8 0.5C5.2 0.5 2.6 1.7 0.8 3.6L2.2 5C3.6 3.4 5.7 2.4 8 2.4Z" fill="#1a1a1a"/><path d="M8 5.2C9.5 5.2 10.9 5.8 11.9 6.9L13.3 5.5C11.9 4.1 10 3.3 8 3.3C6 3.3 4.1 4.1 2.7 5.5L4.1 6.9C5.1 5.8 6.5 5.2 8 5.2Z" fill="#1a1a1a"/><circle cx="8" cy="10" r="1.5" fill="#1a1a1a"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1a1a1a" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#1a1a1a"/><path d="M23 4.5V7.5C23.8 7.2 24.5 6.4 24.5 6C24.5 5.6 23.8 4.8 23 4.5Z" fill="#1a1a1a" opacity="0.4"/></svg>
+    </div>
+  </div>
+
+  <!-- Top Nav -->
+  <div class="top-nav">
+    <div class="placeholder"></div>
+    <div class="title">오늘의집페이 머니</div>
+    <div class="placeholder"></div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <div class="content-heading">
+      <h1>시나리오를 선택해주세요</h1>
+      <p>사용자 유형에 따라 플로우가 달라져요</p>
+    </div>
+
+    <div class="section-label">사용자 유형</div>
+
+    <div class="scenario-list">
+
+      <!-- 시나리오 1: 신규 가입자 -->
+      <a class="scenario-card" href="customer-info.html?flow=new">
+        <div class="card-badge badge-new">신규 가입</div>
+        <div class="card-title">오늘의집페이 신규 가입자</div>
+        <div class="card-desc">오늘의집페이 가입 이력이 없는 사용자예요.</div>
+        <div class="card-flow">
+          <span class="flow-step">고객정보 등록</span>
+          <span class="flow-arrow">›</span>
+          <span class="flow-step">신분증 스캔</span>
+          <span class="flow-arrow">›</span>
+          <span class="flow-step">계좌 등록</span>
+          <span class="flow-arrow">›</span>
+          <span class="flow-step">충전하기</span>
+        </div>
+      </a>
+
+      <!-- 시나리오 2: 가입O, 계좌X -->
+      <a class="scenario-card" href="terms.html?flow=no-account">
+        <div class="card-badge badge-partial">가입 완료 · 계좌 미등록</div>
+        <div class="card-title">페이 가입했지만 계좌가 없는 사용자</div>
+        <div class="card-desc">오늘의집페이에 가입했지만 계좌를 등록하지 않은 사용자예요.</div>
+        <div class="card-flow">
+          <span class="flow-step">선불약관 동의</span>
+          <span class="flow-arrow">›</span>
+          <span class="flow-step">고객정보 등록</span>
+          <span class="flow-arrow">›</span>
+          <span class="flow-step">신분증 스캔</span>
+          <span class="flow-arrow">›</span>
+          <span class="flow-step">계좌 등록</span>
+          <span class="flow-arrow">›</span>
+          <span class="flow-step">충전하기</span>
+        </div>
+      </a>
+
+      <!-- 시나리오 3: 가입O, 계좌O -->
+      <a class="scenario-card" href="terms.html?flow=has-account">
+        <div class="card-badge badge-full">가입 완료 · 계좌 등록 완료</div>
+        <div class="card-title">페이 가입 + 계좌까지 등록된 사용자</div>
+        <div class="card-desc">오늘의집페이와 계좌 등록까지 완료된 사용자예요.</div>
+        <div class="card-flow">
+          <span class="flow-step">선불약관 동의</span>
+          <span class="flow-arrow">›</span>
+          <span class="flow-step">고객정보 등록</span>
+          <span class="flow-arrow">›</span>
+          <span class="flow-step">신분증 스캔</span>
+          <span class="flow-arrow">›</span>
+          <span class="flow-step">충전하기</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <div class="home-indicator">
+    <div class="home-indicator-bar"></div>
+  </div>
+</div>
+</body>
+</html>
