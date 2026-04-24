@@ -2138,6 +2138,7 @@ body.preview-mode .preview-toggle { display: block; }
   // ─── 스낵바 ──────────────────────────
   let snackbarTimer = null;
   function showScrapSnackbar() {
+    alert('함수 실행됨');
     const sb = document.getElementById('snackbar');
     sb.classList.add('show');
     clearTimeout(snackbarTimer);
