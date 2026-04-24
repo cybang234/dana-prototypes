@@ -293,12 +293,10 @@ body.preview-mode .preview-toggle { display: block; }
 /* ── 스낵바 ── */
 .snackbar {
   display: none;
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 343px;
-  max-width: calc(100vw - 32px);
+  position: absolute;
+  bottom: 24px;
+  left: 16px;
+  right: 16px;
   background: #2f3438;
   border-radius: 8px;
   height: 48px;
@@ -309,6 +307,14 @@ body.preview-mode .preview-toggle { display: block; }
 }
 .snackbar.show {
   display: flex;
+}
+@media (max-width: 500px) {
+  .snackbar {
+    position: fixed;
+    bottom: 24px;
+    left: 16px;
+    right: 16px;
+  }
 }
 .snackbar-text {
   font-family: 'Pretendard', sans-serif;
