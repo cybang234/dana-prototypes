@@ -81,16 +81,23 @@ body {
 
 /* 바텀시트 */
 .mobile-panel-sheet {
-  display: none;
   position: fixed;
   inset: 0;
   z-index: 300;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.mobile-panel-sheet.open {
+  pointer-events: auto;
+  opacity: 1;
 }
 .mobile-panel-dim {
   position: absolute;
   inset: 0;
   background: rgba(0,0,0,0.4);
-  z-index: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 .mobile-panel-inner {
   position: absolute;
@@ -100,7 +107,11 @@ body {
   padding: 16px 20px 40px;
   max-height: 80vh;
   overflow-y: auto;
-  z-index: 2;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.mobile-panel-sheet.open .mobile-panel-inner {
+  transform: translateY(0);
 }
 .mobile-panel-handle {
   width: 36px; height: 4px;
@@ -1592,10 +1603,10 @@ body.preview-mode .preview-toggle { display: block; }
 
   // ─── 모바일 바텀시트 ───────────────────
   function openMobilePanel() {
-    document.getElementById('mobilePanelSheet').style.display = 'block';
+    document.getElementById('mobilePanelSheet').classList.add('open');
   }
   function closeMobilePanel() {
-    document.getElementById('mobilePanelSheet').style.display = 'none';
+    document.getElementById('mobilePanelSheet').classList.remove('open');
   }
   // 데스크탑 토글 ↔ 모바일 토글 양방향 동기화
   function syncToggle(masterId, mirrorId) {
