@@ -284,6 +284,12 @@ body.preview-mode .preview-toggle { display: block; }
 /* ──────────────────────────────────
    FAB
 ────────────────────────────────── */
+/* ── phone-wrap ── */
+.phone-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
 /* ── 스낵바 ── */
 .snackbar {
   position: absolute;
@@ -296,9 +302,9 @@ body.preview-mode .preview-toggle { display: block; }
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  z-index: 500;
+  z-index: 600;
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(16px);
   transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.32,0.72,0,1);
   pointer-events: none;
 }
@@ -1164,6 +1170,7 @@ body.preview-mode .preview-toggle { display: block; }
 </div>
 
 <!-- ─── PHONE ──────────────────────────── -->
+<div class="phone-wrap">
 <div class="phone">
 
   <!-- STATUS BAR -->
@@ -1874,12 +1881,6 @@ body.preview-mode .preview-toggle { display: block; }
 
   </div><!-- end scroll-area -->
 
-  <!-- 스낵바 -->
-  <div class="snackbar" id="snackbar">
-    <span class="snackbar-text">스크랩했어요.</span>
-    <button class="snackbar-action" onclick="goToScrapbook()">스크랩북 보기</button>
-  </div>
-
   <!-- FAB -->
   <div class="fab-wrap">
     <button class="fab-btn" onclick="sharePage()" title="공유하기">
@@ -1891,6 +1892,14 @@ body.preview-mode .preview-toggle { display: block; }
   </div>
 
 </div><!-- end phone -->
+
+  <!-- 스낵바 -->
+  <div class="snackbar" id="snackbar">
+    <span class="snackbar-text">스크랩했어요.</span>
+    <button class="snackbar-action" onclick="goToScrapbook()">스크랩북 보기</button>
+  </div>
+
+</div><!-- end phone-wrap -->
 
 <script>
   // ─── 로고 토글 ────────────────────────
