@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=375, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>기획전 기본형 프로토타입</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Pretendard:wght@400;500;600;700&family=Figtree:wght@500&display=swap" rel="stylesheet">
@@ -52,6 +52,28 @@ body {
   /* 바텀시트 */
   .mobile-panel-sheet {
     display: block !important;
+  }
+}
+
+/* ── 실제 모바일 기기: 폰 프레임 제거, 풀스크린 ── */
+@media (max-width: 500px) {
+  body {
+    background: #fff;
+    padding: 0;
+    align-items: flex-start;
+  }
+  .phone {
+    width: 100vw;
+    min-height: 100svh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .status-bar {
+    display: none;
+  }
+  .scroll-area {
+    max-height: none !important;
+    height: calc(100svh - 44px);
   }
 }
 
