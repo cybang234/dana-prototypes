@@ -1233,7 +1233,7 @@ body.preview-mode .preview-toggle { display: block; }
 
     <!-- BRAND HOME CTA -->
     <div class="brand-cta" id="brandCta" style="padding-top:24px;">
-      <button class="btn-outlined">
+      <button class="btn-outlined" onclick="showScrapSnackbar()">
         <span style="display:block; width:18px; height:18px; flex-shrink:0; background:#141414;
           -webkit-mask-image:url('https://www.figma.com/api/mcp/asset/a63e0ce4-7f08-4e32-b3a7-c1f47b1d03ac');
           mask-image:url('https://www.figma.com/api/mcp/asset/a63e0ce4-7f08-4e32-b3a7-c1f47b1d03ac');
@@ -2138,7 +2138,6 @@ body.preview-mode .preview-toggle { display: block; }
   // ─── 스낵바 ──────────────────────────
   let snackbarTimer = null;
   function showScrapSnackbar() {
-    alert('함수 실행됨');
     const sb = document.getElementById('snackbar');
     sb.classList.add('show');
     clearTimeout(snackbarTimer);
