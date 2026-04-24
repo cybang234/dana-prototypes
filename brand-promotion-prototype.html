@@ -105,6 +105,51 @@ body {
   box-shadow: 0 8px 40px rgba(0,0,0,0.2);
   border-radius: 40px;
   flex-shrink: 0;
+  position: relative;
+}
+
+/* ──────────────────────────────────
+   FAB
+────────────────────────────────── */
+.fab-wrap {
+  position: absolute;
+  right: 16px;
+  bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  z-index: 100;
+}
+.fab-btn {
+  width: 48px; height: 48px;
+  background: #fff;
+  border: none; border-radius: 50px;
+  box-shadow: 0px 2px 10px rgba(63,71,77,0.25);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 12px;
+  flex-shrink: 0;
+}
+.fab-icon {
+  display: block;
+  width: 24px; height: 24px;
+  background: #141414;
+  flex-shrink: 0;
+}
+.fab-icon-up {
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/ce8fe4ff-d117-4a6c-bd8c-a9fe4cbcf36c');
+  mask-image: url('https://www.figma.com/api/mcp/asset/ce8fe4ff-d117-4a6c-bd8c-a9fe4cbcf36c');
+  -webkit-mask-size: 15.475px 18px; mask-size: 15.475px 18px;
+  -webkit-mask-position: 4.275px 3px; mask-position: 4.275px 3px;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+.fab-icon-share {
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/a4209eb5-7a7d-4ab4-9b96-808feaa63a0c');
+  mask-image: url('https://www.figma.com/api/mcp/asset/a4209eb5-7a7d-4ab4-9b96-808feaa63a0c');
+  -webkit-mask-size: 17.96px 18.1px; mask-size: 17.96px 18.1px;
+  -webkit-mask-position: 3px 2.7px; mask-position: 3px 2.7px;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
 }
 
 /* STATUS BAR */
@@ -1122,6 +1167,17 @@ body {
     </div><!-- end product-section -->
 
   </div><!-- end scroll-area -->
+
+  <!-- FAB -->
+  <div class="fab-wrap">
+    <button class="fab-btn" onclick="sharePage()" title="공유하기">
+      <span class="fab-icon fab-icon-share"></span>
+    </button>
+    <button class="fab-btn" onclick="scrollToTop()" title="위로가기">
+      <span class="fab-icon fab-icon-up"></span>
+    </button>
+  </div>
+
 </div><!-- end phone -->
 
 <script>
@@ -1301,6 +1357,21 @@ body {
 
   setInterval(updateTimer, 1000);
   updateTimer();
+
+  // ─── FAB ───────────────────────────────
+  function scrollToTop() {
+    document.querySelector('.scroll-area').scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function sharePage() {
+    if (navigator.share) {
+      navigator.share({ title: document.title, url: location.href });
+    } else {
+      navigator.clipboard.writeText(location.href).then(() => {
+        alert('링크가 복사되었습니다.');
+      });
+    }
+  }
 </script>
 </body>
 </html>
