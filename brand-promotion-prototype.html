@@ -292,33 +292,23 @@ body.preview-mode .preview-toggle { display: block; }
 
 /* ── 스낵바 ── */
 .snackbar {
-  position: absolute;
+  display: none;
+  position: fixed;
   bottom: 80px;
-  left: 16px; right: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 343px;
+  max-width: calc(100vw - 32px);
   background: #2f3438;
   border-radius: 8px;
   height: 48px;
-  display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  z-index: 600;
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.32,0.72,0,1);
-  pointer-events: none;
+  z-index: 9999;
 }
 .snackbar.show {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-@media (max-width: 500px) {
-  .snackbar {
-    position: fixed;
-    bottom: 80px;
-    left: 16px; right: 16px;
-  }
+  display: flex;
 }
 .snackbar-text {
   font-family: 'Pretendard', sans-serif;
@@ -2156,11 +2146,12 @@ body.preview-mode .preview-toggle { display: block; }
     document.getElementById('snackbar').classList.remove('show');
   }
 
-  // scrap-btn 이벤트 위임
-  document.addEventListener('click', function(e) {
-    if (e.target.closest('.scrap-btn')) {
+  // scrap-btn 직접 바인딩
+  document.querySelectorAll('.scrap-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
       showScrapSnackbar();
-    }
+    });
   });
 </script>
 </body>
