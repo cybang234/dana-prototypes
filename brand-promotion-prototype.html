@@ -809,7 +809,7 @@ body {
         <span class="toggle-track"></span>
       </label>
     </div>
-    <div class="panel-row">
+    <div class="panel-row" id="logoRow">
       <span class="panel-label">로고 노출</span>
       <label class="toggle-switch">
         <input type="checkbox" id="logoToggle" checked onchange="toggleLogo()">
@@ -1194,11 +1194,25 @@ body {
     const ht = document.getElementById('heroText');
     ht.style.display = checked ? 'none' : 'flex';
     document.getElementById('brandCta').style.paddingTop = checked ? '24px' : '12px';
+    // 로고 옵션: KV 이미지 사용 시에만 노출
+    document.getElementById('logoRow').style.display = checked ? 'flex' : 'none';
+    updateDivider();
   }
 
   // ─── 모듈 토글 ─────────────────────────
   function toggleModule(moduleId, toggleEl) {
     document.getElementById(moduleId).style.display = toggleEl.checked ? '' : 'none';
+    updateDivider();
+  }
+
+  // ─── 디바이더 노출 조건 ─────────────────
+  // KV 이미지 사용 + CTA X + 혜택 X → divider 숨김
+  function updateDivider() {
+    const kvOn = document.getElementById('kvTogglePanel').checked;
+    const ctaOn = document.getElementById('ctaToggle').checked;
+    const benefitOn = document.getElementById('benefitToggle').checked;
+    const hide = kvOn && !ctaOn && !benefitOn;
+    document.querySelector('.divider').style.display = hide ? 'none' : '';
   }
 
   // ─── 혜택 타입 ─────────────────────────
