@@ -348,7 +348,7 @@ body {
 }
 .coupon-left {
   width: 275px; padding: 0 20px;
-  display: flex; flex-direction: column; gap: 16px;
+  display: flex; flex-direction: column; gap: 12px;
 }
 .coupon-amount-row {
   display: flex; align-items: center; gap: 0;
@@ -356,28 +356,34 @@ body {
 .coupon-tilde { height: 8px; width: 16px; display: block; flex-shrink: 0; margin-right: 2px; }
 .coupon-num {
   font-family: 'Figtree', sans-serif;
-  font-size: 30px; font-weight: 500;
+  font-size: 28px; font-weight: 500;
   color: #fff; line-height: 16px;
   letter-spacing: -0.3px;
   white-space: nowrap;
 }
 .coupon-unit {
   font-family: 'Pretendard', sans-serif;
-  font-size: 28px; font-weight: 500;
+  font-size: 24px; font-weight: 500;
   color: #fff; line-height: normal;
   letter-spacing: -0.3px;
   margin-left: 2px;
   white-space: nowrap;
 }
 .coupon-sub {
-  font-size: 12px; font-weight: 500;
-  color: rgba(255,255,255,0.8);
-  line-height: 16px; letter-spacing: -0.3px;
-  max-width: 140px; width: 120px;
-  height: 24px;
-  vertical-align: middle;
+  display: flex; flex-direction: column; gap: 2px;
 }
-.coupon-sub br { vertical-align: middle; }
+.coupon-sub-desc {
+  font-size: 12px; font-weight: 400;
+  color: rgba(255,255,255,0.8);
+  font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.3px; line-height: 16px;
+}
+.coupon-sub-timer {
+  font-size: 14px; font-weight: 500;
+  color: #fd3d4a;
+  font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.3px; line-height: 18px;
+}
 .coupon-right {
   width: 68px; height: 62px;
   display: flex; align-items: center; justify-content: center;
@@ -386,7 +392,8 @@ body {
 }
 .download-icon-wrap {
   width: 24px; height: 24px;
-  overflow: hidden; position: relative; flex-shrink: 0;
+  position: relative; overflow: hidden;
+  flex-shrink: 0;
   cursor: pointer;
 }
 .dl-arrow-up {
@@ -407,10 +414,13 @@ body {
 
 /* 쿠폰형 inner layout */
 .benefit-coupon-inner {
-  display: flex; flex-direction: column; gap: 28px;
+  display: flex; flex-direction: column; gap: 20px;
 }
 .benefit-title-section {
-  display: flex; flex-direction: column; gap: 12px;
+  display: flex; flex-direction: column; gap: 0;
+}
+.benefit-progress-bar {
+  height: 1.5px; background: #141414; width: 100%;
 }
 
 /* 서술형 타입 */
@@ -496,7 +506,7 @@ body {
   font-family: 'Pretendard', sans-serif;
 }
 .detail-coupon-sub {
-  font-size: 12px; font-weight: 500;
+  font-size: 12px; font-weight: 400;
   color: rgba(255,255,255,0.8);
   line-height: 16px; max-width: 120px;
   font-family: 'Pretendard', sans-serif;
@@ -566,26 +576,29 @@ body {
 
 .chip-strip {
   display: flex; gap: 6px;
-  padding: 12px 16px 20px;
+  padding: 12px 16px 16px;
   overflow-x: auto; background: #fff;
   position: sticky; top: 0; z-index: 10;
 }
 .chip-strip::-webkit-scrollbar { display: none; }
 
 .chip {
-  height: 32px; padding: 0 12px;
-  border-radius: 16px;
-  font-size: 13px; font-weight: 500;
+  height: 32px;
+  padding: 1px 11px;
+  border-radius: 9999px;
   font-family: 'Pretendard', sans-serif;
-  letter-spacing: -0.3px;
-  cursor: pointer; white-space: nowrap;
-  border: none; transition: all 0.15s; flex-shrink: 0;
-  line-height: 32px;
+  font-size: 14px; font-weight: 400;
+  line-height: 18px; letter-spacing: -0.3px;
+  cursor: pointer; flex-shrink: 0;
+  white-space: nowrap; overflow: hidden;
 }
-.chip.active { background: var(--foreground); color: #fff; }
+.chip.active {
+  background: #141414; color: #fff;
+  border: 1px solid transparent;
+}
 .chip.normal {
-  background: transparent; color: var(--foreground);
-  border: 1px solid rgba(0,0,0,0.15);
+  background: #fff; color: #141414;
+  border: 1px solid #e0e0e0;
 }
 
 .product-grid { padding: 0; }
@@ -606,13 +619,24 @@ body {
   position: absolute;
   right: 8px; bottom: 8px;
   width: 24px; height: 24px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.9);
-  box-shadow: 0 2px 10px rgba(63,71,77,0.25);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; border: none; padding: 0;
+  background: transparent;
+  border: none; padding: 0;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.12);
+  cursor: pointer;
 }
-.scrap-btn img { width: 24px; height: 24px; display: block; opacity: 0.7; }
+.scrap-icon {
+  display: block;
+  width: 24px; height: 24px;
+  background: #ffffff;
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/b3cf8f47-39e2-4a1b-b6d4-bd405ba81fe6');
+  mask-image: url('https://www.figma.com/api/mcp/asset/b3cf8f47-39e2-4a1b-b6d4-bd405ba81fe6');
+  -webkit-mask-size: 15.6px 18.3px;
+  mask-size: 15.6px 18.3px;
+  -webkit-mask-position: 4.2px 3px;
+  mask-position: 4.2px 3px;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
 
 .product-info { padding: 8px 9px 0; }
 .product-brand {
@@ -653,6 +677,75 @@ body {
   font-size: 12px; font-weight: 400;
   color: var(--foregroundWeak); line-height: 16px;
   letter-spacing: -0.3px;
+}
+
+/* ──────────────────────────────────
+   서술형 편집 패널 (side panel)
+────────────────────────────────── */
+.detail-edit-panel { margin-top: 12px; }
+.detail-item-control {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+.detail-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 7px;
+}
+.detail-item-num {
+  font-size: 11px; font-weight: 600;
+  color: #7f7dff; letter-spacing: -0.3px;
+}
+.detail-item-del {
+  font-size: 13px; color: #c1c1c1;
+  cursor: pointer; background: none; border: none; padding: 0; line-height: 1;
+}
+.detail-item-del:hover { color: #8c8c8c; }
+.panel-input {
+  width: 100%; height: 28px;
+  border: 1px solid rgba(0,0,0,0.12); border-radius: 5px;
+  background: #fff; font-size: 12px;
+  font-family: 'Pretendard', sans-serif;
+  color: #141414; padding: 0 7px; margin-bottom: 5px;
+  letter-spacing: -0.3px; outline: none;
+}
+.panel-input:focus { border-color: #141414; }
+.panel-input::placeholder { color: #c1c1c1; }
+.panel-select-sm {
+  width: 100%; height: 26px;
+  border: 1px solid rgba(0,0,0,0.12); border-radius: 5px;
+  background: #fff; font-size: 11px;
+  font-family: 'Pretendard', sans-serif;
+  color: #8c8c8c; padding: 0 6px;
+  cursor: pointer; outline: none; margin-top: 1px;
+}
+.add-item-btn {
+  width: 100%; height: 32px;
+  border: 1.5px dashed #d4d4d4; border-radius: 6px;
+  background: #fafafa; font-size: 12px; color: #8c8c8c;
+  cursor: pointer; letter-spacing: -0.3px;
+  font-family: 'Pretendard', sans-serif; margin-top: 4px;
+}
+.add-item-btn:hover { background: #f5f5f5; }
+
+/* 사은품형 이미지 플레이스홀더 */
+.gift-placeholder {
+  width: 343px; height: 200px;
+  background: #f5f5f5; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.gift-placeholder-icon {
+  display: block; width: 24px; height: 24px;
+  background: #8c8c8c;
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/eeaf293d-a35e-4183-a46b-ce257f6b417a');
+  mask-image: url('https://www.figma.com/api/mcp/asset/eeaf293d-a35e-4183-a46b-ce257f6b417a');
+  -webkit-mask-size: 17.8px 17.8px; mask-size: 17.8px 17.8px;
+  -webkit-mask-position: 3.1px 3.1px; mask-position: 3.1px 3.1px;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
 }
 </style>
 </head>
@@ -707,6 +800,11 @@ body {
       <option value="coupon">쿠폰형</option>
       <option value="detail">서술형</option>
     </select>
+    <!-- 서술형 편집 패널 -->
+    <div class="detail-edit-panel" id="detailEditPanel" style="display:none;">
+      <div id="detailItemControls"></div>
+      <button class="add-item-btn" onclick="addDetailItem()">+ 항목 추가</button>
+    </div>
   </div>
 
   <div class="panel-section">
@@ -792,21 +890,25 @@ body {
     </div>
 
     <!-- BRAND HOME CTA -->
-    <div class="brand-cta" id="brandCta">
+    <div class="brand-cta" id="brandCta" style="padding-top:24px;">
       <button class="btn-outlined">
-        <!-- ODS [Icon] Bookmark outline — mask 15.6×18.3px at (4.2, 3) in 24×24 -->
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M4.5 3.5C4.5 3.22386 4.72386 3 5 3H19C19.2761 3 19.5 3.22386 19.5 3.5V20.382C19.5 20.7607 19.0724 20.9822 18.7764 20.7584L12 16.9338L5.22361 20.7584C4.92757 20.9822 4.5 20.7607 4.5 20.382V3.5Z" stroke="#141414" stroke-width="1.5" stroke-linejoin="round"/>
-        </svg>
+        <span style="display:block; width:18px; height:18px; flex-shrink:0; background:#141414;
+          -webkit-mask-image:url('https://www.figma.com/api/mcp/asset/a63e0ce4-7f08-4e32-b3a7-c1f47b1d03ac');
+          mask-image:url('https://www.figma.com/api/mcp/asset/a63e0ce4-7f08-4e32-b3a7-c1f47b1d03ac');
+          -webkit-mask-size:11.7px 13.7px; mask-size:11.7px 13.7px;
+          -webkit-mask-position:3.15px 2.25px; mask-position:3.15px 2.25px;
+          -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;"></span>
         브랜드 스크랩
       </button>
       <button class="btn-outlined">
-        <img src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" style="width:24px; height:24px; border-radius:50%; object-fit:cover; flex-shrink:0;" alt="">
+        <img src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" style="width:20px; height:20px; border-radius:50%; object-fit:cover; flex-shrink:0;" alt="">
         브랜드홈
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7 17L17 7" stroke="#141414" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M8 7H17V16" stroke="#141414" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <span style="display:block; width:18px; height:18px; flex-shrink:0; background:#141414;
+          -webkit-mask-image:url('https://www.figma.com/api/mcp/asset/5f172262-103c-476b-b351-1f27bea06b64');
+          mask-image:url('https://www.figma.com/api/mcp/asset/5f172262-103c-476b-b351-1f27bea06b64');
+          -webkit-mask-size:9.92px 9.92px; mask-size:9.92px 9.92px;
+          -webkit-mask-position:4.06px 4.03px; mask-position:4.06px 4.03px;
+          -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;"></span>
       </button>
     </div>
 
@@ -816,36 +918,31 @@ body {
       <!-- 쿠폰 타입 -->
       <div id="benefitCouponType" class="benefit-coupon-type">
         <div class="benefit-coupon-inner">
-          <div class="benefit-title-section">
-            <div class="benefit-title">Benefit</div>
-            <div class="benefit-timer-wrap">
-              <div class="benefit-timer" id="timerText">종료까지 0일 3시간 22분 14초 남음</div>
-              <div class="benefit-slider" style="height:1.5px; position:relative;">
-                <div class="slider-bg"></div>
-                <div class="slider-fill" id="progressFill"></div>
-              </div>
-            </div>
-          </div>
+          <div class="benefit-title">Benefit</div>
+          <div class="benefit-progress-bar"></div>
           <div class="coupon-card-wrap">
             <div class="coupon-card">
-              <img class="coupon-bg" src="https://www.figma.com/api/mcp/asset/bc5c7f2d-5650-4811-8f3a-7a5866681955" alt="">
+              <img class="coupon-bg" src="https://www.figma.com/api/mcp/asset/21d64405-2252-4213-a028-7ca6ddecdfca" alt="">
               <div class="coupon-dashes"></div>
               <div class="coupon-content">
                 <div class="coupon-left">
                   <div class="coupon-amount-row">
-                    <img class="coupon-tilde" src="https://www.figma.com/api/mcp/asset/66518fec-0433-480c-b8c9-1f6aa90a1cd9" alt="~">
+                    <img class="coupon-tilde" src="https://www.figma.com/api/mcp/asset/edf1403c-c1e4-41f7-b7d3-7d20f286513b" alt="~">
                     <span class="coupon-num">10,000</span>
                     <span class="coupon-unit">원</span>
                   </div>
-                  <div class="coupon-sub">상품쿠폰<br>5만원 구매 시 적용 가능</div>
+                  <div class="coupon-sub">
+                    <span class="coupon-sub-desc">5만원 구매 시 최대 10자</span>
+                    <span class="coupon-sub-timer" id="timerText">종료까지 0일 3시간 22분 14초 남음</span>
+                  </div>
                 </div>
                 <div class="coupon-right">
                   <div class="download-icon-wrap">
-                    <div class="dl-arrow-up" style="position:absolute; left:50%; top:3.8px; transform:translateX(-50%); width:6.6px; height:9.4px;">
-                      <img src="https://www.figma.com/api/mcp/asset/63f9fce3-f335-41a8-8288-c33ad3eaef8e" style="width:100%; height:100%; display:block; transform:scaleY(-1);" alt="">
+                    <div style="position:absolute; left:50%; top:3.8px; transform:translateX(-50%); width:6.6px; height:9.4px;">
+                      <img src="https://www.figma.com/api/mcp/asset/da19fe41-f205-4a14-b834-249e151c3a64" style="width:100%; height:100%; display:block; transform:scaleY(-1);" alt="">
                     </div>
                     <div style="position:absolute; left:50%; top:14.3px; transform:translateX(-50%); width:16.36px; height:5.7px;">
-                      <img src="https://www.figma.com/api/mcp/asset/169b0ed8-4eea-48f4-a001-187f0bc916d4" style="width:100%; height:100%; display:block;" alt="">
+                      <img src="https://www.figma.com/api/mcp/asset/127c79e8-8f25-47ac-85bb-c294c47071a3" style="width:100%; height:100%; display:block;" alt="">
                     </div>
                   </div>
                 </div>
@@ -862,87 +959,7 @@ body {
             <div class="benefit-title">Benefit</div>
             <div class="benefit-full-slider"></div>
           </div>
-          <div class="benefit-items-list">
-
-            <!-- 01 -->
-            <div class="benefit-item-wrap">
-              <div class="benefit-num">01</div>
-              <div style="height: fit-content;">
-                <div class="benefit-item-title">상품 한정 최대 10% 할인</div>
-                <div class="benefit-item-desc">기획전 상품 대상</div>
-              </div>
-            </div>
-            <div class="benefit-item-divider"></div>
-
-            <!-- 02 -->
-            <div class="benefit-item-wrap">
-              <div class="benefit-num">02</div>
-              <div style="display:flex; flex-direction:column; gap:12px;">
-                <div>
-                  <div class="benefit-item-title">기간 한정 쿠폰팩</div>
-                  <div class="benefit-item-desc">1만원 이상, 최대 100만원</div>
-                </div>
-                <!-- 서술형 쿠폰 카드 -->
-                <div class="detail-coupon-card">
-                  <img class="detail-coupon-bg" src="https://www.figma.com/api/mcp/asset/84e1ccf3-e9f5-474a-9219-5c3012fa14fc" alt="">
-                  <div class="detail-coupon-dashes"></div>
-                  <div class="detail-coupon-content">
-                    <div class="detail-coupon-left">
-                      <div class="detail-coupon-amount">최대 10% 할인</div>
-                      <div class="detail-coupon-sub">5만원 구매 시 적용 가능</div>
-                    </div>
-                    <div class="detail-coupon-right">
-                      <div class="download-icon-wrap">
-                        <div style="position:absolute; left:50%; top:3.8px; transform:translateX(-50%); width:6.6px; height:9.4px;">
-                          <img src="https://www.figma.com/api/mcp/asset/63f9fce3-f335-41a8-8288-c33ad3eaef8e" style="width:100%; height:100%; display:block; transform:scaleY(-1);" alt="">
-                        </div>
-                        <div style="position:absolute; left:50%; top:14.3px; transform:translateX(-50%); width:16.36px; height:5.7px;">
-                          <img src="https://www.figma.com/api/mcp/asset/169b0ed8-4eea-48f4-a001-187f0bc916d4" style="width:100%; height:100%; display:block;" alt="">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="benefit-item-divider"></div>
-
-            <!-- 03 -->
-            <div class="benefit-item-wrap">
-              <div class="benefit-num">03</div>
-              <div style="display:flex; flex-direction:column; gap:12px;">
-                <div>
-                  <div class="benefit-item-title">카카오페이 7% 할인</div>
-                  <div class="benefit-item-desc">3만원 이상, 최대 5만원</div>
-                </div>
-                <div class="payment-card">
-                  <span class="payment-text">카카오페이 9만원 이상 결제 시 1만원 할인</span>
-                  <img class="kakao-logo" src="https://www.figma.com/api/mcp/asset/f1374f90-716a-4cc6-bcda-039252ca4e93" alt="kakaopay">
-                </div>
-              </div>
-            </div>
-            <div class="benefit-item-divider"></div>
-
-            <!-- 04 -->
-            <div class="benefit-item-wrap">
-              <div class="benefit-num">04</div>
-              <div style="display:flex; flex-direction:column; gap:12px;">
-                <div>
-                  <div class="benefit-item-title">사은품 증정</div>
-                  <div class="benefit-item-desc">신상품 포토리뷰 작성 시, 5명 추첨</div>
-                </div>
-                <div class="gift-card">
-                  <div class="gift-text">
-                    <div class="gift-text-inner">포토리뷰 작성 이벤트<br>에어스트레이트 증정</div>
-                  </div>
-                  <div class="gift-img-wrap">
-                    <img class="gift-product" src="https://www.figma.com/api/mcp/asset/910057f2-c260-4081-bd11-4fe134ca5b37" alt="사은품">
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
+          <div class="benefit-items-list" id="detailItemsList"></div>
         </div>
       </div>
 
@@ -971,9 +988,7 @@ body {
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
               <button class="scrap-btn">
-                <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 1.5C1 1.22386 1.22386 1 1.5 1H13.5C13.7761 1 14 1.22386 14 1.5V16.6624C14 16.9685 13.6805 17.1614 13.4164 17.0129L7.5 13.75L1.58359 17.0129C1.31952 17.1614 1 16.9685 1 16.6624V1.5Z" stroke="#141414" stroke-width="1.2"/>
-                </svg>
+                <span class="scrap-icon"></span>
               </button>
             </div>
             <div class="product-info">
@@ -994,9 +1009,7 @@ body {
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
               <button class="scrap-btn">
-                <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 1.5C1 1.22386 1.22386 1 1.5 1H13.5C13.7761 1 14 1.22386 14 1.5V16.6624C14 16.9685 13.6805 17.1614 13.4164 17.0129L7.5 13.75L1.58359 17.0129C1.31952 17.1614 1 16.9685 1 16.6624V1.5Z" stroke="#141414" stroke-width="1.2"/>
-                </svg>
+                <span class="scrap-icon"></span>
               </button>
             </div>
             <div class="product-info">
@@ -1020,9 +1033,7 @@ body {
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
               <button class="scrap-btn">
-                <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 1.5C1 1.22386 1.22386 1 1.5 1H13.5C13.7761 1 14 1.22386 14 1.5V16.6624C14 16.9685 13.6805 17.1614 13.4164 17.0129L7.5 13.75L1.58359 17.0129C1.31952 17.1614 1 16.9685 1 16.6624V1.5Z" stroke="#141414" stroke-width="1.2"/>
-                </svg>
+                <span class="scrap-icon"></span>
               </button>
             </div>
             <div class="product-info">
@@ -1043,9 +1054,7 @@ body {
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
               <button class="scrap-btn">
-                <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 1.5C1 1.22386 1.22386 1 1.5 1H13.5C13.7761 1 14 1.22386 14 1.5V16.6624C14 16.9685 13.6805 17.1614 13.4164 17.0129L7.5 13.75L1.58359 17.0129C1.31952 17.1614 1 16.9685 1 16.6624V1.5Z" stroke="#141414" stroke-width="1.2"/>
-                </svg>
+                <span class="scrap-icon"></span>
               </button>
             </div>
             <div class="product-info">
@@ -1069,9 +1078,7 @@ body {
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
               <button class="scrap-btn">
-                <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 1.5C1 1.22386 1.22386 1 1.5 1H13.5C13.7761 1 14 1.22386 14 1.5V16.6624C14 16.9685 13.6805 17.1614 13.4164 17.0129L7.5 13.75L1.58359 17.0129C1.31952 17.1614 1 16.9685 1 16.6624V1.5Z" stroke="#141414" stroke-width="1.2"/>
-                </svg>
+                <span class="scrap-icon"></span>
               </button>
             </div>
             <div class="product-info">
@@ -1092,9 +1099,7 @@ body {
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
               <button class="scrap-btn">
-                <svg width="15" height="18" viewBox="0 0 15 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M1 1.5C1 1.22386 1.22386 1 1.5 1H13.5C13.7761 1 14 1.22386 14 1.5V16.6624C14 16.9685 13.6805 17.1614 13.4164 17.0129L7.5 13.75L1.58359 17.0129C1.31952 17.1614 1 16.9685 1 16.6624V1.5Z" stroke="#141414" stroke-width="1.2"/>
-                </svg>
+                <span class="scrap-icon"></span>
               </button>
             </div>
             <div class="product-info">
@@ -1132,6 +1137,7 @@ body {
     document.getElementById('heroImage').style.display = checked ? 'block' : 'none';
     const ht = document.getElementById('heroText');
     ht.style.display = checked ? 'none' : 'flex';
+    document.getElementById('brandCta').style.paddingTop = checked ? '24px' : '12px';
   }
 
   // ─── 모듈 토글 ─────────────────────────
@@ -1143,6 +1149,119 @@ body {
   function setBenefitType(value) {
     document.getElementById('benefitCouponType').style.display = value === 'coupon' ? 'block' : 'none';
     document.getElementById('benefitDetailType').style.display = value === 'detail' ? 'block' : 'none';
+    document.getElementById('detailEditPanel').style.display = value === 'detail' ? 'block' : 'none';
+    if (value === 'detail') {
+      renderDetailPanel();
+      renderDetailSection();
+    }
+  }
+
+  // ─── 서술형 items state ─────────────────
+  let detailItems = [
+    { type: 'basic',   title: '상품 한정 최대 10% 할인', subtext: '기획전 상품 대상' },
+    { type: 'coupon',  title: '기간 한정 쿠폰팩',        subtext: '1만원 이상, 최대 100만원' },
+    { type: 'payment', title: '카카오페이 7% 할인',       subtext: '카카오페이 9만원 이상 결제 시 1만원 할인' },
+    { type: 'gift',    title: '사은품 증정',              subtext: '신상품 포토리뷰 작성 시, 5명 추첨' },
+  ];
+  const typeLabels = { basic: '기본형', coupon: '쿠폰형', payment: '결제혜택형', gift: '사은품형' };
+
+  function addDetailItem() {
+    detailItems.push({ type: 'basic', title: '', subtext: '' });
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function removeDetailItem(idx) {
+    if (detailItems.length <= 1) return;
+    detailItems.splice(idx, 1);
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function updateDetailItem(idx, field, value) {
+    detailItems[idx][field] = value;
+    renderDetailSection();
+  }
+
+  function updateDetailItemType(idx, value) {
+    detailItems[idx].type = value;
+    renderDetailSection();
+  }
+
+  function renderDetailPanel() {
+    const container = document.getElementById('detailItemControls');
+    container.innerHTML = detailItems.map((item, idx) => `
+      <div class="detail-item-control">
+        <div class="detail-item-header">
+          <span class="detail-item-num">${String(idx + 1).padStart(2, '0')}</span>
+          <button class="detail-item-del" onclick="removeDetailItem(${idx})">✕</button>
+        </div>
+        <input class="panel-input" type="text" value="${item.title.replace(/"/g, '&quot;')}" placeholder="제목" oninput="updateDetailItem(${idx}, 'title', this.value)">
+        <input class="panel-input" type="text" value="${item.subtext.replace(/"/g, '&quot;')}" placeholder="서브텍스트 (선택)" oninput="updateDetailItem(${idx}, 'subtext', this.value)">
+        <select class="panel-select-sm" onchange="updateDetailItemType(${idx}, this.value)">
+          ${['basic','coupon','payment','gift'].map(t => `<option value="${t}"${item.type===t?' selected':''}>${typeLabels[t]}</option>`).join('')}
+        </select>
+      </div>
+    `).join('');
+  }
+
+  function renderDetailSection() {
+    const list = document.getElementById('detailItemsList');
+    list.innerHTML = detailItems.map((item, idx) => {
+      const num = String(idx + 1).padStart(2, '0');
+      const hasSubtext = item.subtext && item.subtext.trim();
+      const titleBlock = `
+        <div>
+          <div class="benefit-item-title">${item.title || '&nbsp;'}</div>
+          ${hasSubtext ? `<div class="benefit-item-desc">${item.subtext}</div>` : ''}
+        </div>`;
+      let cardBlock = '';
+      if (item.type === 'coupon') cardBlock = renderCouponCard();
+      else if (item.type === 'payment') cardBlock = renderPaymentCard(item.subtext);
+      else if (item.type === 'gift') cardBlock = renderGiftCard();
+      const divider = idx < detailItems.length - 1 ? `<div class="benefit-item-divider"></div>` : '';
+      const inner = cardBlock
+        ? `<div style="display:flex;flex-direction:column;gap:12px;">${titleBlock}${cardBlock}</div>`
+        : titleBlock;
+      return `<div class="benefit-item-wrap"><div class="benefit-num">${num}</div>${inner}</div>${divider}`;
+    }).join('');
+  }
+
+  function renderCouponCard() {
+    return `
+      <div class="detail-coupon-card">
+        <img class="detail-coupon-bg" src="https://www.figma.com/api/mcp/asset/a97fba83-993f-46a6-9f55-8ab8e193b58c" alt="">
+        <div class="detail-coupon-dashes"></div>
+        <div class="detail-coupon-content">
+          <div class="detail-coupon-left">
+            <div class="detail-coupon-amount">최대 10% 할인</div>
+            <div class="detail-coupon-sub">5만원 구매 시 적용 가능</div>
+          </div>
+          <div class="detail-coupon-right">
+            <div class="download-icon-wrap">
+              <div style="position:absolute;left:50%;top:3.8px;transform:translateX(-50%);width:6.6px;height:9.4px;">
+                <img src="https://www.figma.com/api/mcp/asset/8644b140-adb6-4cc1-ac0d-957b0f21a74e" style="width:100%;height:100%;display:block;transform:scaleY(-1);" alt="">
+              </div>
+              <div style="position:absolute;left:50%;top:14.3px;transform:translateX(-50%);width:16.36px;height:5.7px;">
+                <img src="https://www.figma.com/api/mcp/asset/b85bf019-182a-418b-8a9d-c8923d549b7a" style="width:100%;height:100%;display:block;" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderPaymentCard(subtext) {
+    const text = (subtext && subtext.trim()) ? subtext : '카카오페이 결제 시 할인';
+    return `
+      <div class="payment-card">
+        <span class="payment-text">${text}</span>
+        <img class="kakao-logo" src="https://www.figma.com/api/mcp/asset/f1374f90-716a-4cc6-bcda-039252ca4e93" alt="kakaopay">
+      </div>`;
+  }
+
+  function renderGiftCard() {
+    return `<div class="gift-placeholder"><span class="gift-placeholder-icon"></span></div>`;
   }
 
   // ─── 칩 필터 ───────────────────────────
