@@ -1244,14 +1244,14 @@ body.preview-mode .preview-toggle { display: block; }
 
     <!-- BRAND HOME CTA -->
     <div class="brand-cta" id="brandCta" style="padding-top:24px;">
-      <button class="btn-outlined" onclick="showScrapSnackbar()">
-        <span style="display:block; width:18px; height:18px; flex-shrink:0; background:#141414;
+      <button class="btn-outlined" id="brandScrapBtn" onclick="toggleBrandScrap()">
+        <span id="brandScrapIcon" style="display:block; width:18px; height:18px; flex-shrink:0; background:#141414;
           -webkit-mask-image:url('https://www.figma.com/api/mcp/asset/a63e0ce4-7f08-4e32-b3a7-c1f47b1d03ac');
           mask-image:url('https://www.figma.com/api/mcp/asset/a63e0ce4-7f08-4e32-b3a7-c1f47b1d03ac');
           -webkit-mask-size:11.7px 13.7px; mask-size:11.7px 13.7px;
           -webkit-mask-position:3.15px 2.25px; mask-position:3.15px 2.25px;
           -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;"></span>
-        브랜드 스크랩
+        <span id="brandScrapLabel">브랜드 스크랩</span>
       </button>
       <button class="btn-outlined">
         <img src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" style="width:20px; height:20px; border-radius:50%; object-fit:cover; flex-shrink:0;" alt="">
@@ -2157,6 +2157,25 @@ body.preview-mode .preview-toggle { display: block; }
   function toggleScrap(btn) {
     btn.querySelector('.scrap-icon').classList.toggle('selected');
     showScrapSnackbar();
+  }
+
+  const BRAND_SCRAP_ICON_DEFAULT = "https://www.figma.com/api/mcp/asset/a63e0ce4-7f08-4e32-b3a7-c1f47b1d03ac";
+  const BRAND_SCRAP_ICON_CANCEL  = "https://www.figma.com/api/mcp/asset/2b03cc3a-1b67-4ea4-8b03-e7e9cb399eee";
+  let brandScrapped = false;
+  function toggleBrandScrap() {
+    brandScrapped = !brandScrapped;
+    const icon  = document.getElementById('brandScrapIcon');
+    const label = document.getElementById('brandScrapLabel');
+    if (brandScrapped) {
+      icon.style.webkitMaskImage = `url('${BRAND_SCRAP_ICON_CANCEL}')`;
+      icon.style.maskImage       = `url('${BRAND_SCRAP_ICON_CANCEL}')`;
+      label.textContent = '스크랩 취소';
+      showScrapSnackbar();
+    } else {
+      icon.style.webkitMaskImage = `url('${BRAND_SCRAP_ICON_DEFAULT}')`;
+      icon.style.maskImage       = `url('${BRAND_SCRAP_ICON_DEFAULT}')`;
+      label.textContent = '브랜드 스크랩';
+    }
   }
   function goToScrapbook() {
     document.getElementById('snackbar').classList.remove('show');
