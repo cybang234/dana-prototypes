@@ -753,7 +753,9 @@ body.preview-mode .preview-toggle { display: block; }
   padding: 12px 16px 16px;
   overflow-x: auto; background: #fff;
   position: sticky; top: 0; z-index: 10;
+  transition: padding-top 0.15s;
 }
+.chip-strip.is-stuck { padding-top: 0; }
 .chip-strip::-webkit-scrollbar { display: none; }
 
 .chip {
@@ -1221,6 +1223,8 @@ body.preview-mode .preview-toggle { display: block; }
     <!-- PRODUCT LIST -->
     <div class="product-section">
 
+      <!-- sticky 감지용 센티넬 -->
+      <div id="chipSentinel" style="height:1px;"></div>
       <!-- 칩 필터 -->
       <div class="chip-strip" id="chipStrip">
         <button class="chip active" onclick="selectChip(this)">전체</button>
@@ -1576,6 +1580,13 @@ body.preview-mode .preview-toggle { display: block; }
 
   setInterval(updateTimer, 1000);
   updateTimer();
+
+  // ─── 칩 sticky 감지 ────────────────────
+  const chipObserver = new IntersectionObserver(
+    ([e]) => document.getElementById('chipStrip').classList.toggle('is-stuck', !e.isIntersecting),
+    { root: document.querySelector('.scroll-area'), threshold: 1 }
+  );
+  chipObserver.observe(document.getElementById('chipSentinel'));
 
   // ─── 모바일 바텀시트 ───────────────────
   function openMobilePanel() {
