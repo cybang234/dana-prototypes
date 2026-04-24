@@ -908,6 +908,11 @@ body.preview-mode .preview-toggle { display: block; }
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
 }
+.scrap-icon.selected {
+  background: #00a1ff;
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/d4f56051-2bea-4ebd-8b23-8ab2b3090da2');
+  mask-image: url('https://www.figma.com/api/mcp/asset/d4f56051-2bea-4ebd-8b23-8ab2b3090da2');
+}
 
 .product-info { padding: 8px 9px 0; }
 .product-brand {
@@ -1337,7 +1342,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()">
+              <button class="scrap-btn" onclick="toggleScrap(this)">
                 <span class="scrap-icon"></span>
               </button>
             </div>
@@ -1358,7 +1363,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()">
+              <button class="scrap-btn" onclick="toggleScrap(this)">
                 <span class="scrap-icon"></span>
               </button>
             </div>
@@ -1382,7 +1387,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()">
+              <button class="scrap-btn" onclick="toggleScrap(this)">
                 <span class="scrap-icon"></span>
               </button>
             </div>
@@ -1403,7 +1408,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()">
+              <button class="scrap-btn" onclick="toggleScrap(this)">
                 <span class="scrap-icon"></span>
               </button>
             </div>
@@ -1427,7 +1432,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()">
+              <button class="scrap-btn" onclick="toggleScrap(this)">
                 <span class="scrap-icon"></span>
               </button>
             </div>
@@ -1448,7 +1453,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()">
+              <button class="scrap-btn" onclick="toggleScrap(this)">
                 <span class="scrap-icon"></span>
               </button>
             </div>
@@ -1472,7 +1477,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">일룸</div>
@@ -1484,7 +1489,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">리바트</div>
@@ -1499,7 +1504,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">한샘</div>
@@ -1511,7 +1516,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">에이스침대</div>
@@ -1526,7 +1531,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">까사미아</div>
@@ -1538,7 +1543,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">이케아</div>
@@ -1553,7 +1558,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">시디즈</div>
@@ -1565,7 +1570,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">퍼시스</div>
@@ -1580,7 +1585,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">보루네오</div>
@@ -1592,7 +1597,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">자코모</div>
@@ -1607,7 +1612,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">스툴앤체어</div>
@@ -1619,7 +1624,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">일룸</div>
@@ -1634,7 +1639,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">까사마루</div>
@@ -1646,7 +1651,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">리바트</div>
@@ -1661,7 +1666,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">한샘</div>
@@ -1673,7 +1678,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">까사미아</div>
@@ -1688,7 +1693,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">이케아</div>
@@ -1700,7 +1705,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">보루네오</div>
@@ -1715,7 +1720,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">자코모</div>
@@ -1727,7 +1732,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">퍼시스</div>
@@ -1742,7 +1747,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">에이스침대</div>
@@ -1754,7 +1759,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">스툴앤체어</div>
@@ -1769,7 +1774,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">한샘</div>
@@ -1781,7 +1786,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">일룸</div>
@@ -1796,7 +1801,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">리바트</div>
@@ -1808,7 +1813,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">까사마루</div>
@@ -1823,7 +1828,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">시디즈</div>
@@ -1835,7 +1840,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">이케아</div>
@@ -1850,7 +1855,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/4422d561-7d9b-47a1-9138-70acacbb5ee2" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">까사미아</div>
@@ -1862,7 +1867,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card">
             <div class="product-img-wrap">
               <img class="product-img" src="https://www.figma.com/api/mcp/asset/5d9bc3f4-ac18-4e2c-8b3f-2a17e0bf47c3" alt="product">
-              <button class="scrap-btn" onclick="showScrapSnackbar()"><span class="scrap-icon"></span></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><span class="scrap-icon"></span></button>
             </div>
             <div class="product-info">
               <div class="product-brand">한샘</div>
@@ -2148,6 +2153,10 @@ body.preview-mode .preview-toggle { display: block; }
     sb.classList.add('show');
     clearTimeout(snackbarTimer);
     snackbarTimer = setTimeout(() => sb.classList.remove('show'), 3000);
+  }
+  function toggleScrap(btn) {
+    btn.querySelector('.scrap-icon').classList.toggle('selected');
+    showScrapSnackbar();
   }
   function goToScrapbook() {
     document.getElementById('snackbar').classList.remove('show');
