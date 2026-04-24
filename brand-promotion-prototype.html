@@ -34,6 +34,81 @@ body {
 }
 
 /* ──────────────────────────────────
+   MOBILE LAYOUT
+────────────────────────────────── */
+@media (max-width: 900px) {
+  body {
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0 120px;
+  }
+  .side-panel {
+    display: none;
+  }
+  /* 모바일 편집 버튼 */
+  .mobile-edit-btn {
+    display: flex !important;
+  }
+  /* 바텀시트 */
+  .mobile-panel-sheet {
+    display: block !important;
+  }
+}
+
+/* 모바일 편집 FAB */
+.mobile-edit-btn {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  background: #141414;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.3px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  gap: 6px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* 바텀시트 */
+.mobile-panel-sheet {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+}
+.mobile-panel-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+}
+.mobile-panel-inner {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 16px 20px 40px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.mobile-panel-handle {
+  width: 36px; height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+.mobile-panel-inner::-webkit-scrollbar { display: none; }
+
+/* ──────────────────────────────────
    PREVIEW MODE
 ────────────────────────────────── */
 body.preview-mode {
@@ -925,6 +1000,73 @@ body.preview-mode .preview-toggle { display: block; }
 <!-- 전체보기 모드 복귀 버튼 -->
 <button class="preview-toggle" onclick="exitPreview()">✕ 편집으로</button>
 
+<!-- 모바일 편집 버튼 -->
+<button class="mobile-edit-btn" onclick="openMobilePanel()">⚙ 편집 옵션</button>
+
+<!-- 모바일 바텀시트 -->
+<div class="mobile-panel-sheet" id="mobilePanelSheet">
+  <div class="mobile-panel-dim" onclick="closeMobilePanel()"></div>
+  <div class="mobile-panel-inner" id="mobilePanelInner">
+    <div class="mobile-panel-handle"></div>
+    <!-- 편집 옵션 내용 (side-panel과 동일) -->
+    <h3 style="font-size:13px;font-weight:700;color:#8c8c8c;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:16px;">편집 옵션</h3>
+    <div class="panel-section">
+      <div class="panel-section-title">히어로</div>
+      <div class="panel-row">
+        <span class="panel-label">KV 이미지 사용</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="kvToggleMobile" checked onchange="syncToggle('kvTogglePanel','kvToggleMobile'); toggleKV();">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div class="panel-row" id="logoRowMobile">
+        <span class="panel-label">로고 노출</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="logoToggleMobile" checked onchange="syncToggle('logoToggle','logoToggleMobile'); toggleLogo();">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">브랜드홈 CTA</div>
+      <div class="panel-row">
+        <span class="panel-label">모듈 노출</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="ctaToggleMobile" checked onchange="syncToggle('ctaToggle','ctaToggleMobile'); toggleModule('brandCta', document.getElementById('ctaToggle'));">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">혜택</div>
+      <div class="panel-row">
+        <span class="panel-label">모듈 노출</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="benefitToggleMobile" checked onchange="syncToggle('benefitToggle','benefitToggleMobile'); toggleModule('benefitSection', document.getElementById('benefitToggle'));">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div class="panel-row" style="margin-top:4px;">
+        <span class="panel-label">혜택 타입</span>
+      </div>
+      <select class="panel-select" onchange="setBenefitType(this.value)">
+        <option value="coupon">쿠폰형</option>
+        <option value="detail">서술형</option>
+      </select>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">상품리스트</div>
+      <div class="panel-row">
+        <span class="panel-label sub">필터 타입</span>
+      </div>
+      <select class="panel-select" onchange="setFilterType(this.value)">
+        <option value="category">카테고리 필터</option>
+        <option value="brand">브랜드 필터</option>
+      </select>
+    </div>
+  </div>
+</div>
+
 <!-- ─── PHONE ──────────────────────────── -->
 <div class="phone">
 
@@ -1432,6 +1574,19 @@ body.preview-mode .preview-toggle { display: block; }
 
   setInterval(updateTimer, 1000);
   updateTimer();
+
+  // ─── 모바일 바텀시트 ───────────────────
+  function openMobilePanel() {
+    document.getElementById('mobilePanelSheet').style.display = 'block';
+  }
+  function closeMobilePanel() {
+    document.getElementById('mobilePanelSheet').style.display = 'none';
+  }
+  // 데스크탑 토글 ↔ 모바일 토글 양방향 동기화
+  function syncToggle(masterId, mirrorId) {
+    const mirror = document.getElementById(mirrorId);
+    document.getElementById(masterId).checked = mirror.checked;
+  }
 
   // ─── 전체보기 모드 ─────────────────────
   function enterPreview() {
