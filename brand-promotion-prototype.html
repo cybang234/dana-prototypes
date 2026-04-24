@@ -58,22 +58,31 @@ body {
 /* ── 실제 모바일 기기: 폰 프레임 제거, 풀스크린 ── */
 @media (max-width: 500px) {
   body {
-    background: #fff;
-    padding: 0;
-    align-items: flex-start;
+    background: #fff !important;
+    padding: 0 !important;
+    align-items: stretch;
+    justify-content: flex-start;
   }
   .phone {
-    width: 100vw;
+    width: 100vw !important;
+    min-width: 100vw !important;
     min-height: 100svh;
-    border-radius: 0;
-    box-shadow: none;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible;
   }
   .status-bar {
-    display: none;
+    display: none !important;
   }
   .scroll-area {
+    height: calc(100svh - 44px) !important;
     max-height: none !important;
-    height: calc(100svh - 44px);
+  }
+  /* FAB: phone overflow:visible로 바꿨으므로 fixed로 전환 */
+  .fab-wrap {
+    position: fixed !important;
+    right: 16px;
+    bottom: 40px;
   }
 }
 
