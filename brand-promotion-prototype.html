@@ -1012,8 +1012,10 @@ body.preview-mode .preview-toggle { display: block; }
   width: 100%; aspect-ratio: 343 / 200;
   background: #f5f5f5; border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+  flex-shrink: 0; overflow: hidden; position: relative;
+  cursor: pointer;
 }
+.gift-placeholder:hover .gift-upload-hint { opacity: 1; }
 .gift-placeholder-icon {
   display: block; width: 24px; height: 24px;
   background: #8c8c8c;
@@ -1023,6 +1025,63 @@ body.preview-mode .preview-toggle { display: block; }
   -webkit-mask-position: 3.1px 3.1px; mask-position: 3.1px 3.1px;
   -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
 }
+.gift-upload-hint {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  opacity: 1; transition: opacity 0.15s;
+}
+.gift-upload-hint span {
+  font-size: 12px; color: #8c8c8c;
+  font-family: 'Pretendard', sans-serif; letter-spacing: -0.3px;
+}
+/* 업로드된 이미지: 세로 꽉 차게 + 비율 유지 + 중앙 정렬 */
+.gift-uploaded-img {
+  height: 100%; width: auto;
+  display: block; flex-shrink: 0;
+}
+/* 이미지 올라간 후 hover 시 재업로드 오버레이 */
+.gift-reupload-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.15s; cursor: pointer;
+}
+.gift-placeholder:hover .gift-reupload-overlay { opacity: 1; }
+.gift-reupload-overlay span {
+  font-size: 12px; color: #fff;
+  font-family: 'Pretendard', sans-serif; letter-spacing: -0.3px;
+}
+/* 이미지 업로드 후 액션 바 */
+.gift-action-bar {
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; z-index: 10;
+  opacity: 0; transition: opacity 0.15s;
+}
+.gift-placeholder:hover .gift-action-bar { opacity: 1; }
+.gift-action-btn {
+  height: 28px; padding: 0 10px;
+  background: rgba(0,0,0,0.6); color: #fff;
+  border: none; border-radius: 6px; cursor: pointer;
+  font-size: 11px; font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.2px; white-space: nowrap;
+  transition: background 0.1s;
+}
+.gift-action-btn:hover { background: rgba(0,0,0,0.8); }
+.gift-action-btn:disabled { opacity: 0.6; cursor: default; }
+/* 누끼 로딩 */
+.gift-loading {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.gift-loading span:last-child {
+  font-size: 12px; color: #8c8c8c;
+  font-family: 'Pretendard', sans-serif; letter-spacing: -0.3px;
+}
+.gift-loading-spinner {
+  display: block; width: 20px; height: 20px;
+  border: 2px solid #e0e0e0; border-top-color: #8c8c8c;
+  border-radius: 50%;
+  animation: gift-spin 0.7s linear infinite;
+}
+@keyframes gift-spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -2054,7 +2113,73 @@ body.preview-mode .preview-toggle { display: block; }
   }
 
   function renderGiftCard() {
-    return `<div class="gift-placeholder"><span class="gift-placeholder-icon"></span></div>`;
+    return `
+      <div class="gift-placeholder" id="giftPlaceholder" onclick="document.getElementById('giftFileInput').click()">
+        <input type="file" id="giftFileInput" accept="image/*" style="display:none" onchange="handleGiftImageUpload(event)">
+        <div class="gift-upload-hint" id="giftUploadHint">
+          <span class="gift-placeholder-icon"></span>
+          <span>이미지 업로드</span>
+        </div>
+      </div>`;
+  }
+
+  function handleGiftImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const placeholder = document.getElementById('giftPlaceholder');
+    const hint = document.getElementById('giftUploadHint');
+
+    placeholder.querySelectorAll('.gift-uploaded-img, .gift-action-bar, .gift-loading').forEach(el => el.remove());
+    placeholder.onclick = null;
+
+    // localhost(serve.py)로 열었을 때만 누끼 자동 실행
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      hint.style.display = 'none';
+      const loading = document.createElement('div');
+      loading.className = 'gift-loading';
+      loading.innerHTML = '<span class="gift-loading-spinner"></span><span>누끼 따는 중...</span>';
+      placeholder.insertBefore(loading, hint);
+      runNukiAuto(url, file, placeholder, hint, loading);
+    } else {
+      // file://로 열었을 때는 그냥 이미지 삽입
+      hint.style.display = 'none';
+      const img = document.createElement('img');
+      img.className = 'gift-uploaded-img';
+      img.src = url; img.alt = '사은품 이미지';
+      placeholder.insertBefore(img, hint);
+      const bar = document.createElement('div');
+      bar.className = 'gift-action-bar';
+      bar.innerHTML = `<button class="gift-action-btn" onclick="event.stopPropagation(); document.getElementById('giftFileInput').click()">🔄 이미지 변경</button>`;
+      placeholder.appendChild(bar);
+    }
+  }
+
+  async function runNukiAuto(url, file, placeholder, hint, loading) {
+    try {
+      const { removeBackground } = await import('https://esm.sh/@imgly/background-removal@1.4.5');
+      const resultBlob = await removeBackground(url, {
+        publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/',
+        model: 'small',
+        debug: false,
+      });
+      const resultUrl = URL.createObjectURL(resultBlob);
+      loading.remove();
+      placeholder.style.background = 'repeating-conic-gradient(#e0e0e0 0% 25%, #f5f5f5 0% 50%) 0 0 / 12px 12px';
+      const img = document.createElement('img');
+      img.className = 'gift-uploaded-img';
+      img.src = resultUrl; img.alt = '사은품 이미지';
+      placeholder.insertBefore(img, hint);
+      const bar = document.createElement('div');
+      bar.className = 'gift-action-bar';
+      bar.innerHTML = `<button class="gift-action-btn" onclick="event.stopPropagation(); document.getElementById('giftFileInput').click()">🔄 이미지 변경</button>`;
+      placeholder.appendChild(bar);
+    } catch (err) {
+      console.error('누끼 오류:', err);
+      loading.remove();
+      placeholder.style.background = '#f5f5f5';
+      hint.style.display = 'flex';
+    }
   }
 
   // ─── 칩 필터 ───────────────────────────
