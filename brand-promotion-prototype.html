@@ -2099,7 +2099,7 @@ body.preview-mode .preview-toggle { display: block; }
     { type: 'basic',   title: '상품 한정 최대 10% 할인', subtext: '기획전 상품 대상' },
     { type: 'coupon',  title: '기간 한정 쿠폰팩',        subtext: '1만원 이상, 최대 100만원', showTimer: false },
     { type: 'payment', title: '카카오페이 7% 할인',       subtext: '카카오페이 9만원 이상 결제 시 1만원 할인' },
-    { type: 'gift',    title: '사은품 증정',              subtext: '신상품 포토리뷰 작성 시, 5명 추첨', giftModules: [{ gridType: '1grid' }] },
+    { type: 'gift',    title: '사은품 증정',              subtext: '신상품 포토리뷰 작성 시, 5명 추첨', giftModules: [{ gridType: '1grid', badge: 'N명', showCaption: true, captionText: '더 플렌더 MAX 구매 시 증정', showTitle: true, titleText: '팸퍼스 체험팩(2팩) 추첨 증정', showDesc: true, descText: '구매 제품 동일 단계로 증정' }] },
   ];
   let giftModuleIdCounter = 0;
   const typeLabels = { basic: '기본형', coupon: '쿠폰형', payment: '결제혜택형', gift: '사은품형' };
@@ -2141,7 +2141,7 @@ body.preview-mode .preview-toggle { display: block; }
 
   function addGiftModule(idx) {
     detailItems[idx].giftModules = detailItems[idx].giftModules || [];
-    detailItems[idx].giftModules.push({ gridType: '1grid' });
+    detailItems[idx].giftModules.push({ gridType: '1grid', badge: 'N명', showCaption: true, captionText: '더 플렌더 MAX 구매 시 증정', showTitle: true, titleText: '팸퍼스 체험팩(2팩) 추첨 증정', showDesc: true, descText: '구매 제품 동일 단계로 증정' });
     renderDetailPanel();
     renderDetailSection();
   }
@@ -2155,6 +2155,11 @@ body.preview-mode .preview-toggle { display: block; }
 
   function updateGiftModuleType(idx, modIdx, value) {
     detailItems[idx].giftModules[modIdx].gridType = value;
+    renderDetailSection();
+  }
+
+  function updateGiftModuleField(idx, modIdx, field, value) {
+    detailItems[idx].giftModules[modIdx][field] = value;
     renderDetailSection();
   }
 
@@ -2174,15 +2179,45 @@ body.preview-mode .preview-toggle { display: block; }
       } else if (item.type === 'gift') {
         const modules = item.giftModules || [{ gridType: '1grid' }];
         extraControls = `
-          <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px;">
+          <div style="margin-top:6px;display:flex;flex-direction:column;gap:6px;">
             <span style="font-size:11px;color:#8c8c8c;letter-spacing:-0.3px;">이미지 모듈</span>
             ${modules.map((mod, modIdx) => `
-              <div style="display:flex;gap:4px;align-items:center;">
-                <select class="panel-select-sm" style="flex:1;" onchange="updateGiftModuleType(${idx},${modIdx},this.value)">
-                  <option value="1grid"${mod.gridType==='1grid'?' selected':''}>1 grid</option>
-                  <option value="2grid"${mod.gridType==='2grid'?' selected':''}>2 grid</option>
-                </select>
-                ${modules.length > 1 ? `<button onclick="removeGiftModule(${idx},${modIdx})" style="background:none;border:none;color:#8c8c8c;cursor:pointer;font-size:12px;padding:4px;">✕</button>` : ''}
+              <div style="display:flex;flex-direction:column;gap:4px;padding:8px;background:#f8f8f8;border-radius:6px;">
+                <div style="display:flex;gap:4px;align-items:center;">
+                  <select class="panel-select-sm" style="flex:1;" onchange="updateGiftModuleType(${idx},${modIdx},this.value)">
+                    <option value="1grid"${mod.gridType==='1grid'?' selected':''}>1 grid</option>
+                    <option value="2grid"${mod.gridType==='2grid'?' selected':''}>2 grid</option>
+                  </select>
+                  ${modules.length > 1 ? `<button onclick="removeGiftModule(${idx},${modIdx})" style="background:none;border:none;color:#8c8c8c;cursor:pointer;font-size:12px;padding:4px;">✕</button>` : ''}
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:10px;color:#8c8c8c;min-width:32px;letter-spacing:-0.3px;">뱃지</span>
+                  <input class="panel-input" style="flex:1;font-size:11px;margin:0;" type="text" value="${(mod.badge||'N명').replace(/"/g,'&quot;')}" placeholder="N명" oninput="updateGiftModuleField(${idx},${modIdx},'badge',this.value)">
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:10px;color:#8c8c8c;min-width:32px;letter-spacing:-0.3px;">캡션</span>
+                  <label class="toggle-switch" style="transform:scale(0.7);transform-origin:left;flex-shrink:0;">
+                    <input type="checkbox" ${mod.showCaption!==false?'checked':''} onchange="updateGiftModuleField(${idx},${modIdx},'showCaption',this.checked)">
+                    <span class="toggle-track"></span>
+                  </label>
+                  <input class="panel-input" style="flex:1;font-size:11px;margin:0;" type="text" value="${(mod.captionText||'').replace(/"/g,'&quot;')}" placeholder="캡션 텍스트" oninput="updateGiftModuleField(${idx},${modIdx},'captionText',this.value)">
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:10px;color:#8c8c8c;min-width:32px;letter-spacing:-0.3px;">타이틀</span>
+                  <label class="toggle-switch" style="transform:scale(0.7);transform-origin:left;flex-shrink:0;">
+                    <input type="checkbox" ${mod.showTitle!==false?'checked':''} onchange="updateGiftModuleField(${idx},${modIdx},'showTitle',this.checked)">
+                    <span class="toggle-track"></span>
+                  </label>
+                  <input class="panel-input" style="flex:1;font-size:11px;margin:0;" type="text" value="${(mod.titleText||'').replace(/"/g,'&quot;')}" placeholder="타이틀 텍스트" oninput="updateGiftModuleField(${idx},${modIdx},'titleText',this.value)">
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:10px;color:#8c8c8c;min-width:32px;letter-spacing:-0.3px;">서브</span>
+                  <label class="toggle-switch" style="transform:scale(0.7);transform-origin:left;flex-shrink:0;">
+                    <input type="checkbox" ${mod.showDesc!==false?'checked':''} onchange="updateGiftModuleField(${idx},${modIdx},'showDesc',this.checked)">
+                    <span class="toggle-track"></span>
+                  </label>
+                  <input class="panel-input" style="flex:1;font-size:11px;margin:0;" type="text" value="${(mod.descText||'').replace(/"/g,'&quot;')}" placeholder="서브타이틀 텍스트" oninput="updateGiftModuleField(${idx},${modIdx},'descText',this.value)">
+                </div>
               </div>`).join('')}
             <button onclick="addGiftModule(${idx})" style="font-size:11px;color:#00a1ff;background:none;border:none;cursor:pointer;text-align:left;padding:2px 0;letter-spacing:-0.3px;">+ 모듈 추가</button>
           </div>`;
@@ -2267,6 +2302,12 @@ body.preview-mode .preview-toggle { display: block; }
     const rendered = modules.map((mod) => {
       giftModuleIdCounter++;
       const uid0 = 'gm' + giftModuleIdCounter + 'a';
+      const badge = mod.badge || 'N명';
+      const captionHtml = mod.showCaption !== false ? `<div class="gift-img-caption">${mod.captionText || ''}</div>` : '';
+      const titleHtml = mod.showTitle !== false ? `<div class="gift-module-title">${mod.titleText || ''}</div>` : '';
+      const descHtml = mod.showDesc !== false ? `<div class="gift-module-desc">${mod.descText || ''}</div>` : '';
+      const textBlock = (titleHtml || descHtml) ? `${titleHtml}${descHtml}` : '';
+
       if (mod.gridType === '1grid') {
         return `
           <div class="gift-img-module">
@@ -2275,11 +2316,10 @@ body.preview-mode .preview-toggle { display: block; }
               <div class="gift-img-inner" id="gi-${uid0}">
                 <span class="gift-module-ph-icon" id="gph-${uid0}"></span>
               </div>
-              <span class="gift-img-badge">N명</span>
-              <div class="gift-img-caption">더 플렌더 MAX 구매 시 증정</div>
+              <span class="gift-img-badge">${badge}</span>
+              ${captionHtml}
             </div>
-            <div class="gift-module-title">팸퍼스 체험팩(2팩) 추첨 증정</div>
-            <div class="gift-module-desc">구매 제품 동일 단계로 증정</div>
+            ${textBlock}
           </div>`;
       } else {
         const uid1 = 'gm' + giftModuleIdCounter + 'b';
@@ -2291,20 +2331,19 @@ body.preview-mode .preview-toggle { display: block; }
                 <div class="gift-img-inner" id="gi-${uid0}">
                   <span class="gift-module-ph-icon" id="gph-${uid0}"></span>
                 </div>
-                <span class="gift-img-badge">N명</span>
-                <div class="gift-img-caption">더 플렌더 MAX 구매 시 증정</div>
+                <span class="gift-img-badge">${badge}</span>
+                ${captionHtml}
               </div>
               <div class="gift-img-2grid-slot" onclick="document.getElementById('gf-${uid1}').click()">
                 <input type="file" id="gf-${uid1}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,'${uid1}')">
                 <div class="gift-img-inner" id="gi-${uid1}">
                   <span class="gift-module-ph-icon" id="gph-${uid1}"></span>
                 </div>
-                <span class="gift-img-badge">N명</span>
-                <div class="gift-img-caption">더 플렌더 MAX 구매 시 증정</div>
+                <span class="gift-img-badge">${badge}</span>
+                ${captionHtml}
               </div>
             </div>
-            <div class="gift-module-title">팸퍼스 체험팩(2팩) 추첨 증정</div>
-            <div class="gift-module-desc">구매 제품 동일 단계로 증정</div>
+            ${textBlock}
           </div>`;
       }
     });
