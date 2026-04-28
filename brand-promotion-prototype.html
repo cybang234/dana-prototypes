@@ -2317,7 +2317,7 @@ body.preview-mode .preview-toggle { display: block; }
       let cardBlock = '';
       if (item.type === 'coupon') cardBlock = renderCouponCard(item);
       else if (item.type === 'payment') cardBlock = renderPaymentCard(item);
-      else if (item.type === 'gift') cardBlock = renderGiftCard(item);
+      else if (item.type === 'gift') cardBlock = renderGiftCard(item, idx);
       const divider = idx < detailItems.length - 1 ? `<div class="benefit-item-divider"></div>` : '';
       const inner = cardBlock
         ? `<div style="display:flex;flex-direction:column;gap:12px;">${titleBlock}${cardBlock}</div>`
@@ -2383,11 +2383,19 @@ body.preview-mode .preview-toggle { display: block; }
     }
   }
 
-  function renderGiftCard(item) {
+  function renderGiftSlotInner(imgUrl, phId) {
+    if (imgUrl) {
+      return `<img class="gift-module-img" src="${imgUrl}" alt="">`;
+    }
+    return `<span class="gift-module-ph-icon" id="${phId}"></span>`;
+  }
+
+  function renderGiftCard(item, itemIdx) {
     const modules = (item && item.giftModules) ? item.giftModules : [{ gridType: '1grid' }];
-    const rendered = modules.map((mod) => {
-      giftModuleIdCounter++;
-      const uid0 = 'gm' + giftModuleIdCounter + 'a';
+    const rendered = modules.map((mod, modIdx) => {
+      // stable IDs based on item/module index — survive re-renders
+      const idA = `gift-${itemIdx}-${modIdx}-a`;
+      const idB = `gift-${itemIdx}-${modIdx}-b`;
       const badgeHtml = mod.showBadge !== false ? `<span class="gift-img-badge">${mod.badge || 'N명'}</span>` : '';
       const captionHtml = mod.showCaption !== false ? `<div class="gift-img-caption">${mod.captionText || ''}</div>` : '';
       const titleHtml = mod.showTitle !== false ? `<div class="gift-module-title">${mod.titleText || ''}</div>` : '';
@@ -2397,10 +2405,10 @@ body.preview-mode .preview-toggle { display: block; }
       if (mod.gridType === '1grid') {
         return `
           <div class="gift-img-module">
-            <div class="gift-img-1grid-box" onclick="document.getElementById('gf-${uid0}').click()">
-              <input type="file" id="gf-${uid0}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,'${uid0}')">
-              <div class="gift-img-inner" id="gi-${uid0}">
-                <span class="gift-module-ph-icon" id="gph-${uid0}"></span>
+            <div class="gift-img-1grid-box" onclick="document.getElementById('gf-${idA}').click()">
+              <input type="file" id="gf-${idA}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,${itemIdx},${modIdx},'a')">
+              <div class="gift-img-inner" id="gi-${idA}">
+                ${renderGiftSlotInner(mod.imgUrlA, 'gph-' + idA)}
               </div>
               ${badgeHtml}
               ${captionHtml}
@@ -2408,22 +2416,21 @@ body.preview-mode .preview-toggle { display: block; }
             ${textBlock}
           </div>`;
       } else {
-        const uid1 = 'gm' + giftModuleIdCounter + 'b';
         return `
           <div class="gift-img-module">
             <div class="gift-img-2grid-wrap">
-              <div class="gift-img-2grid-slot" onclick="document.getElementById('gf-${uid0}').click()">
-                <input type="file" id="gf-${uid0}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,'${uid0}')">
-                <div class="gift-img-inner" id="gi-${uid0}">
-                  <span class="gift-module-ph-icon" id="gph-${uid0}"></span>
+              <div class="gift-img-2grid-slot" onclick="document.getElementById('gf-${idA}').click()">
+                <input type="file" id="gf-${idA}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,${itemIdx},${modIdx},'a')">
+                <div class="gift-img-inner" id="gi-${idA}">
+                  ${renderGiftSlotInner(mod.imgUrlA, 'gph-' + idA)}
                 </div>
                 ${badgeHtml}
                 ${captionHtml}
               </div>
-              <div class="gift-img-2grid-slot" onclick="document.getElementById('gf-${uid1}').click()">
-                <input type="file" id="gf-${uid1}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,'${uid1}')">
-                <div class="gift-img-inner" id="gi-${uid1}">
-                  <span class="gift-module-ph-icon" id="gph-${uid1}"></span>
+              <div class="gift-img-2grid-slot" onclick="document.getElementById('gf-${idB}').click()">
+                <input type="file" id="gf-${idB}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,${itemIdx},${modIdx},'b')">
+                <div class="gift-img-inner" id="gi-${idB}">
+                  ${renderGiftSlotInner(mod.imgUrlB, 'gph-' + idB)}
                 </div>
                 ${badgeHtml}
                 ${captionHtml}
@@ -2436,18 +2443,13 @@ body.preview-mode .preview-toggle { display: block; }
     return `<div class="gift-module-list">${rendered.join('')}</div>`;
   }
 
-  function handleGiftModuleUpload(event, uid) {
+  function handleGiftModuleUpload(event, itemIdx, modIdx, slot) {
     const file = event.target.files[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
-    const inner = document.getElementById('gi-' + uid);
-    const ph = document.getElementById('gph-' + uid);
-    if (ph) ph.style.display = 'none';
-    inner.querySelectorAll('.gift-module-img').forEach(el => el.remove());
-    const img = document.createElement('img');
-    img.className = 'gift-module-img';
-    img.src = url;
-    inner.appendChild(img);
+    const key = slot === 'b' ? 'imgUrlB' : 'imgUrlA';
+    detailItems[itemIdx].giftModules[modIdx][key] = url;
+    renderDetailSection();
   }
 
   function handleGiftImageUpload(event) {
