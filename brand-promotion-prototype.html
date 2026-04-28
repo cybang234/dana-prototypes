@@ -785,6 +785,82 @@ body.preview-mode .preview-toggle { display: block; }
   padding: 10px 10px 12px;
 }
 
+/* 쿠폰 종료시간 타이머 (빨간 텍스트) */
+.coupon-sub-timer-red {
+  font-size: 12px; font-weight: 500;
+  color: #fd3d4a; line-height: 16px;
+  letter-spacing: -0.3px; font-family: 'Pretendard', sans-serif;
+}
+
+/* 사은품 이미지 모듈 */
+.gift-module-list { display: flex; flex-direction: column; gap: 16px; }
+.gift-img-module { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+.gift-img-1grid-box {
+  width: 100%; height: 160px;
+  border: 0.5px solid #e0e0e0; border-radius: 8px;
+  padding: 12px;
+  display: flex; flex-direction: column; gap: 12px; align-items: center;
+  position: relative; overflow: hidden; cursor: pointer;
+}
+.gift-img-2grid-wrap {
+  display: flex; gap: 4px; height: 130px; width: 100%;
+}
+.gift-img-2grid-slot {
+  flex: 1; min-width: 0;
+  border: 0.5px solid #e0e0e0; border-radius: 8px;
+  padding: 12px;
+  display: flex; flex-direction: column; gap: 12px; align-items: center;
+  position: relative; overflow: hidden; cursor: pointer;
+}
+.gift-img-inner {
+  flex: 1; min-height: 0; width: 100%;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative;
+}
+.gift-module-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover; border-radius: 6px; display: block;
+}
+.gift-img-caption {
+  font-size: 10px; font-weight: 400;
+  color: #8c8c8c; line-height: 14px;
+  letter-spacing: -0.3px; text-align: center;
+  opacity: 0.8; flex-shrink: 0; width: 100%;
+  font-family: 'Pretendard', sans-serif;
+}
+.gift-img-badge {
+  position: absolute; top: 5.5px; right: 5.5px;
+  background: rgba(0,0,0,0.7); border-radius: 4px;
+  padding: 3px 4px;
+  font-size: 10px; font-weight: 600; color: #fff;
+  line-height: 14px; letter-spacing: -0.3px;
+  white-space: nowrap; font-family: 'Pretendard', sans-serif;
+}
+.gift-module-title {
+  font-size: 14px; font-weight: 500;
+  color: rgba(0,0,0,0.8); line-height: 20px;
+  letter-spacing: -0.3px; width: 100%;
+  font-family: 'Pretendard', sans-serif;
+}
+.gift-module-desc {
+  font-size: 12px; font-weight: 400;
+  color: #8c8c8c; line-height: 20px;
+  letter-spacing: -0.3px; width: 100%;
+  font-family: 'Pretendard', sans-serif; opacity: 0.8;
+  margin-top: -8px;
+}
+.gift-module-ph-icon {
+  display: block; width: 24px; height: 24px;
+  background: #8c8c8c;
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/eeaf293d-a35e-4183-a46b-ce257f6b417a');
+  mask-image: url('https://www.figma.com/api/mcp/asset/eeaf293d-a35e-4183-a46b-ce257f6b417a');
+  -webkit-mask-size: 17.8px 17.8px; mask-size: 17.8px 17.8px;
+  -webkit-mask-position: 3.1px 3.1px; mask-position: 3.1px 3.1px;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  flex-shrink: 0;
+}
+
 /* 카카오페이 결제 카드 */
 .payment-card {
   background: #f5f5f5;
@@ -1099,10 +1175,10 @@ body.preview-mode .preview-toggle { display: block; }
         <span class="toggle-track"></span>
       </label>
     </div>
-    <div class="panel-row" id="logoRow">
+    <div class="panel-row" id="logoRow" style="display:none">
       <span class="panel-label">로고 노출</span>
       <label class="toggle-switch">
-        <input type="checkbox" id="logoToggle" checked onchange="toggleLogo()">
+        <input type="checkbox" id="logoToggle" onchange="toggleLogo()">
         <span class="toggle-track"></span>
       </label>
     </div>
@@ -1135,6 +1211,16 @@ body.preview-mode .preview-toggle { display: block; }
       <option value="coupon">쿠폰형</option>
       <option value="detail">서술형</option>
     </select>
+    <!-- 쿠폰형 옵션 -->
+    <div id="couponOptionPanel">
+      <div class="panel-row" style="margin-top:4px;">
+        <span class="panel-label">종료 시간 노출</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="couponTimerToggle" onchange="toggleBenefitCouponTimer()">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
     <!-- 서술형 편집 패널 -->
     <div class="detail-edit-panel" id="detailEditPanel" style="display:none;">
       <div id="detailItemControls"></div>
@@ -1182,10 +1268,10 @@ body.preview-mode .preview-toggle { display: block; }
           <span class="toggle-track"></span>
         </label>
       </div>
-      <div class="panel-row" id="logoRowMobile">
+      <div class="panel-row" id="logoRowMobile" style="display:none">
         <span class="panel-label">로고 노출</span>
         <label class="toggle-switch">
-          <input type="checkbox" id="logoToggleMobile" checked onchange="syncToggle('logoToggle','logoToggleMobile'); toggleLogo();">
+          <input type="checkbox" id="logoToggleMobile" onchange="syncToggle('logoToggle','logoToggleMobile'); toggleLogo();">
           <span class="toggle-track"></span>
         </label>
       </div>
@@ -1281,7 +1367,7 @@ body.preview-mode .preview-toggle { display: block; }
             <div class="kv-date-img">4.30 - 5.2</div>
           </div>
           <div class="kv-img-bottom">
-            <div class="kv-logo" id="kvLogo">
+            <div class="kv-logo" id="kvLogo" style="display:none">
               <span style="font-family:'Pretendard',sans-serif; font-size:11px; font-weight:700; color:#fff; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.4); padding:3px 8px; border-radius:4px; letter-spacing:0.5px; white-space:nowrap;">오늘의집 LIVE</span>
             </div>
             <div class="kv-title-img">오늘의집<br>원하는날도착</div>
@@ -1333,28 +1419,22 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="benefit-title">Benefit</div>
           <div class="benefit-progress-bar"></div>
           <div class="coupon-card-wrap">
-            <div class="coupon-card">
-              <img class="coupon-bg" src="https://www.figma.com/api/mcp/asset/21d64405-2252-4213-a028-7ca6ddecdfca" alt="">
-              <div class="coupon-dashes"></div>
-              <div class="coupon-content">
-                <div class="coupon-left">
-                  <div class="coupon-amount-row">
-                    <img class="coupon-tilde" src="https://www.figma.com/api/mcp/asset/edf1403c-c1e4-41f7-b7d3-7d20f286513b" alt="~">
-                    <span class="coupon-num">10,000</span>
-                    <span class="coupon-unit">원</span>
-                  </div>
-                  <div class="coupon-sub">
-                    <span class="coupon-sub-desc">5만원 구매 시 최대 10자</span>
-                    <span class="coupon-sub-timer" id="timerText">종료까지 0일 3시간 22분 14초 남음</span>
-                  </div>
+            <div class="detail-coupon-card">
+              <img class="detail-coupon-bg" src="https://www.figma.com/api/mcp/asset/a97fba83-993f-46a6-9f55-8ab8e193b58c" alt="">
+              <div class="detail-coupon-dashes"></div>
+              <div class="detail-coupon-content">
+                <div class="detail-coupon-left">
+                  <div class="detail-coupon-amount">최대 10% 할인</div>
+                  <div class="detail-coupon-sub" id="couponBenefitDesc">5만원 구매 시 최대 10자</div>
+                  <div class="coupon-sub-timer-red" id="couponBenefitTimer" style="display:none">종료까지 0일 3시간 22분 14초 남음</div>
                 </div>
-                <div class="coupon-right">
+                <div class="detail-coupon-right">
                   <div class="download-icon-wrap">
-                    <div style="position:absolute; left:50%; top:3.8px; transform:translateX(-50%); width:6.6px; height:9.4px;">
-                      <img src="https://www.figma.com/api/mcp/asset/da19fe41-f205-4a14-b834-249e151c3a64" style="width:100%; height:100%; display:block; transform:scaleY(-1);" alt="">
+                    <div style="position:absolute;left:50%;top:3.8px;transform:translateX(-50%);width:6.6px;height:9.4px;">
+                      <img src="https://www.figma.com/api/mcp/asset/da19fe41-f205-4a14-b834-249e151c3a64" style="width:100%;height:100%;display:block;transform:scaleY(-1);" alt="">
                     </div>
-                    <div style="position:absolute; left:50%; top:14.3px; transform:translateX(-50%); width:16.36px; height:5.7px;">
-                      <img src="https://www.figma.com/api/mcp/asset/127c79e8-8f25-47ac-85bb-c294c47071a3" style="width:100%; height:100%; display:block;" alt="">
+                    <div style="position:absolute;left:50%;top:14.3px;transform:translateX(-50%);width:16.36px;height:5.7px;">
+                      <img src="https://www.figma.com/api/mcp/asset/127c79e8-8f25-47ac-85bb-c294c47071a3" style="width:100%;height:100%;display:block;" alt="">
                     </div>
                   </div>
                 </div>
@@ -1977,7 +2057,6 @@ body.preview-mode .preview-toggle { display: block; }
     ht.style.display = checked ? 'none' : 'flex';
     document.getElementById('brandCta').style.paddingTop = checked ? '24px' : '12px';
     // 로고 옵션: KV 이미지 사용 시에만 노출
-    document.getElementById('logoRow').style.display = checked ? 'flex' : 'none';
     updateDivider();
   }
 
@@ -2001,6 +2080,7 @@ body.preview-mode .preview-toggle { display: block; }
   function setBenefitType(value) {
     document.getElementById('benefitCouponType').style.display = value === 'coupon' ? 'block' : 'none';
     document.getElementById('benefitDetailType').style.display = value === 'detail' ? 'block' : 'none';
+    document.getElementById('couponOptionPanel').style.display = value === 'coupon' ? 'block' : 'none';
     document.getElementById('detailEditPanel').style.display = value === 'detail' ? 'block' : 'none';
     if (value === 'detail') {
       renderDetailPanel();
@@ -2008,13 +2088,20 @@ body.preview-mode .preview-toggle { display: block; }
     }
   }
 
+  function toggleBenefitCouponTimer() {
+    const on = document.getElementById('couponTimerToggle').checked;
+    document.getElementById('couponBenefitDesc').style.display = on ? 'none' : 'block';
+    document.getElementById('couponBenefitTimer').style.display = on ? 'block' : 'none';
+  }
+
   // ─── 서술형 items state ─────────────────
   let detailItems = [
     { type: 'basic',   title: '상품 한정 최대 10% 할인', subtext: '기획전 상품 대상' },
-    { type: 'coupon',  title: '기간 한정 쿠폰팩',        subtext: '1만원 이상, 최대 100만원' },
+    { type: 'coupon',  title: '기간 한정 쿠폰팩',        subtext: '1만원 이상, 최대 100만원', showTimer: false },
     { type: 'payment', title: '카카오페이 7% 할인',       subtext: '카카오페이 9만원 이상 결제 시 1만원 할인' },
-    { type: 'gift',    title: '사은품 증정',              subtext: '신상품 포토리뷰 작성 시, 5명 추첨' },
+    { type: 'gift',    title: '사은품 증정',              subtext: '신상품 포토리뷰 작성 시, 5명 추첨', giftModules: [{ gridType: '1grid' }] },
   ];
+  let giftModuleIdCounter = 0;
   const typeLabels = { basic: '기본형', coupon: '쿠폰형', payment: '결제혜택형', gift: '사은품형' };
 
   function addDetailItem() {
@@ -2037,12 +2124,70 @@ body.preview-mode .preview-toggle { display: block; }
 
   function updateDetailItemType(idx, value) {
     detailItems[idx].type = value;
+    if (value === 'gift' && !detailItems[idx].giftModules) {
+      detailItems[idx].giftModules = [{ gridType: '1grid' }];
+    }
+    if (value === 'coupon' && detailItems[idx].showTimer === undefined) {
+      detailItems[idx].showTimer = false;
+    }
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function updateDetailItemTimer(idx, checked) {
+    detailItems[idx].showTimer = checked;
+    renderDetailSection();
+  }
+
+  function addGiftModule(idx) {
+    detailItems[idx].giftModules = detailItems[idx].giftModules || [];
+    detailItems[idx].giftModules.push({ gridType: '1grid' });
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function removeGiftModule(idx, modIdx) {
+    if (detailItems[idx].giftModules.length <= 1) return;
+    detailItems[idx].giftModules.splice(modIdx, 1);
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function updateGiftModuleType(idx, modIdx, value) {
+    detailItems[idx].giftModules[modIdx].gridType = value;
     renderDetailSection();
   }
 
   function renderDetailPanel() {
     const container = document.getElementById('detailItemControls');
-    container.innerHTML = detailItems.map((item, idx) => `
+    container.innerHTML = detailItems.map((item, idx) => {
+      let extraControls = '';
+      if (item.type === 'coupon') {
+        extraControls = `
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+            <span style="font-size:11px;color:#8c8c8c;letter-spacing:-0.3px;">종료 시간 노출</span>
+            <label class="toggle-switch" style="transform:scale(0.8);transform-origin:right;">
+              <input type="checkbox" ${item.showTimer?'checked':''} onchange="updateDetailItemTimer(${idx},this.checked)">
+              <span class="toggle-track"></span>
+            </label>
+          </div>`;
+      } else if (item.type === 'gift') {
+        const modules = item.giftModules || [{ gridType: '1grid' }];
+        extraControls = `
+          <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px;">
+            <span style="font-size:11px;color:#8c8c8c;letter-spacing:-0.3px;">이미지 모듈</span>
+            ${modules.map((mod, modIdx) => `
+              <div style="display:flex;gap:4px;align-items:center;">
+                <select class="panel-select-sm" style="flex:1;" onchange="updateGiftModuleType(${idx},${modIdx},this.value)">
+                  <option value="1grid"${mod.gridType==='1grid'?' selected':''}>1 grid</option>
+                  <option value="2grid"${mod.gridType==='2grid'?' selected':''}>2 grid</option>
+                </select>
+                ${modules.length > 1 ? `<button onclick="removeGiftModule(${idx},${modIdx})" style="background:none;border:none;color:#8c8c8c;cursor:pointer;font-size:12px;padding:4px;">✕</button>` : ''}
+              </div>`).join('')}
+            <button onclick="addGiftModule(${idx})" style="font-size:11px;color:#00a1ff;background:none;border:none;cursor:pointer;text-align:left;padding:2px 0;letter-spacing:-0.3px;">+ 모듈 추가</button>
+          </div>`;
+      }
+      return `
       <div class="detail-item-control">
         <div class="detail-item-header">
           <span class="detail-item-num">${String(idx + 1).padStart(2, '0')}</span>
@@ -2053,8 +2198,9 @@ body.preview-mode .preview-toggle { display: block; }
         <select class="panel-select-sm" onchange="updateDetailItemType(${idx}, this.value)">
           ${['basic','coupon','payment','gift'].map(t => `<option value="${t}"${item.type===t?' selected':''}>${typeLabels[t]}</option>`).join('')}
         </select>
-      </div>
-    `).join('');
+        ${extraControls}
+      </div>`;
+    }).join('');
   }
 
   function renderDetailSection() {
@@ -2068,9 +2214,9 @@ body.preview-mode .preview-toggle { display: block; }
           ${hasSubtext ? `<div class="benefit-item-desc">${item.subtext}</div>` : ''}
         </div>`;
       let cardBlock = '';
-      if (item.type === 'coupon') cardBlock = renderCouponCard();
+      if (item.type === 'coupon') cardBlock = renderCouponCard(item);
       else if (item.type === 'payment') cardBlock = renderPaymentCard(item.subtext);
-      else if (item.type === 'gift') cardBlock = renderGiftCard();
+      else if (item.type === 'gift') cardBlock = renderGiftCard(item);
       const divider = idx < detailItems.length - 1 ? `<div class="benefit-item-divider"></div>` : '';
       const inner = cardBlock
         ? `<div style="display:flex;flex-direction:column;gap:12px;">${titleBlock}${cardBlock}</div>`
@@ -2079,7 +2225,8 @@ body.preview-mode .preview-toggle { display: block; }
     }).join('');
   }
 
-  function renderCouponCard() {
+  function renderCouponCard(item) {
+    const showTimer = item && item.showTimer;
     return `
       <div class="detail-coupon-card">
         <img class="detail-coupon-bg" src="https://www.figma.com/api/mcp/asset/a97fba83-993f-46a6-9f55-8ab8e193b58c" alt="">
@@ -2087,7 +2234,10 @@ body.preview-mode .preview-toggle { display: block; }
         <div class="detail-coupon-content">
           <div class="detail-coupon-left">
             <div class="detail-coupon-amount">최대 10% 할인</div>
-            <div class="detail-coupon-sub">5만원 구매 시 적용 가능</div>
+            ${showTimer
+              ? `<div class="coupon-sub-timer-red">종료까지 0일 3시간 22분 14초 남음</div>`
+              : `<div class="detail-coupon-sub">5만원 구매 시 적용 가능</div>`
+            }
           </div>
           <div class="detail-coupon-right">
             <div class="download-icon-wrap">
@@ -2112,15 +2262,67 @@ body.preview-mode .preview-toggle { display: block; }
       </div>`;
   }
 
-  function renderGiftCard() {
-    return `
-      <div class="gift-placeholder" id="giftPlaceholder" onclick="document.getElementById('giftFileInput').click()">
-        <input type="file" id="giftFileInput" accept="image/*" style="display:none" onchange="handleGiftImageUpload(event)">
-        <div class="gift-upload-hint" id="giftUploadHint">
-          <span class="gift-placeholder-icon"></span>
-          <span>이미지 업로드</span>
-        </div>
-      </div>`;
+  function renderGiftCard(item) {
+    const modules = (item && item.giftModules) ? item.giftModules : [{ gridType: '1grid' }];
+    const rendered = modules.map((mod) => {
+      giftModuleIdCounter++;
+      const uid0 = 'gm' + giftModuleIdCounter + 'a';
+      if (mod.gridType === '1grid') {
+        return `
+          <div class="gift-img-module">
+            <div class="gift-img-1grid-box" onclick="document.getElementById('gf-${uid0}').click()">
+              <input type="file" id="gf-${uid0}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,'${uid0}')">
+              <div class="gift-img-inner" id="gi-${uid0}">
+                <span class="gift-module-ph-icon" id="gph-${uid0}"></span>
+              </div>
+              <span class="gift-img-badge">N명</span>
+              <div class="gift-img-caption">더 플렌더 MAX 구매 시 증정</div>
+            </div>
+            <div class="gift-module-title">팸퍼스 체험팩(2팩) 추첨 증정</div>
+            <div class="gift-module-desc">구매 제품 동일 단계로 증정</div>
+          </div>`;
+      } else {
+        const uid1 = 'gm' + giftModuleIdCounter + 'b';
+        return `
+          <div class="gift-img-module">
+            <div class="gift-img-2grid-wrap">
+              <div class="gift-img-2grid-slot" onclick="document.getElementById('gf-${uid0}').click()">
+                <input type="file" id="gf-${uid0}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,'${uid0}')">
+                <div class="gift-img-inner" id="gi-${uid0}">
+                  <span class="gift-module-ph-icon" id="gph-${uid0}"></span>
+                </div>
+                <span class="gift-img-badge">N명</span>
+                <div class="gift-img-caption">더 플렌더 MAX 구매 시 증정</div>
+              </div>
+              <div class="gift-img-2grid-slot" onclick="document.getElementById('gf-${uid1}').click()">
+                <input type="file" id="gf-${uid1}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,'${uid1}')">
+                <div class="gift-img-inner" id="gi-${uid1}">
+                  <span class="gift-module-ph-icon" id="gph-${uid1}"></span>
+                </div>
+                <span class="gift-img-badge">N명</span>
+                <div class="gift-img-caption">더 플렌더 MAX 구매 시 증정</div>
+              </div>
+            </div>
+            <div class="gift-module-title">팸퍼스 체험팩(2팩) 추첨 증정</div>
+            <div class="gift-module-desc">구매 제품 동일 단계로 증정</div>
+          </div>`;
+      }
+    });
+    return `<div class="gift-module-list">${rendered.join('')}</div>`;
+  }
+
+  function handleGiftModuleUpload(event, uid) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const inner = document.getElementById('gi-' + uid);
+    const ph = document.getElementById('gph-' + uid);
+    if (ph) ph.style.display = 'none';
+    inner.querySelectorAll('.gift-module-img').forEach(el => el.remove());
+    const img = document.createElement('img');
+    img.className = 'gift-module-img';
+    img.src = url;
+    inner.appendChild(img);
   }
 
   function handleGiftImageUpload(event) {
