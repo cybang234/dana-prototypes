@@ -2254,6 +2254,10 @@ body.preview-mode .preview-toggle { display: block; }
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;">
                   <span style="font-size:10px;color:#8c8c8c;min-width:32px;letter-spacing:-0.3px;">뱃지</span>
+                  <label class="toggle-switch" style="transform:scale(0.7);transform-origin:left;flex-shrink:0;">
+                    <input type="checkbox" ${mod.showBadge!==false?'checked':''} onchange="updateGiftModuleField(${idx},${modIdx},'showBadge',this.checked)">
+                    <span class="toggle-track"></span>
+                  </label>
                   <input class="panel-input" style="flex:1;font-size:11px;margin:0;" type="text" value="${(mod.badge||'N명').replace(/"/g,'&quot;')}" placeholder="N명" oninput="updateGiftModuleField(${idx},${modIdx},'badge',this.value)">
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;">
@@ -2384,7 +2388,7 @@ body.preview-mode .preview-toggle { display: block; }
     const rendered = modules.map((mod) => {
       giftModuleIdCounter++;
       const uid0 = 'gm' + giftModuleIdCounter + 'a';
-      const badge = mod.badge || 'N명';
+      const badgeHtml = mod.showBadge !== false ? `<span class="gift-img-badge">${mod.badge || 'N명'}</span>` : '';
       const captionHtml = mod.showCaption !== false ? `<div class="gift-img-caption">${mod.captionText || ''}</div>` : '';
       const titleHtml = mod.showTitle !== false ? `<div class="gift-module-title">${mod.titleText || ''}</div>` : '';
       const descHtml = mod.showDesc !== false ? `<div class="gift-module-desc">${mod.descText || ''}</div>` : '';
@@ -2398,7 +2402,7 @@ body.preview-mode .preview-toggle { display: block; }
               <div class="gift-img-inner" id="gi-${uid0}">
                 <span class="gift-module-ph-icon" id="gph-${uid0}"></span>
               </div>
-              <span class="gift-img-badge">${badge}</span>
+              ${badgeHtml}
               ${captionHtml}
             </div>
             ${textBlock}
@@ -2413,7 +2417,7 @@ body.preview-mode .preview-toggle { display: block; }
                 <div class="gift-img-inner" id="gi-${uid0}">
                   <span class="gift-module-ph-icon" id="gph-${uid0}"></span>
                 </div>
-                <span class="gift-img-badge">${badge}</span>
+                ${badgeHtml}
                 ${captionHtml}
               </div>
               <div class="gift-img-2grid-slot" onclick="document.getElementById('gf-${uid1}').click()">
@@ -2421,7 +2425,7 @@ body.preview-mode .preview-toggle { display: block; }
                 <div class="gift-img-inner" id="gi-${uid1}">
                   <span class="gift-module-ph-icon" id="gph-${uid1}"></span>
                 </div>
-                <span class="gift-img-badge">${badge}</span>
+                ${badgeHtml}
                 ${captionHtml}
               </div>
             </div>
