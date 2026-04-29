@@ -797,22 +797,22 @@ body.preview-mode .preview-toggle { display: block; }
 }
 
 /* 사은품 이미지 모듈 */
-.gift-module-list { display: flex; flex-direction: column; gap: 32px; }
+.gift-module-list { display: flex; flex-direction: column; gap: 4px; }
 .gift-img-module { display: flex; flex-direction: column; gap: 12px; width: 100%; }
 .gift-img-1grid-box {
-  width: 100%; height: 160px;
+  width: 100%; height: 200px;
   border: 0.5px solid #e0e0e0; border-radius: 8px;
-  padding: 12px;
+  padding: 12px; gap: 12px;
   display: flex; flex-direction: column; align-items: center;
   position: relative; overflow: hidden; cursor: pointer;
 }
 .gift-img-2grid-wrap {
-  display: flex; gap: 4px; height: 130px; width: 100%;
+  display: flex; gap: 4px; height: 160px; width: 100%;
 }
 .gift-img-2grid-slot {
   flex: 1; min-width: 0;
   border: 0.5px solid #e0e0e0; border-radius: 8px;
-  padding: 12px;
+  padding: 12px; gap: 12px;
   display: flex; flex-direction: column; align-items: center;
   position: relative; overflow: hidden; cursor: pointer;
 }
@@ -825,14 +825,6 @@ body.preview-mode .preview-toggle { display: block; }
 .gift-module-img {
   position: absolute; inset: 0;
   width: 100%; height: 100%; object-fit: contain; border-radius: 6px; display: block;
-}
-.gift-img-caption {
-  font-size: 10px; font-weight: 400;
-  color: #8c8c8c; line-height: 14px;
-  letter-spacing: -0.3px; text-align: center;
-  opacity: 0.8; flex-shrink: 0; width: 100%;
-  font-family: 'Pretendard', sans-serif;
-  margin-top: 8px;
 }
 .gift-img-badge {
   position: absolute; top: 5.5px; right: 5.5px;
@@ -854,6 +846,22 @@ body.preview-mode .preview-toggle { display: block; }
   letter-spacing: -0.3px; width: 100%;
   font-family: 'Pretendard', sans-serif; opacity: 0.8;
   margin-top: -8px;
+}
+.gift-card-text {
+  display: flex; flex-direction: column; gap: 4px;
+  width: 100%; flex-shrink: 0;
+}
+.gift-card-title {
+  font-size: 12px; font-weight: 500;
+  color: rgba(0,0,0,0.8); line-height: 16px;
+  letter-spacing: -0.3px; width: 100%;
+  font-family: 'Pretendard', sans-serif;
+}
+.gift-card-subtitle {
+  font-size: 10px; font-weight: 400;
+  color: #8c8c8c; line-height: 14px;
+  letter-spacing: -0.3px; width: 100%; opacity: 0.8;
+  font-family: 'Pretendard', sans-serif;
 }
 .gift-module-ph-icon {
   display: block; width: 24px; height: 24px;
@@ -913,6 +921,28 @@ body.preview-mode .preview-toggle { display: block; }
 .payment-rows {
   display: flex; flex-direction: column; gap: 4px; width: 100%;
 }
+
+/* 유의사항 */
+.benefit-notice-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0; padding-bottom: 4px; cursor: pointer;
+}
+.benefit-notice-label {
+  font-size: 12px; font-weight: 400; color: #000;
+  line-height: 20px; letter-spacing: -0.3px;
+}
+.benefit-notice-chevron {
+  width: 12px; height: 12px; display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.benefit-notice-chevron svg { display: block; }
+.benefit-notice-content {
+  display: none; font-size: 12px; font-weight: 400;
+  color: var(--fg-foreground-weak, #8c8c8c); line-height: 18px;
+  letter-spacing: -0.3px; white-space: pre-line;
+}
+.benefit-notice-content.open { display: block; }
 
 /* 사은품 카드 */
 .gift-card {
@@ -2149,7 +2179,7 @@ body.preview-mode .preview-toggle { display: block; }
     { type: 'basic',   title: '상품 한정 최대 10% 할인', subtext: '기획전 상품 대상' },
     { type: 'coupon',  title: '기간 한정 쿠폰팩',        subtext: '1만원 이상, 최대 100만원', showTimer: false },
     { type: 'payment', title: '카카오페이 7% 할인',       subtext: '카카오페이 9만원 이상 결제 시 1만원 할인', paymentItems: [{ text: '카카오페이 9만원 이상 결제 시 1만원 할인' }] },
-    { type: 'gift',    title: '사은품 증정',              subtext: '신상품 포토리뷰 작성 시, 5명 추첨', giftModules: [{ gridType: '1grid', badge: 'N명', showCaption: true, captionText: '더 플렌더 MAX 구매 시 증정', showTitle: true, titleText: '팸퍼스 체험팩(2팩) 추첨 증정', showDesc: true, descText: '구매 제품 동일 단계로 증정' }] },
+    { type: 'gift',    title: '사은품 증정',              subtext: '신상품 포토리뷰 작성 시, 5명 추첨', giftModules: [{ gridType: '1grid', badge: 'N명', showTitle: true, titleText: '팸퍼스 체험팩(2팩) 추첨 증정', showDesc: true, descText: '구매 제품 동일 단계로 증정' }] },
   ];
   let giftModuleIdCounter = 0;
   const typeLabels = { basic: '기본형', coupon: '쿠폰형', payment: '결제혜택형', gift: '사은품형' };
@@ -2194,7 +2224,7 @@ body.preview-mode .preview-toggle { display: block; }
 
   function addGiftModule(idx) {
     detailItems[idx].giftModules = detailItems[idx].giftModules || [];
-    detailItems[idx].giftModules.push({ gridType: '1grid', badge: 'N명', showCaption: true, captionText: '더 플렌더 MAX 구매 시 증정', showTitle: true, titleText: '팸퍼스 체험팩(2팩) 추첨 증정', showDesc: true, descText: '구매 제품 동일 단계로 증정' });
+    detailItems[idx].giftModules.push({ gridType: '1grid', badge: 'N명', showTitle: true, titleText: '팸퍼스 체험팩(2팩) 추첨 증정', showDesc: true, descText: '구매 제품 동일 단계로 증정' });
     renderDetailPanel();
     renderDetailSection();
   }
@@ -2235,6 +2265,26 @@ body.preview-mode .preview-toggle { display: block; }
     renderDetailSection();
   }
 
+  function toggleNotice(idx, val) {
+    detailItems[idx].showNotice = val;
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function updateNoticeText(idx, value) {
+    detailItems[idx].noticeText = value;
+    renderDetailSection();
+  }
+
+  function toggleNoticeExpand(row) {
+    const icon = row.querySelector('.benefit-notice-chevron div');
+    const content = row.nextElementSibling;
+    if (!content || !content.classList.contains('benefit-notice-content')) return;
+    const isOpen = content.classList.toggle('open');
+    // 기본 rotate(90deg) 기준 → 펼침 시 rotate(270deg)
+    icon.style.transform = isOpen ? 'rotate(270deg)' : 'rotate(90deg)';
+  }
+
   function renderDetailPanel() {
     const container = document.getElementById('detailItemControls');
     container.innerHTML = detailItems.map((item, idx) => {
@@ -2259,6 +2309,16 @@ body.preview-mode .preview-toggle { display: block; }
                 ${pItems.length > 1 ? `<button onclick="removePaymentItem(${idx},${pIdx})" style="background:none;border:none;color:#8c8c8c;cursor:pointer;font-size:12px;padding:4px;">✕</button>` : ''}
               </div>`).join('')}
             <button onclick="addPaymentItem(${idx})" style="font-size:11px;color:#00a1ff;background:none;border:none;cursor:pointer;text-align:left;padding:2px 0;letter-spacing:-0.3px;">+ 항목 추가</button>
+          </div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:11px;color:#8c8c8c;letter-spacing:-0.3px;">유의사항</span>
+              <label class="toggle-switch" style="transform:scale(0.7);transform-origin:left;flex-shrink:0;">
+                <input type="checkbox" ${item.showNotice?'checked':''} onchange="toggleNotice(${idx},this.checked)">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            ${item.showNotice ? `<textarea class="panel-input" rows="2" style="font-size:11px;resize:vertical;" placeholder="유의사항 내용 (접어두기)" oninput="updateNoticeText(${idx},this.value)">${(item.noticeText||'').replace(/</g,'&lt;')}</textarea>` : ''}
           </div>`;
       } else if (item.type === 'gift') {
         const modules = item.giftModules || [{ gridType: '1grid' }];
@@ -2281,14 +2341,6 @@ body.preview-mode .preview-toggle { display: block; }
                     <span class="toggle-track"></span>
                   </label>
                   <input class="panel-input" style="flex:1;font-size:11px;margin:0;" type="text" value="${(mod.badge||'N명').replace(/"/g,'&quot;')}" placeholder="N명" oninput="updateGiftModuleField(${idx},${modIdx},'badge',this.value)">
-                </div>
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <span style="font-size:10px;color:#8c8c8c;min-width:32px;letter-spacing:-0.3px;">캡션</span>
-                  <label class="toggle-switch" style="transform:scale(0.7);transform-origin:left;flex-shrink:0;">
-                    <input type="checkbox" ${mod.showCaption!==false?'checked':''} onchange="updateGiftModuleField(${idx},${modIdx},'showCaption',this.checked)">
-                    <span class="toggle-track"></span>
-                  </label>
-                  <input class="panel-input" style="flex:1;font-size:11px;margin:0;" type="text" value="${(mod.captionText||'').replace(/"/g,'&quot;')}" placeholder="캡션 텍스트" oninput="updateGiftModuleField(${idx},${modIdx},'captionText',this.value)">
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;">
                   <span style="font-size:10px;color:#8c8c8c;min-width:32px;letter-spacing:-0.3px;">타이틀</span>
@@ -2341,8 +2393,22 @@ body.preview-mode .preview-toggle { display: block; }
       else if (item.type === 'payment') cardBlock = renderPaymentCard(item);
       else if (item.type === 'gift') cardBlock = renderGiftCard(item, idx);
       const divider = idx < detailItems.length - 1 ? `<div class="benefit-item-divider"></div>` : '';
+      const noticeRow = (item.type === 'payment' && item.showNotice) ? `
+        <div class="benefit-notice-row" onclick="toggleNoticeExpand(this)">
+          <span class="benefit-notice-label">유의사항 더보기</span>
+          <span class="benefit-notice-chevron">
+            <div style="width:12px;height:12px;transform:rotate(90deg);background-color:#141414;
+              -webkit-mask-image:url('https://www.figma.com/api/mcp/asset/2a939b81-9178-4c35-b1d7-3901793f1f86');
+              mask-image:url('https://www.figma.com/api/mcp/asset/2a939b81-9178-4c35-b1d7-3901793f1f86');
+              -webkit-mask-size:5.656px 9.639px;mask-size:5.656px 9.639px;
+              -webkit-mask-position:3.625px 1.181px;mask-position:3.625px 1.181px;
+              -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;"></div>
+          </span>
+        </div>
+        ${item.noticeText ? `<div class="benefit-notice-content">${item.noticeText.replace(/\n/g,'<br>')}</div>` : ''}
+      ` : '';
       const inner = cardBlock
-        ? `<div style="display:flex;flex-direction:column;gap:12px;">${titleBlock}${cardBlock}</div>`
+        ? `<div style="display:flex;flex-direction:column;gap:12px;">${titleBlock}${cardBlock}${noticeRow}</div>`
         : titleBlock;
       return `<div class="benefit-item-wrap"><div class="benefit-num">${num}</div>${inner}</div>${divider}`;
     }).join('');
@@ -2419,10 +2485,9 @@ body.preview-mode .preview-toggle { display: block; }
       const idA = `gift-${itemIdx}-${modIdx}-a`;
       const idB = `gift-${itemIdx}-${modIdx}-b`;
       const badgeHtml = mod.showBadge !== false ? `<span class="gift-img-badge">${mod.badge || 'N명'}</span>` : '';
-      const captionHtml = mod.showCaption !== false ? `<div class="gift-img-caption">${mod.captionText || ''}</div>` : '';
-      const titleHtml = mod.showTitle !== false ? `<div class="gift-module-title">${mod.titleText || ''}</div>` : '';
-      const descHtml = mod.showDesc !== false ? `<div class="gift-module-desc">${mod.descText || ''}</div>` : '';
-      const textBlock = (titleHtml || descHtml) ? `${titleHtml}${descHtml}` : '';
+      const titleHtml = mod.showTitle !== false ? `<div class="gift-card-title">${mod.titleText || ''}</div>` : '';
+      const subtitleHtml = mod.showDesc !== false ? `<div class="gift-card-subtitle">${mod.descText || ''}</div>` : '';
+      const textBlock = (titleHtml || subtitleHtml) ? `<div class="gift-card-text">${titleHtml}${subtitleHtml}</div>` : '';
 
       if (mod.gridType === '1grid') {
         return `
@@ -2433,9 +2498,8 @@ body.preview-mode .preview-toggle { display: block; }
                 ${renderGiftSlotInner(mod.imgUrlA, 'gph-' + idA)}
               </div>
               ${badgeHtml}
-              ${captionHtml}
+              ${textBlock}
             </div>
-            ${textBlock}
           </div>`;
       } else {
         return `
@@ -2447,7 +2511,7 @@ body.preview-mode .preview-toggle { display: block; }
                   ${renderGiftSlotInner(mod.imgUrlA, 'gph-' + idA)}
                 </div>
                 ${badgeHtml}
-                ${captionHtml}
+                ${textBlock}
               </div>
               <div class="gift-img-2grid-slot" onclick="document.getElementById('gf-${idB}').click()">
                 <input type="file" id="gf-${idB}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,${itemIdx},${modIdx},'b')">
@@ -2455,10 +2519,9 @@ body.preview-mode .preview-toggle { display: block; }
                   ${renderGiftSlotInner(mod.imgUrlB, 'gph-' + idB)}
                 </div>
                 ${badgeHtml}
-                ${captionHtml}
+                ${textBlock}
               </div>
             </div>
-            ${textBlock}
           </div>`;
       }
     });
