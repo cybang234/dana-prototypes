@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1">
+<title>고객 확인</title>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+:root {
+  --fg:          #141414;
+  --fg-weak:     #8C8C8C;
+  --fg-inverse:  #FFFFFF;
+  --bg:          #FFFFFF;
+  --bg-weak:     #F5F5F5;
+  --brand:       #00A1FF;
+  --border:      #E0E0E0;
+  --disabled-bg: #EDEDED;
+  --disabled-fg: #C1C1C1;
+  --critical:    #F05656;
+}
+
+body {
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  background: #E5E5E5;
+  display: flex;
+  justify-content: center;
+  padding: 24px 0 48px;
+}
+
+/* ── Screen Shell ── */
+.screen {
+  width: 375px;
+  height: 812px;
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+  border-radius: 40px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+}
+
+/* ── Status Bar ── */
+.status-bar {
+  height: 50px;
+  padding: 16px 24px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.status-time {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fg);
+  letter-spacing: -0.3px;
+}
+.status-icons { display: flex; gap: 6px; align-items: center; }
+
+/* ── TopNav ── */
+.top-nav {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+.back-btn {
+  position: absolute;
+  left: 16px;
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.nav-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: -0.3px;
+  line-height: 20px;
+}
+
+/* ── Content (scrollable) ── */
+.content {
+  position: absolute;
+  top: 94px;   /* status(50) + nav(44) */
+  left: 0; right: 0;
+  bottom: 154px; /* sticky(120) + home-indicator(34) */
+  overflow-y: auto;
+}
+.content::-webkit-scrollbar { display: none; }
+
+/* ── Page Heading ── */
+.page-heading {
+  padding: 24px 16px 32px;
+}
+.page-heading h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--fg);
+  line-height: 32px;
+  letter-spacing: -0.3px;
+}
+.page-heading p {
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--fg-weak);
+  line-height: 20px;
+  letter-spacing: -0.3px;
+}
+
+/* ── Form ── */
+.form {
+  padding: 0 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;  /* 섹션 간 간격 30px */
+}
+
+/* Field Group (label + inputs) */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;  /* 레이블-Input 간격 8px */
+}
+.field-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: -0.3px;
+  line-height: 18px;
+}
+
+/* 같은 그룹 내 필드끼리 간격 */
+.field-group .field-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Input ── */
+input[type="text"] {
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 12px;
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--fg);
+  letter-spacing: -0.3px;
+  line-height: 24px;
+  background: var(--bg);
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+}
+input[type="text"]::placeholder {
+  color: var(--fg-weak);
+  font-weight: 400;
+}
+input[type="text"]:focus { border-color: var(--brand); }
+input[type="text"]:disabled {
+  background: var(--bg-weak);
+  color: var(--fg-weak);
+  border-color: var(--border);
+  cursor: default;
+}
+
+/* ── 우편번호 행 (Input + Line Button) ── */
+.zip-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.zip-row input { flex: 1; }
+
+/* BoxButton Line variant */
+.btn-line {
+  height: 40px;
+  padding: 0 16px;
+  background: var(--bg);
+  color: var(--brand);
+  border: 1px solid var(--brand);
+  border-radius: 8px;
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-line:hover { background: #F0F8FC; }
+
+/* ── 2열 Input Row ── */
+.name-row {
+  display: flex;
+  gap: 8px;  /* 2열 사이 간격 8px */
+}
+.name-row input { flex: 1; }
+
+/* ── Dropdown (Select) ── */
+.select-wrap { position: relative; }
+select {
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 36px 0 12px;
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+  line-height: 24px;
+  background: var(--bg);
+  color: var(--fg-weak);  /* placeholder 상태 */
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+select.selected { color: var(--fg); }
+select:focus { border-color: var(--brand); }
+.chevron-down {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  color: var(--fg-weak);
+}
+
+/* ── Sticky Bottom ── */
+.sticky-bottom {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 34px;  /* home indicator 위 */
+  background: var(--bg);
+}
+
+/* Checkbox Row (실제 소유자) */
+.owner-section {
+  padding: 16px 16px 12px;
+}
+.owner-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* ODS Checkbox: 20×20px */
+.custom-checkbox {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  margin-top: 2px;
+}
+.custom-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 20px; height: 20px;
+  margin: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+.checkbox-box {
+  width: 20px; height: 20px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+.custom-checkbox input[type="checkbox"]:checked + .checkbox-box {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+.checkbox-check {
+  display: none;
+}
+.custom-checkbox input[type="checkbox"]:checked + .checkbox-box .checkbox-check {
+  display: block;
+}
+
+.owner-text { flex: 1; }
+.owner-primary {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: -0.3px;
+  line-height: 22px;
+  cursor: pointer;
+}
+.owner-secondary {
+  margin-top: 3px;
+  padding-left: 0;  /* 텍스트 컬럼 내에서 이미 들여쓰기됨 */
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--fg-weak);
+  letter-spacing: -0.3px;
+  line-height: 18px;
+}
+
+/* ── CTA Bar ── */
+.cta-bar {
+  padding: 0 16px 8px;
+}
+.cta-btn {
+  width: 100%;
+  height: 44px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 20px;
+  cursor: not-allowed;
+  background: var(--disabled-bg);
+  color: var(--disabled-fg);
+  transition: background 0.15s, color 0.15s;
+}
+.cta-btn.active {
+  background: var(--brand);
+  color: var(--fg-inverse);
+  cursor: pointer;
+}
+
+/* ── Home Indicator ── */
+.home-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--fg);
+  border-radius: 100px;
+  opacity: 0.18;
+}
+</style>
+</head>
+<body>
+<div class="screen">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="status-time">9:41</span>
+    <div class="status-icons">
+      <!-- Signal -->
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+        <rect x="0" y="6" width="3" height="6" rx="1" fill="#141414"/>
+        <rect x="4.5" y="4" width="3" height="8" rx="1" fill="#141414"/>
+        <rect x="9" y="1.5" width="3" height="10.5" rx="1" fill="#141414"/>
+        <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#141414" opacity="0.3"/>
+      </svg>
+      <!-- WiFi -->
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <path d="M8 9.5C8.83 9.5 9.5 10.17 9.5 11S8.83 12.5 8 12.5 6.5 11.83 6.5 11 7.17 9.5 8 9.5Z" fill="#141414"/>
+        <path d="M8 6.5C9.59 6.5 11.02 7.15 12.07 8.19L13.14 7.12C11.8 5.79 9.99 4.97 8 4.97S4.2 5.79 2.86 7.12L3.93 8.19C4.98 7.15 6.41 6.5 8 6.5Z" fill="#141414"/>
+        <path d="M8 3C10.76 3 13.24 4.11 15.05 5.92L16.12 4.85C14.02 2.76 11.15 1.5 8 1.5S1.98 2.76-.12 4.85L.95 5.92C2.76 4.11 5.24 3 8 3Z" fill="#141414" opacity="0.4"/>
+      </svg>
+      <!-- Battery -->
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+        <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#141414" stroke-opacity="0.35"/>
+        <rect x="2" y="2" width="16" height="8" rx="2" fill="#141414"/>
+        <path d="M23 4.5V7.5C23.83 7.22 24.5 6.17 24.5 6C24.5 5.83 23.83 4.78 23 4.5Z" fill="#141414" opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- TopNav -->
+  <div class="top-nav">
+    <div class="back-btn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M15 18L9 12L15 6" stroke="#141414" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="nav-title">고객 확인</span>
+  </div>
+
+  <!-- Scrollable Content -->
+  <div class="content">
+    <div class="page-heading">
+      <h1>고객 정보를<br>확인해주세요</h1>
+      <p>자금세탁방지법에 따라 필요한 정보예요</p>
+    </div>
+
+    <div class="form">
+
+      <!-- 거주주소 -->
+      <div class="field-group">
+        <span class="field-label">거주주소</span>
+        <div class="field-stack">
+          <!-- 우편번호 + 주소 검색 (BoxButton Line) -->
+          <div class="zip-row">
+            <input type="text" id="zip" placeholder="우편번호" disabled>
+            <button class="btn-line" onclick="fillAddress()">주소 검색</button>
+          </div>
+          <!-- 도로명주소 (disabled, auto-filled) -->
+          <input type="text" id="addr1" placeholder="도로명주소" disabled>
+          <!-- 상세주소 (사용자 직접 입력) -->
+          <input type="text" id="addr2" placeholder="상세주소 입력" oninput="checkForm()">
+        </div>
+      </div>
+
+      <!-- 영문명 -->
+      <div class="field-group">
+        <span class="field-label">영문명</span>
+        <div class="name-row">
+          <input type="text" id="lastName"  placeholder="성(Last Name)"    oninput="checkForm()">
+          <input type="text" id="firstName" placeholder="이름(First Name)"  oninput="checkForm()">
+        </div>
+      </div>
+
+      <!-- 직업 -->
+      <div class="field-group">
+        <span class="field-label">직업</span>
+        <div class="select-wrap">
+          <select id="job" onchange="onJobChange(this)">
+            <option value="" disabled selected>직업 선택</option>
+            <option value="employee">직장인</option>
+            <option value="self">자영업자</option>
+            <option value="freelance">프리랜서</option>
+            <option value="student">학생</option>
+            <option value="housewife">주부</option>
+            <option value="etc">기타</option>
+          </select>
+          <span class="chevron-down">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M4 6L8 10L12 6" stroke="#8C8C8C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Sticky Bottom: 실제소유자 체크 + CTA -->
+  <div class="sticky-bottom">
+    <div class="owner-section">
+      <div class="owner-row">
+        <label class="custom-checkbox">
+          <input type="checkbox" id="ownerCheck" onchange="checkForm()">
+          <div class="checkbox-box">
+            <svg class="checkbox-check" width="12" height="9" viewBox="0 0 12 9" fill="none">
+              <path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </label>
+        <div class="owner-text">
+          <div class="owner-primary" onclick="toggleCheck()">사용할 자금의 실제 소유자예요</div>
+          <div class="owner-secondary">실제 소유자가 아닌 경우, 오늘의집페이머니 사용이 불가합니다.</div>
+        </div>
+      </div>
+    </div>
+    <div class="cta-bar">
+      <button class="cta-btn" id="ctaBtn" disabled>다음</button>
+    </div>
+  </div>
+
+  <div class="home-indicator"></div>
+</div>
+
+<script>
+  function fillAddress() {
+    const zip = document.getElementById('zip');
+    const addr1 = document.getElementById('addr1');
+    zip.value = '06235';
+    addr1.value = '서울 강남구 테헤란로 427';
+    checkForm();
+  }
+
+  function onJobChange(el) {
+    el.classList.add('selected');
+    checkForm();
+  }
+
+  function toggleCheck() {
+    const cb = document.getElementById('ownerCheck');
+    cb.checked = !cb.checked;
+    checkForm();
+  }
+
+  function checkForm() {
+    const filled =
+      document.getElementById('zip').value.trim() &&
+      document.getElementById('addr2').value.trim() &&
+      document.getElementById('lastName').value.trim() &&
+      document.getElementById('firstName').value.trim() &&
+      document.getElementById('job').value &&
+      document.getElementById('ownerCheck').checked;
+
+    const btn = document.getElementById('ctaBtn');
+    btn.disabled = !filled;
+    btn.classList.toggle('active', !!filled);
+  }
+</script>
+</body>
+</html>
