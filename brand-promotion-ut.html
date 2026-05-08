@@ -6,7 +6,7 @@
 <title>한샘 오세일 특가 | UT 프로토타입</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Figtree:wght@500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
 
 <!-- ODS Design Tokens -->
 <style>
@@ -82,7 +82,7 @@ body {
   .fab-wrap {
     position: fixed !important;
     right: 16px;
-    bottom: 108px;
+    bottom: 110px;
   }
 }
 
@@ -1478,7 +1478,7 @@ body.preview-mode .preview-toggle { display: block; }
       </div>
 
       <!-- Row 5 -->
-      <div class="product-grid-row">
+      <div class="product-row">
         <div class="product-card">
           <div class="product-img-wrap">
             <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/163722340031298511.jpg" alt="product">
@@ -1505,7 +1505,7 @@ body.preview-mode .preview-toggle { display: block; }
         </div>
       </div>
       <!-- Row 6 -->
-      <div class="product-grid-row">
+      <div class="product-row">
         <div class="product-card">
           <div class="product-img-wrap">
             <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/163661172085995168.jpg" alt="product">
@@ -1532,7 +1532,7 @@ body.preview-mode .preview-toggle { display: block; }
         </div>
       </div>
       <!-- Row 7 -->
-      <div class="product-grid-row">
+      <div class="product-row">
         <div class="product-card">
           <div class="product-img-wrap">
             <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/159416865802600222.jpg" alt="product">
@@ -1559,7 +1559,7 @@ body.preview-mode .preview-toggle { display: block; }
         </div>
       </div>
       <!-- Row 8 -->
-      <div class="product-grid-row">
+      <div class="product-row">
         <div class="product-card">
           <div class="product-img-wrap">
             <img class="product-img" src="https://prs.ohou.se/apne2/any/uploads/productions/v1-197976177594368.jpg?c=c&w=720&h=720" alt="product">
@@ -1924,7 +1924,7 @@ body.preview-mode .preview-toggle { display: block; }
       const num = '혜택 ' + (idx + 1);
       const hasSubtext = item.subtext && item.subtext.trim();
       const titleBlock = `
-        <div>
+        <div style="display:flex;flex-direction:column;gap:2px;">
           <div class="benefit-item-title">${item.title || '&nbsp;'}</div>
           ${hasSubtext ? `<div class="benefit-item-desc">${item.subtext}</div>` : ''}
         </div>`;
