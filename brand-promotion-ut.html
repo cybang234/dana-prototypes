@@ -1091,7 +1091,7 @@ body.preview-mode .preview-toggle { display: block; }
   letter-spacing: -0.3px;
   display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
   -webkit-box-orient: vertical; overflow: hidden;
-  margin-bottom: 4px; height: 36px;
+  margin-bottom: 4px; height: fit-content;
 }
 .price-row {
   display: flex; align-items: baseline;
@@ -1273,10 +1273,10 @@ body.preview-mode .preview-toggle { display: block; }
   <!-- TOP NAV -->
   <div class="top-nav">
     <div class="nav-icon-btn">
-      <img src="https://www.figma.com/api/mcp/asset/205d216c-0c74-4063-9435-6141881ee67b" alt="">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="#2F3438" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div class="nav-title-wrap">
-      <span class="nav-title">한샘ㅣ오늘의집 쇼핑</span>
+      <span class="nav-title">한샘 오늘의집 단독기획전</span>
     </div>
     <div style="display:flex; align-items:center; gap:14px;">
       <div class="nav-icon-btn">
@@ -1717,7 +1717,7 @@ body.preview-mode .preview-toggle { display: block; }
   // ─── 서술형 items state ─────────────────
   let detailItems = [
     { type: 'coupon', title: '상품 할인 쿠폰 10~15%', subtext: '초특가 할인!', showTimer: false },
-    { type: 'payment', title: '카카오페이 7% 할인', subtext: '선착순 이벤트로 조기종료될 수 있습니다', paymentItems: [{ text: '카카오페이 7%, 최대 3만원 할인' }], showNotice: true, noticeText: '선착순 이벤트로 조기종료될 수 있습니다.\n일부 상품 제외.' },
+    { type: 'payment', title: '카카오페이 7% 할인', subtext: '선착순 이벤트로 조기종료될 수 있습니다', paymentItems: [{ text: '카카오페이 7%, 최대 3만원 할인' }], showNotice: true, noticeText: '· 혜택기간 : 2026.05.01 ~ 2026.05.07\n· 상품마다 적용되는 쿠폰 혜택은 상이하며, 정확한 혜택은 각 상품 상세페이지에서 확인 가능합니다.\n· 카카오페이 할인은 선착순으로 조기종료될 수 있습니다.' },
   ];
   let giftModuleIdCounter = 0;
   const typeLabels = { basic: '기본형', coupon: '쿠폰형', payment: '결제혜택형', gift: '사은품형' };
