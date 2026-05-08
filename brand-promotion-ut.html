@@ -1332,7 +1332,7 @@ body.preview-mode .preview-toggle { display: block; }
         <div class="benefit-coupon-inner">
           <div class="coupon-card-wrap">
             <div style="width:100%;border-radius:8px;overflow:hidden;">
-              <img src="coupon-card.png" style="width:100%;display:block;" alt="쿠폰">
+              <img id="couponCardImg" src="coupon-card.png" style="width:100%;display:block;cursor:pointer;" alt="쿠폰" onclick="downloadCouponNudge()">
             </div>
           </div>
         </div>
@@ -1372,7 +1372,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card" data-category="식탁/의자">
             <div class="product-img-wrap">
               <img class="product-img" src="https://prs.ohou.se/apne2/any/uploads/productions/v1-197977159954560.jpg?c=c&w=720&h=720" alt="product">
-              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
             </div>
             <div class="product-info">
               <div class="product-brand">한샘</div>
@@ -1384,7 +1384,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card" data-category="식탁/의자">
             <div class="product-img-wrap">
               <img class="product-img" src="https://prs.ohou.se/apne2/any/uploads/productions/v1-339182408019968.jpg?c=c&w=720&h=720" alt="product">
-              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
             </div>
             <div class="product-info">
               <div class="product-brand">한샘</div>
@@ -1399,7 +1399,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card" data-category="거실장/수납장">
             <div class="product-img-wrap">
               <img class="product-img" src="https://bucketplace-v2-development.s3.ap-northeast-1.amazonaws.com/uploads/openapi/4167132/1717487682689.jpg" alt="product">
-              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
             </div>
             <div class="product-info">
               <div class="product-brand">한샘</div>
@@ -1411,7 +1411,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card" data-category="거실장/수납장">
             <div class="product-img-wrap">
               <img class="product-img" src="https://prs.ohou.se/apne2/any/uploads/productions/v1-294672967540800.jpg?c=c&w=720&h=720" alt="product">
-              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
             </div>
             <div class="product-info">
               <div class="product-brand">한샘</div>
@@ -1426,7 +1426,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card" data-category="거실장/수납장">
             <div class="product-img-wrap">
               <img class="product-img" src="https://prs.ohou.se/apne2/any/uploads/productions/v1-294673521987648.jpg?c=c&w=720&h=720" alt="product">
-              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
             </div>
             <div class="product-info">
               <div class="product-brand">한샘</div>
@@ -1438,7 +1438,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card" data-category="거실장/수납장">
             <div class="product-img-wrap">
               <img class="product-img" src="https://prs.ohou.se/apne2/any/uploads/productions/v1-294672332374144.jpg?c=c&w=720&h=720" alt="product">
-              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
             </div>
             <div class="product-info">
               <div class="product-brand">한샘</div>
@@ -1453,7 +1453,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card" data-category="거실장/수납장">
             <div class="product-img-wrap">
               <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/160756580352233435.jpg" alt="product">
-              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
             </div>
             <div class="product-info">
               <div class="product-brand">한샘</div>
@@ -1465,7 +1465,7 @@ body.preview-mode .preview-toggle { display: block; }
           <div class="product-card" data-category="거실장/수납장">
             <div class="product-img-wrap">
               <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/160756581075599465.jpg" alt="product">
-              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
             </div>
             <div class="product-info">
               <div class="product-brand">한샘</div>
@@ -1482,7 +1482,7 @@ body.preview-mode .preview-toggle { display: block; }
         <div class="product-card" data-category="거실장/수납장">
           <div class="product-img-wrap">
             <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/163722340031298511.jpg" alt="product">
-            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
           </div>
           <div class="product-info">
             <div class="product-brand">한샘</div>
@@ -1494,7 +1494,7 @@ body.preview-mode .preview-toggle { display: block; }
         <div class="product-card" data-category="거실장/수납장">
           <div class="product-img-wrap">
             <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/163704602587170362.jpg" alt="product">
-            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
           </div>
           <div class="product-info">
             <div class="product-brand">한샘</div>
@@ -1509,7 +1509,7 @@ body.preview-mode .preview-toggle { display: block; }
         <div class="product-card" data-category="거실장/수납장">
           <div class="product-img-wrap">
             <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/163661172085995168.jpg" alt="product">
-            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
           </div>
           <div class="product-info">
             <div class="product-brand">한샘</div>
@@ -1521,7 +1521,7 @@ body.preview-mode .preview-toggle { display: block; }
         <div class="product-card" data-category="거실장/수납장">
           <div class="product-img-wrap">
             <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/169718349509004241.jpg" alt="product">
-            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
           </div>
           <div class="product-info">
             <div class="product-brand">한샘</div>
@@ -1536,7 +1536,7 @@ body.preview-mode .preview-toggle { display: block; }
         <div class="product-card" data-category="거실장/수납장">
           <div class="product-img-wrap">
             <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/159416865802600222.jpg" alt="product">
-            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
           </div>
           <div class="product-info">
             <div class="product-brand">한샘</div>
@@ -1548,7 +1548,7 @@ body.preview-mode .preview-toggle { display: block; }
         <div class="product-card" data-category="거실장/수납장">
           <div class="product-img-wrap">
             <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/169750676820319175.jpg" alt="product">
-            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
           </div>
           <div class="product-info">
             <div class="product-brand">한샘</div>
@@ -1563,7 +1563,7 @@ body.preview-mode .preview-toggle { display: block; }
         <div class="product-card" data-category="소파">
           <div class="product-img-wrap">
             <img class="product-img" src="https://prs.ohou.se/apne2/any/uploads/productions/v1-197976177594368.jpg?c=c&w=720&h=720" alt="product">
-            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
           </div>
           <div class="product-info">
             <div class="product-brand">한샘</div>
@@ -1575,7 +1575,7 @@ body.preview-mode .preview-toggle { display: block; }
         <div class="product-card" data-category="소파">
           <div class="product-img-wrap">
             <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/160498873843896110.jpg" alt="product">
-            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style="filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/></svg></button>
           </div>
           <div class="product-info">
             <div class="product-brand">한샘</div>
@@ -1951,7 +1951,7 @@ body.preview-mode .preview-toggle { display: block; }
   }
 
   function renderCouponCard(item) {
-    return `<div style="width:100%;border-radius:8px;overflow:hidden;"><img src="coupon-card.png" style="width:100%;display:block;" alt="쿠폰"></div>`;
+    return `<div style="width:100%;border-radius:8px;overflow:hidden;"><img class="coupon-card-img" src="coupon-card.png" style="width:100%;display:block;" alt="쿠폰"></div>`;
   }
 
   function renderPaymentCard(item) {
@@ -2171,11 +2171,19 @@ body.preview-mode .preview-toggle { display: block; }
     document.getElementById('nudgeCoupon').style.display = 'none';
     document.getElementById('nudgeComplete').style.display = 'flex';
     document.getElementById('nudgeBrand').style.display = 'none';
+    // 혜택 섹션 쿠폰 이미지 → 받기 완료로 교체
+    switchCouponToDone();
     // 3초 후 브랜드홈으로 전환
     setTimeout(() => {
       document.getElementById('nudgeComplete').style.display = 'none';
       document.getElementById('nudgeBrand').style.display = 'flex';
     }, 3000);
+  }
+
+  function switchCouponToDone() {
+    const img = document.getElementById('couponCardImg');
+    if (img) img.src = 'coupon-card-done.png';
+    document.querySelectorAll('.coupon-card-img').forEach(el => { el.src = 'coupon-card-done.png'; });
   }
 
   function closeNudgeBar() {
@@ -2284,10 +2292,10 @@ body.preview-mode .preview-toggle { display: block; }
     const svg = btn.querySelector('.scrap-svg');
     const isSelected = svg.getAttribute('data-selected') === 'true';
     if (isSelected) {
-      svg.innerHTML = '<path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
+      svg.innerHTML = '<path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3H15.5ZM8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="white"/><path d="M8.5 4.6C7.41 4.6 6.78 4.85 6.42 5.22C6.05 5.58 5.8 6.21 5.8 7.3V19.66L11.61 16.42C11.85 16.29 12.15 16.29 12.39 16.42L18.2 19.66V7.3C18.2 6.21 17.95 5.58 17.58 5.22C17.22 4.85 16.59 4.6 15.5 4.6H8.5Z" fill="black" fill-opacity="0.5"/>';
       svg.setAttribute('data-selected', 'false');
     } else {
-      svg.innerHTML = '<path d="M15.3 3C16.61 3 17.73 3.3 18.52 4.08 19.3 4.87 19.6 5.99 19.6 7.3V19.69c0 .55-.26 1.05-.69 1.35-.44.3-1.02.35-1.55.09l-.03-.02L11.8 18.03l-5.53 3.08-.03.02c-.52.26-1.1.26-1.55-.04A1.6 1.6 0 014 19.7V7.3C4 5.99 4.3 4.87 5.08 4.08 5.87 3.3 6.99 3 8.3 3h7Z" fill="#00a1ff"/>';
+      svg.innerHTML = '<path d="M15.5 3C16.8 3 17.93 3.3 18.72 4.08C19.5 4.87 19.8 5.99 19.8 7.3V19.69C19.8 20.24 19.54 20.74 19.11 21.04C18.67 21.34 18.09 21.39 17.56 21.13L12 18.03L6.47 21.11C5.95 21.39 5.33 21.34 4.89 21.04C4.46 20.74 4.2 20.24 4.2 19.69V7.3C4.2 5.99 4.5 4.87 5.28 4.08C6.07 3.3 7.19 3 8.5 3h7Z" fill="#00a1ff"/>';
       svg.setAttribute('data-selected', 'true');
     }
   }
