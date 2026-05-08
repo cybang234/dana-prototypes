@@ -1951,7 +1951,7 @@ body.preview-mode .preview-toggle { display: block; }
   }
 
   function renderCouponCard(item) {
-    return `<div style="width:100%;border-radius:8px;overflow:hidden;"><img class="coupon-card-img" src="coupon-card.png" style="width:100%;display:block;" alt="쿠폰"></div>`;
+    return `<div style="width:100%;border-radius:8px;overflow:hidden;cursor:pointer;" onclick="downloadCouponNudge()"><img class="coupon-card-img" src="${couponDownloaded ? 'coupon-card-done.png' : 'coupon-card.png'}" style="width:100%;display:block;" alt="쿠폰"></div>`;
   }
 
   function renderPaymentCard(item) {
@@ -2117,9 +2117,21 @@ body.preview-mode .preview-toggle { display: block; }
       allCards.forEach(c => c.style.display = '');
       allRows.forEach(r => r.style.display = '');
     } else if (category === 'BEST SELLER') {
-      // BEST SELLER: 전체 보기 (인기순이라 다 보여줌)
+      // BEST SELLER: 전체 보기 + 순서 셔플
       allCards.forEach(c => c.style.display = '');
-      allRows.forEach(r => r.style.display = '');
+      allRows.forEach(r => {
+        r.style.display = '';
+        const cards = Array.from(r.children);
+        cards.sort(() => Math.random() - 0.5);
+        cards.forEach(c => r.appendChild(c));
+      });
+      // row 간 순서도 셔플
+      const grid = document.getElementById('productGrid');
+      if (grid) {
+        const rows = Array.from(grid.querySelectorAll('.product-row'));
+        rows.sort(() => Math.random() - 0.5);
+        rows.forEach(r => grid.appendChild(r));
+      }
     } else {
       // 카테고리 필터링
       allCards.forEach(c => {
