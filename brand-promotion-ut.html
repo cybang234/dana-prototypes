@@ -1614,7 +1614,7 @@ body.preview-mode .preview-toggle { display: block; }
       </div>
       <div class="nudge-brand-right">
         <div id="nudgeBookmark" onclick="event.stopPropagation(); toggleBrandScrap()" style="width:20px;height:20px;cursor:pointer;flex-shrink:0;">
-          <img id="nudgeBookmarkImg" src="cta-scrap-default.svg" width="20" height="20" style="display:block;" alt="">
+          <svg id="nudgeBookmarkSvg" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg>
         </div>
       </div>
     </div>
@@ -2318,9 +2318,11 @@ body.preview-mode .preview-toggle { display: block; }
   let brandScrapped = false;
   function toggleBrandScrap() {
     brandScrapped = !brandScrapped;
-    const img = document.getElementById('nudgeBookmarkImg');
-    if (!img) return;
-    img.src = brandScrapped ? 'cta-scrap-filled.svg' : 'cta-scrap-default.svg';
+    const svg = document.getElementById('nudgeBookmarkSvg');
+    if (!svg) return;
+    const outlinePath = '<path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/>';
+    const filledPath = '<path d="M15.5 3C16.8058 3 17.9292 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47168 21.1144C6.46022 21.1207 6.44857 21.1269 6.43681 21.1327C5.91236 21.3919 5.33398 21.3417 4.88989 21.0391C4.45543 20.743 4.20001 20.2423 4.2 19.6944V7.3C4.2 5.99416 4.49789 4.8707 5.28432 4.08428C6.07076 3.29786 7.19422 3 8.5 3H15.5Z" fill="white"/>';
+    svg.innerHTML = brandScrapped ? filledPath : outlinePath;
   }
   function goToScrapbook() {
     document.getElementById('snackbar').classList.remove('show');
