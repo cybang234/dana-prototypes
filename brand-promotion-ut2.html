@@ -1,0 +1,2385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<title>한샘 오세일 특가 | UT 프로토타입</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Figtree:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+
+<!-- ODS Design Tokens -->
+<style>
+:root {
+  color-scheme: light;
+  --foreground: #141414;
+  --foregroundWeak: #8c8c8c;
+  --foregroundBrand: #00a1ff;
+  --foregroundDisabled: #c1c1c1;
+  --background: #ffffff;
+  --accent-red: #fd3d4a;
+  --border-thumbnail: rgba(0,0,0,0.05);
+  --purple: #7f7dff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #e8e8e8;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 32px 0 80px;
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+/* ──────────────────────────────────
+   MOBILE LAYOUT
+────────────────────────────────── */
+@media (max-width: 900px) {
+  body {
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0 120px;
+  }
+  .side-panel {
+    display: none;
+  }
+  /* 모바일 편집 버튼 */
+  .mobile-edit-btn {
+    display: flex !important;
+  }
+  /* 바텀시트 */
+  .mobile-panel-sheet {
+    display: block !important;
+  }
+}
+
+/* ── 실제 모바일 기기: 폰 프레임 제거, 풀스크린 ── */
+@media (max-width: 500px) {
+  body {
+    background: #fff !important;
+    padding: 0 !important;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+  .phone {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    min-height: 100svh;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible;
+  }
+  .status-bar {
+    display: none !important;
+  }
+  .scroll-area {
+    height: calc(100svh - 44px) !important;
+    max-height: none !important;
+  }
+  /* FAB: phone overflow:visible로 바꿨으므로 fixed로 전환 */
+  .fab-wrap {
+    position: fixed !important;
+    right: 16px;
+    bottom: 84px;
+  }
+}
+
+/* 모바일 편집 FAB */
+.mobile-edit-btn {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  background: #141414;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.3px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  gap: 6px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+/* 바텀시트 */
+.mobile-panel-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.mobile-panel-sheet.open {
+  pointer-events: auto;
+  opacity: 1;
+}
+.mobile-panel-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mobile-panel-inner {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 16px 20px 40px;
+  max-height: 80vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.mobile-panel-sheet.open .mobile-panel-inner {
+  transform: translateY(0);
+}
+.mobile-panel-handle {
+  width: 36px; height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+.mobile-panel-inner::-webkit-scrollbar { display: none; }
+
+/* ──────────────────────────────────
+   PREVIEW MODE
+────────────────────────────────── */
+body.preview-mode {
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  padding: 0;
+  min-height: 100vh;
+}
+body.preview-mode .side-panel { display: none; }
+body.preview-mode .phone {
+  border-radius: 0;
+  box-shadow: none;
+  height: 100vh;
+  overflow: hidden;
+}
+body.preview-mode .scroll-area {
+  height: calc(100vh - 88px);
+}
+.preview-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.3px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  display: none;
+}
+body.preview-mode .preview-toggle { display: block; }
+.panel-preview-btn {
+  width: 100%;
+  height: 36px;
+  background: #141414;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.3px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+.panel-preview-btn:hover { background: #2a2a2a; }
+
+/* ──────────────────────────────────
+   SIDE PANEL
+────────────────────────────────── */
+.side-panel {
+  width: 240px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  padding: 20px;
+  position: sticky;
+  top: 32px;
+  flex-shrink: 0;
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+.side-panel h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #8c8c8c;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.panel-section { margin-bottom: 20px; }
+.panel-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #141414;
+  letter-spacing: -0.3px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.panel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.panel-label { font-size: 13px; color: #141414; letter-spacing: -0.3px; }
+.panel-label.sub { font-size: 12px; color: #8c8c8c; }
+
+.toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+.toggle-switch input { display: none; }
+.toggle-track {
+  position: absolute; inset: 0; background: #d4d4d4;
+  border-radius: 11px; cursor: pointer; transition: background 0.2s;
+}
+.toggle-track::after {
+  content: ''; position: absolute; left: 3px; top: 3px;
+  width: 16px; height: 16px; background: #fff; border-radius: 50%;
+  transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-switch input:checked + .toggle-track { background: #141414; }
+.toggle-switch input:checked + .toggle-track::after { transform: translateX(18px); }
+
+.panel-select {
+  width: 100%; height: 32px;
+  border: 1px solid rgba(0,0,0,0.15); border-radius: 6px;
+  background: #fff; font-size: 13px; font-family: 'Pretendard', sans-serif;
+  color: #141414; letter-spacing: -0.3px; padding: 0 8px;
+  cursor: pointer; outline: none; margin-top: 6px;
+}
+
+/* ──────────────────────────────────
+   PHONE FRAME
+────────────────────────────────── */
+.phone {
+  width: 375px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+  border-radius: 40px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* ──────────────────────────────────
+   FAB
+────────────────────────────────── */
+/* ── phone-wrap ── */
+.phone-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* ── 스낵바 ── */
+.snackbar {
+  display: none;
+  position: absolute;
+  bottom: 24px;
+  left: 16px;
+  right: 16px;
+  background: #2f3438;
+  border-radius: 8px;
+  height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 9999;
+}
+.snackbar.show {
+  display: flex;
+}
+@media (max-width: 500px) {
+  .snackbar {
+    position: fixed;
+    bottom: 24px;
+    left: 16px;
+    right: 16px;
+  }
+}
+.snackbar-text {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px; font-weight: 400;
+  color: #fff;
+  line-height: 18px;
+  letter-spacing: -0.3px;
+}
+.snackbar-action {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px; font-weight: 500;
+  color: #00a1ff;
+  line-height: 18px;
+  letter-spacing: -0.3px;
+  background: none; border: none;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.fab-wrap {
+  position: absolute; bottom: 84px; right: 16px;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+.fab-btn {
+  width: 40px; height: 40px; border-radius: 50px;
+  background: #fff; border: none;
+  box-shadow: 0 2px 10px rgba(63,71,77,0.25);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 8px;
+  flex-shrink: 0;
+}
+.fab-icon {
+  display: block;
+  width: 24px; height: 24px;
+  background: #141414;
+  flex-shrink: 0;
+}
+.fab-icon-up {
+  width: 24px; height: 24px;
+  background: #141414;
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/de75b79c-e6c6-4948-baa5-ed3ff185fc39');
+  mask-image: url('https://www.figma.com/api/mcp/asset/de75b79c-e6c6-4948-baa5-ed3ff185fc39');
+  -webkit-mask-size: 15.475px 18px; mask-size: 15.475px 18px;
+  -webkit-mask-position: 4.275px 3px; mask-position: 4.275px 3px;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+.fab-icon-share {
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/a4209eb5-7a7d-4ab4-9b96-808feaa63a0c');
+  mask-image: url('https://www.figma.com/api/mcp/asset/a4209eb5-7a7d-4ab4-9b96-808feaa63a0c');
+  -webkit-mask-size: 17.96px 18.1px; mask-size: 17.96px 18.1px;
+  -webkit-mask-position: 3px 2.7px; mask-position: 3px 2.7px;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+
+/* STATUS BAR */
+.status-bar {
+  height: 44px;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* TOP NAV */
+.top-nav {
+  height: 44px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  position: relative;
+}
+.nav-icon-btn {
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+}
+.nav-icon-btn img { width: 24px; height: 24px; display: block; }
+.nav-title-wrap {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; align-items: center; gap: 6px;
+}
+.nav-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2f3438;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+  line-height: 20px;
+}
+
+/* SCROLL AREA */
+.scroll-area {
+  height: 724px;
+  overflow-y: auto;
+  background: #fff;
+}
+.scroll-area::-webkit-scrollbar { display: none; }
+
+/* ──────────────────────────────────
+   HERO (KV)
+────────────────────────────────── */
+.hero { background: #fff; position: relative; }
+
+/* KV Image 타입 */
+.hero-image {
+  width: 100%; aspect-ratio: 1 / 1;
+  position: relative; overflow: hidden; display: block;
+}
+.hero-image > .kv-photo {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block; position: absolute; inset: 0;
+}
+.kv-dim {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  width: 100%; height: 75.7%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 100%);
+  mix-blend-mode: multiply;
+}
+.kv-img-content {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+.kv-img-top .kv-date-img {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px; font-weight: 500;
+  color: #fff; line-height: 18px;
+}
+.kv-img-bottom { display: flex; flex-direction: column; gap: 6px; }
+.kv-sub-row {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 12px;
+}
+.kv-brand-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 28px;
+  padding: 0 7px 0 8px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  color: #141414;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px; font-weight: 500; line-height: 16px;
+  letter-spacing: -0.3px;
+  text-decoration: none;
+  white-space: nowrap; flex-shrink: 0;
+  cursor: pointer;
+}
+.kv-brand-btn svg { display: block; }
+.kv-logo { display: block; margin-bottom: 0; }
+.kv-title-img {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 26px; font-weight: 600;
+  color: #fff; line-height: 34px;
+  letter-spacing: -0.1px;
+}
+.kv-sub-img {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px; font-weight: 400;
+  color: #fff; line-height: 20px;
+  letter-spacing: -0.3px;
+}
+
+/* KV Text 타입 */
+.hero-text {
+  padding: 20px 16px 8px;
+  background: #fff;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+.kv-date-text {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px; font-weight: 500;
+  color: var(--foreground); line-height: 18px;
+}
+.kv-text-content { display: flex; flex-direction: column; gap: 8px; }
+.kv-title-text {
+  font-size: 26px; font-weight: 700;
+  color: var(--foreground); line-height: 34px;
+  letter-spacing: -0.3px;
+}
+.kv-sub-text {
+  font-size: 15px; font-weight: 400;
+  color: var(--foreground); line-height: 24px;
+  letter-spacing: -0.3px;
+  display: flex; align-items: center; height: 14px;
+  overflow: visible;
+}
+
+/* ──────────────────────────────────
+   BRAND HOME CTA
+────────────────────────────────── */
+.brand-cta {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 10px 16px 24px;
+  background: none;
+  z-index: 30;
+  display: flex;
+  pointer-events: none;
+}
+.brand-cta > * { pointer-events: auto; }
+
+.nudge-bar {
+  width: 100%; border-radius: 8px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+/* 상태1: 쿠폰 넛지 */
+.nudge-coupon {
+  background: #141414;
+  height: 44px; padding: 12px 16px 14px;
+  cursor: pointer;
+}
+.nudge-coupon-text {
+  font-size: 14px; font-weight: 500; color: #fff;
+  line-height: 20px; letter-spacing: -0.3px;
+}
+.nudge-red { color: #fd3d4a; }
+.nudge-download-icon {
+  width: 20px; height: 20px; flex-shrink: 0;
+  background: #fff;
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/dc8910f8-12ae-43ae-b901-b76c430214bf');
+  mask-image: url('https://www.figma.com/api/mcp/asset/dc8910f8-12ae-43ae-b901-b76c430214bf');
+  -webkit-mask-size: 17.96px 17.95px; mask-size: 17.96px 17.95px;
+  -webkit-mask-position: 1px 1px; mask-position: 1px 1px;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+
+/* 상태2: 쿠폰 완료 */
+.nudge-complete {
+  background: #141414;
+  height: 44px; padding: 12px 16px 14px;
+}
+.nudge-complete-left {
+  font-size: 14px; font-weight: 500; color: #fff;
+  line-height: 20px; letter-spacing: -0.3px;
+}
+.nudge-complete-right {
+  font-size: 12px; font-weight: 500; color: #8c8c8c;
+  line-height: 16px; letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+
+/* 상태3: 브랜드홈 */
+.nudge-brand {
+  background-image: linear-gradient(90deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6)), linear-gradient(90deg, rgba(153,152,147,0.6), rgba(153,152,147,0.6));
+  backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
+  box-shadow: 0 4px 5px rgba(0,0,0,0.12);
+  padding: 12px 16px;
+}
+.nudge-brand-left {
+  display: flex; align-items: center; gap: 6px;
+}
+.nudge-brand-avatar {
+  width: 20px; height: 20px; border-radius: 50%;
+  object-fit: cover; flex-shrink: 0;
+}
+.nudge-brand-name {
+  font-size: 14px; font-weight: 500; color: #fff;
+  line-height: 20px; letter-spacing: -0.3px; white-space: nowrap;
+}
+.nudge-brand-link {
+  display: flex; align-items: center; gap: 2px;
+  font-size: 12px; font-weight: 400; color: #ededed;
+  line-height: 16px; letter-spacing: -0.3px; cursor: pointer; white-space: nowrap;
+}
+.nudge-brand-right {
+  display: flex; align-items: center; gap: 8px;
+}
+.nudge-bookmark-icon {
+  width: 20px; height: 20px; cursor: pointer;
+  background: #fff;
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/3b671328-9b15-4818-bba1-d61805cf479b');
+  mask-image: url('https://www.figma.com/api/mcp/asset/3b671328-9b15-4818-bba1-d61805cf479b');
+  -webkit-mask-size: 15.6px 18.3px; mask-size: 15.6px 18.3px;
+  -webkit-mask-position: 2.2px 1px; mask-position: 2.2px 1px;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+.nudge-close-icon {
+  width: 20px; height: 20px; cursor: pointer;
+  background: #fff;
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/62611dfc-1f4f-4218-8b68-fd1e902ac238');
+  mask-image: url('https://www.figma.com/api/mcp/asset/62611dfc-1f4f-4218-8b68-fd1e902ac238');
+  -webkit-mask-size: 16.1px 16.1px; mask-size: 16.1px 16.1px;
+  -webkit-mask-position: 1.95px 1.95px; mask-position: 1.95px 1.95px;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+
+/* ──────────────────────────────────
+   DIVIDER
+────────────────────────────────── */
+.divider { height: 12px; background: #f5f5f5; }
+
+/* ──────────────────────────────────
+   BENEFIT
+────────────────────────────────── */
+.benefit-section {
+  background: #fff;
+  padding: 16px 16px 12px;
+}
+.benefit-section.hidden { display: none; }
+
+.benefit-title {
+  font-size: 20px; font-weight: 700;
+  color: #000; line-height: 28px;
+  letter-spacing: -0.3px;
+  width: 100%;
+}
+
+/* 쿠폰 타입 */
+.benefit-coupon-type { display: none; }
+.benefit-detail-type { display: block; }
+
+.benefit-timer-wrap {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.benefit-timer {
+  font-size: 14px; font-weight: 500;
+  color: var(--accent-red); line-height: 18px;
+  letter-spacing: -0.3px;
+}
+.benefit-slider {
+  display: grid; place-items: start; width: 100%;
+  position: relative; height: 1.5px;
+}
+.slider-bg {
+  position: absolute; inset: 0;
+  background: var(--foregroundDisabled);
+  border-radius: 1px; width: 100%;
+}
+.slider-fill {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: var(--foreground);
+  border-radius: 1px;
+  width: 49.69%;
+  transition: width 1s linear;
+}
+
+/* 쿠폰 카드 */
+.coupon-card-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; width: 100%;
+  margin-top: 4px;
+}
+.coupon-card {
+  width: 100%; height: 106px;
+  position: relative; overflow: hidden;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.coupon-bg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+  object-fit: cover;
+}
+.coupon-dashes {
+  position: absolute;
+  left: calc(80.03% + 0px);
+  top: calc(50% - 39.5px);
+  width: 1px; height: 79px;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0, transparent 4px,
+    rgba(255,255,255,0.3) 4px, rgba(255,255,255,0.3) 7px
+  );
+}
+.coupon-content {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  display: flex; align-items: center;
+  justify-content: space-between;
+}
+.coupon-left {
+  flex: 1; padding: 0 20px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.coupon-amount-row {
+  display: flex; align-items: center; gap: 0;
+}
+.coupon-tilde { height: 8px; width: 16px; display: block; flex-shrink: 0; margin-right: 2px; }
+.coupon-num {
+  font-family: 'Figtree', sans-serif;
+  font-size: 28px; font-weight: 500;
+  color: #fff; line-height: 16px;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+.coupon-unit {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 24px; font-weight: 500;
+  color: #fff; line-height: normal;
+  letter-spacing: -0.3px;
+  margin-left: 2px;
+  white-space: nowrap;
+}
+.coupon-sub {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.coupon-sub-desc {
+  font-size: 12px; font-weight: 400;
+  color: rgba(255,255,255,0.8);
+  font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.3px; line-height: 16px;
+}
+.coupon-sub-timer {
+  font-size: 14px; font-weight: 500;
+  color: #fd3d4a;
+  font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.3px; line-height: 18px;
+}
+.coupon-right {
+  width: 68px; height: 62px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px 10px 12px;
+  flex-shrink: 0;
+}
+.download-icon-wrap {
+  width: 24px; height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+  background: #fff;
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/d907a373-5fb4-4572-897a-98dc12f43258');
+  mask-image: url('https://www.figma.com/api/mcp/asset/d907a373-5fb4-4572-897a-98dc12f43258');
+  -webkit-mask-size: 17.96px 17.95px; mask-size: 17.96px 17.95px;
+  -webkit-mask-position: 3px 3px; mask-position: 3px 3px;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+
+/* 쿠폰형 inner layout */
+.benefit-coupon-inner {
+  display: flex; flex-direction: column; gap: 12px;
+  height: 62px;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+.benefit-title-section {
+  display: flex; flex-direction: column; gap: 0;
+}
+.benefit-progress-bar {
+  height: 1.5px; background: #141414; width: 100%;
+}
+
+/* 서술형 타입 */
+.benefit-detail-inner {
+  display: flex; flex-direction: column; gap: 12px;
+  padding-top: 4px;
+}
+.benefit-items-list {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.benefit-item-wrap {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.benefit-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  align-self: flex-start;
+  height: 16px;
+  background: var(--backgroundBrandWeak, #f0f8fc);
+  padding: 3px 4px;
+  border-radius: 4px;
+  font-size: 10px; font-weight: 600;
+  color: var(--foregroundBrand, #00a1ff);
+  line-height: 14px; letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+.benefit-item-title {
+  font-size: 16px; font-weight: 600;
+  color: var(--foreground); line-height: 20px;
+  letter-spacing: -0.3px;
+}
+.benefit-item-desc {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px; font-weight: 400;
+  color: #8c8c8c; line-height: 18px;
+  letter-spacing: -0.3px;
+}
+.benefit-item-divider { height: 1px; background: rgba(0,0,0,0.08); }
+
+/* 서술형 세부 카드: 쿠폰 (CSS 기반 다크 카드) */
+.detail-coupon-card {
+  display: flex; width: 100%;
+  background: var(--backgroundInverse, #141414);
+  border-radius: 8px; overflow: hidden;
+  flex-shrink: 0;
+}
+.coupon-card-text {
+  flex: 1; padding: 12px 16px 14px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.coupon-card-title {
+  font-size: 14px; font-weight: 600; color: var(--foregroundInverse, #fff);
+  line-height: 20px; letter-spacing: -0.3px;
+}
+.coupon-card-desc {
+  font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.8);
+  line-height: 14px; letter-spacing: -0.3px;
+}
+.coupon-card-icon {
+  width: 56px; display: flex; align-items: center; justify-content: center;
+  border-left: 1px solid rgba(193,193,193,0.2);
+  position: relative;
+}
+
+/* 쿠폰 종료시간 타이머 (빨간 텍스트) */
+.coupon-sub-timer-red {
+  font-size: 12px; font-weight: 500;
+  color: #fd3d4a; line-height: 16px;
+  letter-spacing: -0.3px; font-family: 'Pretendard', sans-serif;
+}
+
+/* 사은품 이미지 모듈 */
+.gift-module-list { display: flex; flex-direction: column; gap: 4px; }
+.gift-img-module { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+.gift-img-1grid-box {
+  width: 100%; height: 200px;
+  border: 0.5px solid #e0e0e0; border-radius: 8px;
+  padding: 12px; gap: 12px;
+  display: flex; flex-direction: column; align-items: center;
+  position: relative; overflow: hidden; cursor: pointer;
+}
+.gift-img-2grid-wrap {
+  display: flex; gap: 4px; height: 160px; width: 100%;
+}
+.gift-img-2grid-slot {
+  flex: 1; min-width: 0;
+  border: 0.5px solid #e0e0e0; border-radius: 8px;
+  padding: 12px; gap: 12px;
+  display: flex; flex-direction: column; align-items: center;
+  position: relative; overflow: hidden; cursor: pointer;
+}
+.gift-img-inner {
+  flex: 1; min-height: 0; width: 100%;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative;
+}
+.gift-module-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: contain; border-radius: 6px; display: block;
+}
+.gift-img-badge {
+  position: absolute; top: 5.5px; right: 5.5px;
+  background: var(--bg-disabled, #ededed); border-radius: 4px;
+  padding: 3px 4px 4px;
+  font-size: 10px; font-weight: 600; color: var(--fg-foreground-weak, #8c8c8c);
+  line-height: 14px; letter-spacing: -0.3px;
+  white-space: nowrap; font-family: 'Pretendard', sans-serif;
+}
+.gift-module-title {
+  font-size: 14px; font-weight: 500;
+  color: rgba(0,0,0,0.8); line-height: 20px;
+  letter-spacing: -0.3px; width: 100%;
+  font-family: 'Pretendard', sans-serif;
+}
+.gift-module-desc {
+  font-size: 12px; font-weight: 400;
+  color: #8c8c8c; line-height: 20px;
+  letter-spacing: -0.3px; width: 100%;
+  font-family: 'Pretendard', sans-serif; opacity: 0.8;
+  margin-top: -8px;
+}
+.gift-card-text {
+  display: flex; flex-direction: column; gap: 4px;
+  width: 100%; flex-shrink: 0;
+}
+.gift-card-title {
+  display: none;
+}
+.gift-card-subtitle {
+  font-size: 10px; font-weight: 400;
+  color: #8c8c8c; line-height: 14px;
+  letter-spacing: -0.3px; width: 100%; opacity: 0.8;
+  font-family: 'Pretendard', sans-serif;
+}
+.gift-module-ph-icon {
+  display: block; width: 24px; height: 24px;
+  background: #8c8c8c;
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/eeaf293d-a35e-4183-a46b-ce257f6b417a');
+  mask-image: url('https://www.figma.com/api/mcp/asset/eeaf293d-a35e-4183-a46b-ce257f6b417a');
+  -webkit-mask-size: 17.8px 17.8px; mask-size: 17.8px 17.8px;
+  -webkit-mask-position: 3.1px 3.1px; mask-position: 3.1px 3.1px;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  flex-shrink: 0;
+}
+
+/* 카카오페이 결제 카드 */
+.payment-card {
+  background: #f5f5f5;
+  border-radius: 8px;
+  width: 100%;
+  display: flex;
+  align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+}
+.payment-text {
+  font-size: 12px; font-weight: 400;
+  color: rgba(0,0,0,0.8); line-height: 20px;
+  letter-spacing: -0.3px; white-space: nowrap;
+  opacity: 0.8;
+}
+.kakao-logo {
+  height: 19px; width: auto;
+  display: block; flex-shrink: 0;
+  margin-left: auto;
+}
+.payment-large {
+  display: flex; width: 100%; height: 86px;
+  border-radius: 8px; overflow: hidden;
+}
+.payment-large-text {
+  width: 240px; flex-shrink: 0;
+  background: #f5f5f5;
+  border-radius: 8px 0 0 8px;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 0 16px;
+}
+.payment-large-text-inner {
+  font-size: 12px; font-weight: 400;
+  color: rgba(0,0,0,0.8); line-height: 20px;
+  letter-spacing: -0.3px; opacity: 0.8;
+}
+.payment-large-logo {
+  flex: 1;
+  background: #f5f5f5;
+  border-radius: 0 8px 8px 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.payment-large-logo img {
+  height: 22px; width: auto; display: block;
+}
+.payment-rows {
+  display: flex; flex-direction: column; gap: 4px; width: 100%;
+  height: fit-content;
+}
+
+/* 유의사항 */
+.benefit-notice-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0; padding-bottom: 4px; cursor: pointer;
+}
+.benefit-notice-label {
+  font-size: 12px; font-weight: 400; color: #8c8c8c;
+  line-height: 20px; letter-spacing: -0.3px;
+}
+.benefit-notice-chevron {
+  width: 12px; height: 12px; display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.benefit-notice-chevron svg { display: block; }
+.benefit-notice-content {
+  display: none; font-size: 12px; font-weight: 400;
+  color: var(--fg-foreground-weak, #8c8c8c); line-height: 18px;
+  letter-spacing: -0.3px; white-space: pre-line;
+}
+.benefit-notice-content.open { display: block; }
+
+/* 사은품 카드 */
+.gift-card {
+  width: 100%;
+  display: flex; flex-shrink: 0;
+  aspect-ratio: 343 / 86;
+}
+.gift-text {
+  flex: 0 0 70%;
+  background: #f5f5f5;
+  border-radius: 8px 0 0 8px;
+  display: flex; align-items: center; justify-content: flex-start;
+  padding: 0 20px;
+}
+.gift-text-inner {
+  font-size: 14px; font-weight: 400;
+  color: rgba(0,0,0,0.8); line-height: 20px;
+  letter-spacing: -0.3px; opacity: 0.8;
+}
+.gift-img-wrap {
+  flex: 1;
+  background: #f5f5f5;
+  border-radius: 0 8px 8px 0;
+  position: relative; overflow: hidden;
+}
+.gift-product {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%; height: 80%;
+  object-fit: cover;
+}
+
+
+/* ──────────────────────────────────
+   PRODUCT LIST
+────────────────────────────────── */
+.product-section { background: #fff; padding-top: 12px; padding-bottom: 100px; }
+
+.chip-strip-wrap {
+  position: sticky; top: 0; z-index: 15;
+  background: #fff;
+  padding: 8px 16px 12px;
+  display: flex; align-items: center;
+  gap: 20px;
+  transition: padding-top 0.15s;
+}
+.chip-strip-wrap.is-stuck { padding-top: 4px; }
+.chip-strip {
+  display: flex; gap: 6px;
+  flex: 1; min-width: 0;
+  overflow-x: auto;
+  padding-right: 28px;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+}
+.chip-strip.scroll-end {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+.chip-strip::-webkit-scrollbar { display: none; }
+.chip-sort {
+  display: flex; align-items: center; gap: 2px;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px; font-weight: 400;
+  color: #141414;
+  line-height: 18px; letter-spacing: -0.3px;
+  flex-shrink: 0; cursor: pointer;
+  white-space: nowrap;
+}
+.chip-sort svg { display: block; }
+
+.chip {
+  height: 32px;
+  padding: 1px 11px;
+  border-radius: 9999px;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px; font-weight: 400;
+  line-height: 18px; letter-spacing: -0.3px;
+  cursor: pointer; flex-shrink: 0;
+  white-space: nowrap; overflow: hidden;
+}
+.chip.active {
+  background: #141414; color: #fff;
+  border: 1px solid transparent;
+}
+.chip.normal {
+  background: #fff; color: #141414;
+  border: 1px solid #e0e0e0;
+}
+
+.product-grid { padding: 0; }
+.product-row {
+  display: flex; gap: 2px;
+  margin-bottom: 20px; padding: 0;
+}
+.product-card { flex: 1; position: relative; }
+.product-img-wrap {
+  position: relative; width: 100%; aspect-ratio: 1;
+}
+.product-img {
+  width: 100%; aspect-ratio: 1;
+  object-fit: cover; display: block;
+  border: 1px solid var(--border-thumbnail);
+}
+.scrap-btn {
+  position: absolute;
+  right: 0px; bottom: 0px;
+  width: 44px; height: 44px;
+  background: transparent;
+  border: none; padding: 10px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.scrap-icon {
+  display: block;
+  width: 24px; height: 24px;
+  background: #ffffff;
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/0c417a1f-d3e1-409c-99ba-f2cf3f1ac511');
+  mask-image: url('https://www.figma.com/api/mcp/asset/0c417a1f-d3e1-409c-99ba-f2cf3f1ac511');
+  -webkit-mask-size: 15.6px 18.3px;
+  mask-size: 15.6px 18.3px;
+  -webkit-mask-position: 4.2px 3px;
+  mask-position: 4.2px 3px;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.scrap-icon.selected {
+  background: #00a1ff;
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/d4f56051-2bea-4ebd-8b23-8ab2b3090da2');
+  mask-image: url('https://www.figma.com/api/mcp/asset/d4f56051-2bea-4ebd-8b23-8ab2b3090da2');
+}
+
+.product-info { padding: 8px 9px 0; }
+.product-brand {
+  font-size: 12px; font-weight: 400;
+  color: var(--foregroundWeak); line-height: 16px;
+  letter-spacing: -0.3px; margin-bottom: 2px;
+}
+.product-name {
+  font-size: 13px; font-weight: 400;
+  color: var(--foreground); line-height: 18px;
+  letter-spacing: -0.3px;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+  margin-bottom: 4px; height: fit-content;
+}
+.price-row {
+  display: flex; align-items: baseline;
+  gap: 4px; margin-bottom: 2px;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 18px; font-weight: 700;
+  line-height: 24px; letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+.price-discount { color: var(--foregroundBrand); }
+.price-amount { color: var(--foreground); }
+.review-row {
+  display: flex; align-items: center; gap: 4px;
+}
+.star-icon {
+  width: 12px; height: 12px; display: block;
+}
+.review-score {
+  font-size: 12px; font-weight: 600;
+  color: var(--foreground); line-height: 16px;
+  letter-spacing: -0.3px;
+}
+.review-count {
+  font-size: 12px; font-weight: 400;
+  color: var(--foregroundWeak); line-height: 16px;
+  letter-spacing: -0.3px;
+}
+
+/* ──────────────────────────────────
+   서술형 편집 패널 (side panel)
+────────────────────────────────── */
+.detail-edit-panel { margin-top: 12px; }
+.detail-item-control {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+.detail-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 7px;
+}
+.detail-item-num {
+  font-size: 11px; font-weight: 600;
+  color: #7f7dff; letter-spacing: -0.3px;
+}
+.detail-item-del {
+  font-size: 13px; color: #c1c1c1;
+  cursor: pointer; background: none; border: none; padding: 0; line-height: 1;
+}
+.detail-item-del:hover { color: #8c8c8c; }
+.panel-input {
+  width: 100%; height: 28px;
+  border: 1px solid rgba(0,0,0,0.12); border-radius: 5px;
+  background: #fff; font-size: 12px;
+  font-family: 'Pretendard', sans-serif;
+  color: #141414; padding: 0 7px; margin-bottom: 5px;
+  letter-spacing: -0.3px; outline: none;
+}
+.panel-input:focus { border-color: #141414; }
+.panel-input::placeholder { color: #c1c1c1; }
+.panel-select-sm {
+  width: 100%; height: 26px;
+  border: 1px solid rgba(0,0,0,0.12); border-radius: 5px;
+  background: #fff; font-size: 11px;
+  font-family: 'Pretendard', sans-serif;
+  color: #8c8c8c; padding: 0 6px;
+  cursor: pointer; outline: none; margin-top: 1px;
+}
+.add-item-btn {
+  width: 100%; height: 32px;
+  border: 1.5px dashed #d4d4d4; border-radius: 6px;
+  background: #fafafa; font-size: 12px; color: #8c8c8c;
+  cursor: pointer; letter-spacing: -0.3px;
+  font-family: 'Pretendard', sans-serif; margin-top: 4px;
+}
+.add-item-btn:hover { background: #f5f5f5; }
+
+/* 사은품형 이미지 플레이스홀더 */
+.gift-placeholder {
+  width: 100%; aspect-ratio: 343 / 200;
+  background: #f5f5f5; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden; position: relative;
+  cursor: pointer;
+}
+.gift-placeholder:hover .gift-upload-hint { opacity: 1; }
+.gift-placeholder-icon {
+  display: block; width: 24px; height: 24px;
+  background: #8c8c8c;
+  -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/eeaf293d-a35e-4183-a46b-ce257f6b417a');
+  mask-image: url('https://www.figma.com/api/mcp/asset/eeaf293d-a35e-4183-a46b-ce257f6b417a');
+  -webkit-mask-size: 17.8px 17.8px; mask-size: 17.8px 17.8px;
+  -webkit-mask-position: 3.1px 3.1px; mask-position: 3.1px 3.1px;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+.gift-upload-hint {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  opacity: 1; transition: opacity 0.15s;
+}
+.gift-upload-hint span {
+  font-size: 12px; color: #8c8c8c;
+  font-family: 'Pretendard', sans-serif; letter-spacing: -0.3px;
+}
+/* 업로드된 이미지: 세로 꽉 차게 + 비율 유지 + 중앙 정렬 */
+.gift-uploaded-img {
+  height: 100%; width: auto;
+  display: block; flex-shrink: 0;
+}
+/* 이미지 올라간 후 hover 시 재업로드 오버레이 */
+.gift-reupload-overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.15s; cursor: pointer;
+}
+.gift-placeholder:hover .gift-reupload-overlay { opacity: 1; }
+.gift-reupload-overlay span {
+  font-size: 12px; color: #fff;
+  font-family: 'Pretendard', sans-serif; letter-spacing: -0.3px;
+}
+/* 이미지 업로드 후 액션 바 */
+.gift-action-bar {
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; z-index: 10;
+  opacity: 0; transition: opacity 0.15s;
+}
+.gift-placeholder:hover .gift-action-bar { opacity: 1; }
+.gift-action-btn {
+  height: 28px; padding: 0 10px;
+  background: rgba(0,0,0,0.6); color: #fff;
+  border: none; border-radius: 6px; cursor: pointer;
+  font-size: 11px; font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.2px; white-space: nowrap;
+  transition: background 0.1s;
+}
+.gift-action-btn:hover { background: rgba(0,0,0,0.8); }
+.gift-action-btn:disabled { opacity: 0.6; cursor: default; }
+/* 누끼 로딩 */
+.gift-loading {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.gift-loading span:last-child {
+  font-size: 12px; color: #8c8c8c;
+  font-family: 'Pretendard', sans-serif; letter-spacing: -0.3px;
+}
+.gift-loading-spinner {
+  display: block; width: 20px; height: 20px;
+  border: 2px solid #e0e0e0; border-top-color: #8c8c8c;
+  border-radius: 50%;
+  animation: gift-spin 0.7s linear infinite;
+}
+@keyframes gift-spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- 전체보기 모드 복귀 버튼 -->
+<button class="preview-toggle" onclick="exitPreview()">✕ 편집으로</button>
+
+<!-- ─── PHONE ──────────────────────────── -->
+<div class="phone-wrap">
+<div class="phone">
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div style="display:flex; align-items:center; justify-content:space-between; height:44px; padding:0 20px;">
+      <span style="font-family:'SF Pro Text',-apple-system,sans-serif; font-size:14px; font-weight:600; color:#141414; letter-spacing:-0.28px;">9:41</span>
+      <div style="display:flex; align-items:center; gap:5px;">
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0.5" y="0.5" width="3" height="10" rx="1" fill="#141414"/><rect x="4.5" y="2.5" width="3" height="8" rx="1" fill="#141414"/><rect x="8.5" y="4.5" width="3" height="6" rx="1" fill="#141414"/><rect x="12.5" y="6.5" width="3" height="4" rx="1" fill="#141414"/></svg>
+        <svg width="15" height="12" viewBox="0 0 15 12" fill="none"><path d="M7.5 3.5C9.43 3.5 11.13 4.33 12.33 5.67L14 4C12.35 2.17 10.05 1 7.5 1C4.95 1 2.65 2.17 1 4L2.67 5.67C3.87 4.33 5.57 3.5 7.5 3.5Z" fill="#141414"/><path d="M7.5 6.5C8.6 6.5 9.59 6.95 10.33 7.67L12 6C10.8 4.89 9.22 4.2 7.5 4.2C5.78 4.2 4.2 4.89 3 6L4.67 7.67C5.41 6.95 6.4 6.5 7.5 6.5Z" fill="#141414"/><circle cx="7.5" cy="10" r="1.5" fill="#141414"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="2" stroke="#141414" stroke-opacity="0.35"/><rect x="2" y="2" width="18" height="8" rx="1" fill="#141414"/><path d="M23 4.5V7.5C23.83 7.17 24.33 6.42 24.33 5.5V6.5C24.33 5.58 23.83 4.83 23 4.5Z" fill="#141414" fill-opacity="0.4"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP NAV -->
+  <div class="top-nav">
+    <div class="nav-icon-btn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.07 4.56c.33.37.3.94-.07 1.27L5.17 12.8H21.5c.5 0 .9.4.9.9s-.4.9-.9.9H5.17l7.83 6.96c.37.33.4.9.07 1.27-.33.37-.9.4-1.27.07L2.2 14.37a.9.9 0 0 1-.3-.67c0-.26.11-.5.3-.67L11.8 4.5c.37-.33.94-.3 1.27.07Z" fill="#2F3438"/></svg>
+    </div>
+    <div class="nav-title-wrap">
+      <span class="nav-title">한샘 오늘의집 단독기획전</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <div class="nav-icon-btn">
+        <span style="display:block;width:24px;height:24px;background:#141414;-webkit-mask-image:url('https://www.figma.com/api/mcp/asset/0cd447fe-2029-412c-946f-b1dac096b6a9');mask-image:url('https://www.figma.com/api/mcp/asset/0cd447fe-2029-412c-946f-b1dac096b6a9');-webkit-mask-size:17.96px 18.1px;mask-size:17.96px 18.1px;-webkit-mask-position:3px 2.7px;mask-position:3px 2.7px;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;"></span>
+      </div>
+      <div class="nav-icon-btn">
+        <span style="display:block;width:24px;height:24px;background:#141414;-webkit-mask-image:url('https://www.figma.com/api/mcp/asset/709374f7-ab7c-4744-bed0-fc64d3400033');mask-image:url('https://www.figma.com/api/mcp/asset/709374f7-ab7c-4744-bed0-fc64d3400033');-webkit-mask-size:20.2px 19.8px;mask-size:20.2px 19.8px;-webkit-mask-position:1.2px 2.2px;mask-position:1.2px 2.2px;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCROLL AREA -->
+  <div class="scroll-area">
+
+    <!-- HERO -->
+    <div class="hero" id="heroSection">
+
+      <!-- KV Image 타입 -->
+      <div class="hero-image" id="heroImage">
+        <img class="kv-photo" src="https://www.figma.com/api/mcp/asset/5402b022-cbed-4fde-bcbe-8c8838a5e786" alt="KV">
+        <div class="kv-dim"></div>
+        <div class="kv-img-content">
+          <div class="kv-img-top">
+            <div class="kv-date-img">5.1 - 5.7</div>
+          </div>
+          <div class="kv-img-bottom">
+            <div class="kv-logo" id="kvLogo" style="display:none">
+              <span style="font-family:'Pretendard',sans-serif; font-size:11px; font-weight:700; color:#fff; background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.4); padding:3px 8px; border-radius:4px; letter-spacing:0.5px; white-space:nowrap;">오늘의집 LIVE</span>
+            </div>
+            <div class="kv-title-img">한샘<br>오세일 특가</div>
+            <div class="kv-sub-row">
+              <div class="kv-sub-img">가정의 달 쇼핑 찬스</div>
+              <a class="kv-brand-btn" href="brand-home.html">
+                <span>브랜드홈 가기</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3.5 8.5L8.5 3.5M8.5 3.5H4.5M8.5 3.5V7.5" stroke="#141414" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KV Text 타입 -->
+      <div class="hero-text" id="heroText">
+        <div class="kv-date-text">5.1 - 5.7</div>
+        <div class="kv-text-content">
+          <div class="kv-title-text">한샘<br>오세일 특가</div>
+          <div class="kv-sub-text">가정의 달 쇼핑 찬스</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BENEFIT -->
+    <div class="benefit-section" id="benefitSection">
+
+      <!-- 쿠폰 타입 -->
+      <div id="benefitCouponType" class="benefit-coupon-type">
+        <div class="benefit-coupon-inner">
+          <div class="coupon-card-wrap">
+            <div style="width:100%;border-radius:8px;overflow:hidden;">
+              <img id="couponCardImg" src="coupon-card.png" style="width:100%;display:block;cursor:pointer;" alt="쿠폰" onclick="downloadCouponNudge()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 서술형 타입 -->
+      <div id="benefitDetailType" class="benefit-detail-type">
+        <div class="benefit-detail-inner">
+          <div class="benefit-items-list" id="detailItemsList"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 혜택↔상품 사이 divider -->
+    <div id="benefitProductDivider" style="height:12px;background:#f5f5f5;display:none;"></div>
+
+    <!-- PRODUCT LIST -->
+    <div class="product-section">
+
+      <!-- sticky 감지용 센티넬 -->
+      <div id="chipSentinel" style="height:1px;"></div>
+      <!-- 칩 필터 -->
+      <div class="chip-strip-wrap" id="chipStripWrap">
+        <div class="chip-strip" id="chipStrip">
+          <button class="chip active" onclick="selectChip(this)">전체</button>
+          <button class="chip normal" onclick="selectChip(this)">NEW IN</button>
+          <button class="chip normal" onclick="selectChip(this)">BEST SELLER</button>
+          <button class="chip normal" onclick="selectChip(this)">식탁/의자</button>
+          <button class="chip normal" onclick="selectChip(this)">거실장/수납장</button>
+          <button class="chip normal" onclick="selectChip(this)">소파</button>
+          <button class="chip normal" onclick="selectChip(this)">침대</button>
+        </div>
+        <div class="chip-sort">
+          <span>최신순</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.1208 9.2C16.865 9.2 17.2499 10.0885 16.7409 10.6313L13.1064 14.5083L13.0905 14.5248C12.7582 14.8609 12.2143 14.8609 11.8821 14.5248L11.8661 14.5083L8.23157 10.6313C7.72265 10.0885 8.10757 9.2 8.85168 9.2H16.1208Z" fill="#141414"/></svg>
+        </div>
+      </div>
+
+      <!-- 상품 그리드 -->
+      <div class="product-grid" id="productGrid">
+        <!-- Row 1 -->
+        <div class="product-row">
+          <div class="product-card" data-category="식탁/의자">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://prs.ohou.se/apne2/any/uploads/productions/v1-197977159954560.jpg?c=c&w=720&h=720" alt="product">
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">한샘</div>
+              <div class="product-name">미나 내추럴/스틸/스테인리스 식탁/식탁세트</div>
+              <div class="price-row"><span class="price-discount">7%</span><span class="price-amount">129,000외</span></div>
+              <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.9</span><span class="review-count">리뷰 2,054</span></div>
+            </div>
+          </div>
+          <div class="product-card" data-category="식탁/의자">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://prs.ohou.se/apne2/any/uploads/productions/v1-339182408019968.jpg?c=c&w=720&h=720" alt="product">
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">한샘</div>
+              <div class="product-name">위드 라운드 식탁의자 2개입 (2종/택1)</div>
+              <div class="price-row"><span class="price-discount">13%</span><span class="price-amount">212,000</span></div>
+              <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.9</span><span class="review-count">리뷰 71</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- Row 2 -->
+        <div class="product-row">
+          <div class="product-card" data-category="거실장/수납장">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://bucketplace-v2-development.s3.ap-northeast-1.amazonaws.com/uploads/openapi/4167132/1717487682689.jpg" alt="product">
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">한샘</div>
+              <div class="product-name">플리츠 거실장 210cm 오트밀</div>
+              <div class="price-row"><span class="price-discount">21%</span><span class="price-amount">669,000</span></div>
+              <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.9</span><span class="review-count">리뷰 35</span></div>
+            </div>
+          </div>
+          <div class="product-card" data-category="거실장/수납장">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://prs.ohou.se/apne2/any/uploads/productions/v1-294672967540800.jpg?c=c&w=720&h=720" alt="product">
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">한샘</div>
+              <div class="product-name">아카이브 200cm 거실장 (2종 택1)</div>
+              <div class="price-row"><span class="price-discount">21%</span><span class="price-amount">594,000</span></div>
+              <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.9</span><span class="review-count">리뷰 168</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- Row 3 -->
+        <div class="product-row">
+          <div class="product-card" data-category="거실장/수납장">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://prs.ohou.se/apne2/any/uploads/productions/v1-294673521987648.jpg?c=c&w=720&h=720" alt="product">
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">한샘</div>
+              <div class="product-name">아카이브 160cm 멀티수납장 높은선반형</div>
+              <div class="price-row"><span class="price-discount">17%</span><span class="price-amount">840,000</span></div>
+              <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.8</span><span class="review-count">리뷰 49</span></div>
+            </div>
+          </div>
+          <div class="product-card" data-category="거실장/수납장">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://prs.ohou.se/apne2/any/uploads/productions/v1-294672332374144.jpg?c=c&w=720&h=720" alt="product">
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">한샘</div>
+              <div class="product-name">아카이브 80cm 오픈수납장 (3종 택1)</div>
+              <div class="price-row"><span class="price-discount">19%</span><span class="price-amount">422,000</span></div>
+              <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.9</span><span class="review-count">리뷰 49</span></div>
+            </div>
+          </div>
+        </div>
+        <!-- Row 4 -->
+        <div class="product-row">
+          <div class="product-card" data-category="거실장/수납장">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/160756580352233435.jpg" alt="product">
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">한샘</div>
+              <div class="product-name">바이엘 채널 거울옷장세트 150cm</div>
+              <div class="price-row"><span class="price-discount">21%</span><span class="price-amount">658,860</span></div>
+              <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.9</span><span class="review-count">리뷰 8</span></div>
+            </div>
+          </div>
+          <div class="product-card" data-category="거실장/수납장">
+            <div class="product-img-wrap">
+              <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/160756581075599465.jpg" alt="product">
+              <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+            </div>
+            <div class="product-info">
+              <div class="product-brand">한샘</div>
+              <div class="product-name">바이엘 채널 거울옷장세트 300cm</div>
+              <div class="price-row"><span class="price-discount">5%</span><span class="price-amount">1,326,000</span></div>
+              <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">5.0</span><span class="review-count">리뷰 21</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 5 -->
+      <div class="product-row">
+        <div class="product-card" data-category="거실장/수납장">
+          <div class="product-img-wrap">
+            <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/163722340031298511.jpg" alt="product">
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">한샘</div>
+            <div class="product-name">샘베딩 스테디 옷장세트 160cm 서랍형</div>
+            <div class="price-row"><span class="price-discount">12%</span><span class="price-amount">581,000</span></div>
+            <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.8</span><span class="review-count">리뷰 252</span></div>
+          </div>
+        </div>
+        <div class="product-card" data-category="거실장/수납장">
+          <div class="product-img-wrap">
+            <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/163704602587170362.jpg" alt="product">
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">한샘</div>
+            <div class="product-name">샘베딩 스테디 옷장 80cm 5type</div>
+            <div class="price-row"><span class="price-discount">15%</span><span class="price-amount">237,000</span></div>
+            <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.8</span><span class="review-count">리뷰 409</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Row 6 -->
+      <div class="product-row">
+        <div class="product-card" data-category="거실장/수납장">
+          <div class="product-img-wrap">
+            <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/163661172085995168.jpg" alt="product">
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">한샘</div>
+            <div class="product-name">샘베딩 스테디 서랍장 5단 800</div>
+            <div class="price-row"><span class="price-discount">14%</span><span class="price-amount">237,000</span></div>
+            <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.7</span><span class="review-count">리뷰 348</span></div>
+          </div>
+        </div>
+        <div class="product-card" data-category="거실장/수납장">
+          <div class="product-img-wrap">
+            <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/169718349509004241.jpg" alt="product">
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">한샘</div>
+            <div class="product-name">바이엘 채널 붙박이장 화이트 행거형</div>
+            <div class="price-row"><span class="price-discount">6%</span><span class="price-amount">1,035,000</span></div>
+            <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">5.0</span><span class="review-count">리뷰 14</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Row 7 -->
+      <div class="product-row">
+        <div class="product-card" data-category="거실장/수납장">
+          <div class="product-img-wrap">
+            <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/159416865802600222.jpg" alt="product">
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">한샘</div>
+            <div class="product-name">스테이 드레스룸 세트 240+118cm 행거형</div>
+            <div class="price-row"><span class="price-discount">1%</span><span class="price-amount">701,000</span></div>
+            <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.8</span><span class="review-count">리뷰 302</span></div>
+          </div>
+        </div>
+        <div class="product-card" data-category="거실장/수납장">
+          <div class="product-img-wrap">
+            <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/169750676820319175.jpg" alt="product">
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">한샘</div>
+            <div class="product-name">바이엘 슬라이딩 옷장 화이트 1600~2000</div>
+            <div class="price-row"><span class="price-discount">22%</span><span class="price-amount">864,280</span></div>
+            <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.8</span><span class="review-count">리뷰 374</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Row 8 -->
+      <div class="product-row">
+        <div class="product-card" data-category="소파">
+          <div class="product-img-wrap">
+            <img class="product-img" src="https://prs.ohou.se/apne2/any/uploads/productions/v1-197976177594368.jpg?c=c&w=720&h=720" alt="product">
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">한샘</div>
+            <div class="product-name">MVME 프라임 노블 천연면피가죽 전동 리클라이너 소파</div>
+            <div class="price-row"><span class="price-discount">10%</span><span class="price-amount">1,656,000</span></div>
+            <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.9</span><span class="review-count">리뷰 41</span></div>
+          </div>
+        </div>
+        <div class="product-card" data-category="소파">
+          <div class="product-img-wrap">
+            <img class="product-img" src="https://bucketplace-v2-development.s3.amazonaws.com/uploads/productions/160498873843896110.jpg" alt="product">
+            <button class="scrap-btn" onclick="toggleScrap(this)"><svg class="scrap-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12));"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/></svg></button>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">한샘</div>
+            <div class="product-name">모아 모듈형 패브릭소파 4인 오픈형</div>
+            <div class="price-row"><span class="price-discount">26%</span><span class="price-amount">718,000</span></div>
+            <div class="review-row"><svg class="star-icon" viewBox="0 0 42.715 40.94" fill="none"><path d="M19.53 2.39c.7-1.58 2.95-1.58 3.65 0l4.33 9.72c.29.65.91 1.1 1.62 1.17l10.59 1.12c1.72.18 2.41 2.32 1.13 3.47l-7.91 7.13c-.53.48-.77 1.2-.62 1.9l2.21 10.41c.36 1.69-1.46 3.01-2.95 2.15l-9.22-5.32c-.62-.36-1.38-.36-2 0l-9.22 5.32c-1.5.87-3.31-.45-2.96-2.15l2.21-10.41c.15-.7-.08-1.42-.61-1.9L1.87 17.87C.58 16.72 1.27 14.58 2.99 14.4l10.59-1.12c.71-.08 1.33-.52 1.62-1.17l4.33-9.72Z" fill="#0AA5FF"/></svg><span class="review-score">4.8</span><span class="review-count">리뷰 141</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end product-section -->
+
+  </div><!-- end scroll-area -->
+
+  <!-- BRAND HOME CTA (sticky bottom, scroll 영역 밖) -->
+  <div class="brand-cta" id="brandCta">
+    <!-- 상태1: 쿠폰 넛지 -->
+    <div class="nudge-bar nudge-coupon" id="nudgeCoupon" style="display:none;" onclick="downloadCouponNudge()">
+      <span class="nudge-coupon-text">최대 15% 쿠폰, <span class="nudge-red">3일</span> 뒤에 사라져요</span>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="flex-shrink:0;"><path d="M10 3v9.5m0 0L6.5 9M10 12.5l3.5-3.5" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.5 14v1.5a1.5 1.5 0 001.5 1.5h10a1.5 1.5 0 001.5-1.5V14" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <!-- 상태2: 쿠폰 완료 -->
+    <div class="nudge-bar nudge-complete" id="nudgeComplete" style="display:none;">
+      <span class="nudge-complete-left">지금 바로 쿠폰을 사용해보세요!</span>
+      <span class="nudge-complete-right">쿠폰받기 완료</span>
+    </div>
+    <!-- 상태3: 브랜드홈 -->
+  </div>
+
+
+</div><!-- end phone -->
+
+  <!-- FAB -->
+  <div class="fab-wrap">
+    <button class="fab-btn" onclick="scrollToTop()" title="위로가기">
+      <span class="fab-icon fab-icon-up"></span>
+    </button>
+  </div>
+
+  <!-- 스낵바 -->
+  <div class="snackbar" id="snackbar">
+    <span class="snackbar-text">스크랩했어요.</span>
+    <button class="snackbar-action" onclick="goToScrapbook()">스크랩북 보기</button>
+  </div>
+
+</div><!-- end phone-wrap -->
+
+<script>
+  // ─── 로고 토글 ────────────────────────
+  function toggleLogo() {
+    const logoToggle = document.getElementById('logoToggle');
+    const el = document.getElementById('kvLogo');
+    if (logoToggle && el) el.style.display = logoToggle.checked ? 'block' : 'none';
+  }
+
+  // ─── KV 이미지/텍스트 토글 ─────────────
+  function toggleKV() {
+    const kvTogglePanel = document.getElementById('kvTogglePanel');
+    const checked = kvTogglePanel ? kvTogglePanel.checked : true;
+    document.getElementById('heroImage').style.display = checked ? 'block' : 'none';
+    const ht = document.getElementById('heroText');
+    ht.style.display = checked ? 'none' : 'flex';
+    document.getElementById('brandCta').style.paddingTop = checked ? '24px' : '12px';
+    updateDivider();
+  }
+
+  // ─── 모듈 토글 ─────────────────────────
+  function toggleModule(moduleId, toggleEl) {
+    if (moduleId === 'brandCta') {
+      nudgeClosed = !toggleEl.checked;
+      if (nudgeClosed) {
+        document.getElementById('brandCta').style.display = 'none';
+      } else {
+        const heroSection = document.getElementById('heroSection');
+        const sa = document.querySelector('.scroll-area');
+        const scrolled = (heroSection && sa) ? sa.scrollTop > heroSection.offsetHeight : false;
+        if (scrolled) {
+          document.getElementById('brandCta').style.display = 'flex';
+          initNudgeBar();
+        }
+      }
+    } else {
+      document.getElementById(moduleId).style.display = toggleEl.checked ? '' : 'none';
+    }
+    updateDivider();
+  }
+
+  // ─── 디바이더 노출 조건 ─────────────────
+  function updateDivider() {
+    const kvTogglePanel = document.getElementById('kvTogglePanel');
+    const ctaToggle = document.getElementById('ctaToggle');
+    const benefitToggle = document.getElementById('benefitToggle');
+    const kvOn = kvTogglePanel ? kvTogglePanel.checked : true;
+    const ctaOn = ctaToggle ? ctaToggle.checked : true;
+    const benefitOn = benefitToggle ? benefitToggle.checked : true;
+    const hide = kvOn && !ctaOn && !benefitOn;
+    const divider = document.querySelector('.divider');
+    if (divider) divider.style.display = hide ? 'none' : '';
+  }
+
+  // ─── 혜택 타입 ─────────────────────────
+  function setBenefitType(value) {
+    document.getElementById('benefitCouponType').style.display = value === 'coupon' ? 'block' : 'none';
+    document.getElementById('benefitDetailType').style.display = value === 'detail' ? 'block' : 'none';
+    const couponOptionPanel = document.getElementById('couponOptionPanel');
+    if (couponOptionPanel) couponOptionPanel.style.display = value === 'coupon' ? 'block' : 'none';
+    const detailEditPanel = document.getElementById('detailEditPanel');
+    if (detailEditPanel) detailEditPanel.style.display = value === 'detail' ? 'block' : 'none';
+    document.getElementById('benefitProductDivider').style.display = value === 'coupon' ? 'none' : 'block';
+    if (value === 'detail') {
+      renderDetailSection();
+    }
+  }
+
+  function toggleBenefitCouponTimer() {
+    const couponTimerToggle = document.getElementById('couponTimerToggle');
+    const on = couponTimerToggle ? couponTimerToggle.checked : false;
+    const couponBenefitDesc = document.getElementById('couponBenefitDesc');
+    const couponBenefitTimer = document.getElementById('couponBenefitTimer');
+    if (couponBenefitDesc) couponBenefitDesc.style.display = on ? 'none' : 'block';
+    if (couponBenefitTimer) couponBenefitTimer.style.display = on ? 'block' : 'none';
+    initNudgeBar();
+  }
+
+  // ─── 서술형 items state ─────────────────
+  let detailItems = [
+    { type: 'coupon', title: '상품 할인 쿠폰 10~15%', subtext: '초특가 할인!', showTimer: false },
+    { type: 'payment', title: '카카오페이 7% 할인', subtext: '선착순 이벤트로 조기종료될 수 있습니다', paymentItems: [{ text: '카카오페이 7%, 최대 3만원 할인' }], showNotice: true, noticeText: '· 혜택기간 : 2026.05.01 ~ 2026.05.07\n· 상품마다 적용되는 쿠폰 혜택은 상이하며, 정확한 혜택은 각 상품 상세페이지에서 확인 가능합니다.\n· 카카오페이 할인은 선착순으로 조기종료될 수 있습니다.' },
+  ];
+  let giftModuleIdCounter = 0;
+  const typeLabels = { basic: '기본형', coupon: '쿠폰형', payment: '결제혜택형', gift: '사은품형' };
+
+  function addDetailItem() {
+    detailItems.push({ type: 'basic', title: '', subtext: '' });
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function removeDetailItem(idx) {
+    if (detailItems.length <= 1) return;
+    detailItems.splice(idx, 1);
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function updateDetailItem(idx, field, value) {
+    detailItems[idx][field] = value;
+    renderDetailSection();
+  }
+
+  function updateDetailItemType(idx, value) {
+    detailItems[idx].type = value;
+    if (value === 'gift' && !detailItems[idx].giftModules) {
+      detailItems[idx].giftModules = [{ gridType: '1grid' }];
+    }
+    if (value === 'coupon' && detailItems[idx].showTimer === undefined) {
+      detailItems[idx].showTimer = false;
+    }
+    if (value === 'payment' && !detailItems[idx].paymentItems) {
+      detailItems[idx].paymentItems = [{ text: '카카오페이 9만원 이상 결제 시 1만원 할인' }];
+    }
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function updateDetailItemTimer(idx, checked) {
+    detailItems[idx].showTimer = checked;
+    renderDetailSection();
+  }
+
+  function addGiftModule(idx) {
+    detailItems[idx].giftModules = detailItems[idx].giftModules || [];
+    detailItems[idx].giftModules.push({ gridType: '1grid', badge: 'N명', showTitle: true, titleText: '팸퍼스 체험팩(2팩) 추첨 증정', showDesc: true, descText: '구매 제품 동일 단계로 증정' });
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function removeGiftModule(idx, modIdx) {
+    if (detailItems[idx].giftModules.length <= 1) return;
+    detailItems[idx].giftModules.splice(modIdx, 1);
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function updateGiftModuleType(idx, modIdx, value) {
+    detailItems[idx].giftModules[modIdx].gridType = value;
+    renderDetailSection();
+  }
+
+  function updateGiftModuleField(idx, modIdx, field, value) {
+    detailItems[idx].giftModules[modIdx][field] = value;
+    renderDetailSection();
+  }
+
+  function addPaymentItem(idx) {
+    detailItems[idx].paymentItems = detailItems[idx].paymentItems || [];
+    detailItems[idx].paymentItems.push({ text: '결제혜택 내용' });
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function removePaymentItem(idx, pIdx) {
+    if (detailItems[idx].paymentItems.length <= 1) return;
+    detailItems[idx].paymentItems.splice(pIdx, 1);
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function updatePaymentItemText(idx, pIdx, value) {
+    detailItems[idx].paymentItems[pIdx].text = value;
+    renderDetailSection();
+  }
+
+  function toggleNotice(idx, val) {
+    detailItems[idx].showNotice = val;
+    renderDetailPanel();
+    renderDetailSection();
+  }
+
+  function updateNoticeText(idx, value) {
+    detailItems[idx].noticeText = value;
+    renderDetailSection();
+  }
+
+  function toggleNoticeExpand(row) {
+    const icon = row.querySelector('.benefit-notice-chevron div');
+    const content = row.nextElementSibling;
+    if (!content || !content.classList.contains('benefit-notice-content')) return;
+    const isOpen = content.classList.toggle('open');
+    // 기본 rotate(90deg) 기준 → 펼침 시 rotate(270deg)
+    icon.style.transform = isOpen ? 'rotate(270deg)' : 'rotate(90deg)';
+  }
+
+  function renderDetailPanel() {
+    const container = document.getElementById('detailItemControls');
+    if (!container) return;
+    container.innerHTML = detailItems.map((item, idx) => {
+      let extraControls = '';
+      if (item.type === 'coupon') {
+        extraControls = `
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+            <span style="font-size:11px;color:#8c8c8c;letter-spacing:-0.3px;">종료 시간 노출</span>
+            <label class="toggle-switch" style="transform:scale(0.8);transform-origin:right;">
+              <input type="checkbox" ${item.showTimer?'checked':''} onchange="updateDetailItemTimer(${idx},this.checked)">
+              <span class="toggle-track"></span>
+            </label>
+          </div>`;
+      } else if (item.type === 'payment') {
+        const pItems = item.paymentItems || [{ text: '' }];
+        extraControls = `
+          <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px;">
+            <span style="font-size:11px;color:#8c8c8c;letter-spacing:-0.3px;">결제혜택 항목 (${pItems.length}개${pItems.length>=2?' → 축약형':''})</span>
+            ${pItems.map((p, pIdx) => `
+              <div style="display:flex;gap:4px;align-items:center;">
+                <input class="panel-input" style="flex:1;font-size:11px;margin:0;" type="text" value="${p.text.replace(/"/g,'&quot;')}" placeholder="혜택 내용" oninput="updatePaymentItemText(${idx},${pIdx},this.value)">
+                ${pItems.length > 1 ? `<button onclick="removePaymentItem(${idx},${pIdx})" style="background:none;border:none;color:#8c8c8c;cursor:pointer;font-size:12px;padding:4px;">✕</button>` : ''}
+              </div>`).join('')}
+            <button onclick="addPaymentItem(${idx})" style="font-size:11px;color:#00a1ff;background:none;border:none;cursor:pointer;text-align:left;padding:2px 0;letter-spacing:-0.3px;">+ 항목 추가</button>
+          </div>
+          <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:11px;color:#8c8c8c;letter-spacing:-0.3px;">유의사항</span>
+              <label class="toggle-switch" style="transform:scale(0.7);transform-origin:left;flex-shrink:0;">
+                <input type="checkbox" ${item.showNotice?'checked':''} onchange="toggleNotice(${idx},this.checked)">
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+            ${item.showNotice ? `<textarea class="panel-input" rows="2" style="font-size:11px;resize:vertical;" placeholder="유의사항 내용 (접어두기)" oninput="updateNoticeText(${idx},this.value)">${(item.noticeText||'').replace(/</g,'&lt;')}</textarea>` : ''}
+          </div>`;
+      } else if (item.type === 'gift') {
+        const modules = item.giftModules || [{ gridType: '1grid' }];
+        extraControls = `
+          <div style="margin-top:6px;display:flex;flex-direction:column;gap:6px;">
+            <span style="font-size:11px;color:#8c8c8c;letter-spacing:-0.3px;">이미지 모듈</span>
+            ${modules.map((mod, modIdx) => `
+              <div style="display:flex;flex-direction:column;gap:4px;padding:8px;background:#f8f8f8;border-radius:6px;">
+                <div style="display:flex;gap:4px;align-items:center;">
+                  <select class="panel-select-sm" style="flex:1;" onchange="updateGiftModuleType(${idx},${modIdx},this.value)">
+                    <option value="1grid"${mod.gridType==='1grid'?' selected':''}>1 grid</option>
+                    <option value="2grid"${mod.gridType==='2grid'?' selected':''}>2 grid</option>
+                  </select>
+                  ${modules.length > 1 ? `<button onclick="removeGiftModule(${idx},${modIdx})" style="background:none;border:none;color:#8c8c8c;cursor:pointer;font-size:12px;padding:4px;">✕</button>` : ''}
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:10px;color:#8c8c8c;min-width:32px;letter-spacing:-0.3px;">뱃지</span>
+                  <label class="toggle-switch" style="transform:scale(0.7);transform-origin:left;flex-shrink:0;">
+                    <input type="checkbox" ${mod.showBadge!==false?'checked':''} onchange="updateGiftModuleField(${idx},${modIdx},'showBadge',this.checked)">
+                    <span class="toggle-track"></span>
+                  </label>
+                  <input class="panel-input" style="flex:1;font-size:11px;margin:0;" type="text" value="${(mod.badge||'N명').replace(/"/g,'&quot;')}" placeholder="N명" oninput="updateGiftModuleField(${idx},${modIdx},'badge',this.value)">
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:10px;color:#8c8c8c;min-width:32px;letter-spacing:-0.3px;">타이틀</span>
+                  <label class="toggle-switch" style="transform:scale(0.7);transform-origin:left;flex-shrink:0;">
+                    <input type="checkbox" ${mod.showTitle!==false?'checked':''} onchange="updateGiftModuleField(${idx},${modIdx},'showTitle',this.checked)">
+                    <span class="toggle-track"></span>
+                  </label>
+                  <input class="panel-input" style="flex:1;font-size:11px;margin:0;" type="text" value="${(mod.titleText||'').replace(/"/g,'&quot;')}" placeholder="타이틀 텍스트" oninput="updateGiftModuleField(${idx},${modIdx},'titleText',this.value)">
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:10px;color:#8c8c8c;min-width:32px;letter-spacing:-0.3px;">서브</span>
+                  <label class="toggle-switch" style="transform:scale(0.7);transform-origin:left;flex-shrink:0;">
+                    <input type="checkbox" ${mod.showDesc!==false?'checked':''} onchange="updateGiftModuleField(${idx},${modIdx},'showDesc',this.checked)">
+                    <span class="toggle-track"></span>
+                  </label>
+                  <input class="panel-input" style="flex:1;font-size:11px;margin:0;" type="text" value="${(mod.descText||'').replace(/"/g,'&quot;')}" placeholder="서브타이틀 텍스트" oninput="updateGiftModuleField(${idx},${modIdx},'descText',this.value)">
+                </div>
+              </div>`).join('')}
+            <button onclick="addGiftModule(${idx})" style="font-size:11px;color:#00a1ff;background:none;border:none;cursor:pointer;text-align:left;padding:2px 0;letter-spacing:-0.3px;">+ 모듈 추가</button>
+          </div>`;
+      }
+      return `
+      <div class="detail-item-control">
+        <div class="detail-item-header">
+          <span class="detail-item-num">${String(idx + 1).padStart(2, '0')}</span>
+          <button class="detail-item-del" onclick="removeDetailItem(${idx})">✕</button>
+        </div>
+        <input class="panel-input" type="text" value="${item.title.replace(/"/g, '&quot;')}" placeholder="제목" oninput="updateDetailItem(${idx}, 'title', this.value)">
+        <input class="panel-input" type="text" value="${item.subtext.replace(/"/g, '&quot;')}" placeholder="서브텍스트 (선택)" oninput="updateDetailItem(${idx}, 'subtext', this.value)">
+        <select class="panel-select-sm" onchange="updateDetailItemType(${idx}, this.value)">
+          ${['basic','coupon','payment','gift'].map(t => `<option value="${t}"${item.type===t?' selected':''}>${typeLabels[t]}</option>`).join('')}
+        </select>
+        ${extraControls}
+      </div>`;
+    }).join('');
+  }
+
+  function renderDetailSection() {
+    const list = document.getElementById('detailItemsList');
+    list.innerHTML = detailItems.map((item, idx) => {
+      const num = '혜택 ' + (idx + 1);
+      const hasSubtext = item.subtext && item.subtext.trim();
+      const titleBlock = `
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <div class="benefit-item-title">${item.title || '&nbsp;'}</div>
+          ${hasSubtext ? `<div class="benefit-item-desc">${item.subtext}</div>` : ''}
+        </div>`;
+      let cardBlock = '';
+      if (item.type === 'coupon') cardBlock = renderCouponCard(item);
+      else if (item.type === 'payment') cardBlock = renderPaymentCard(item);
+      else if (item.type === 'gift') cardBlock = renderGiftCard(item, idx);
+      const nextItem = detailItems[idx + 1];
+      const divider = (idx < detailItems.length - 1) ? `<div class="benefit-item-divider"></div>` : '';
+      const noticeRow = (item.type === 'payment' && item.showNotice) ? `
+        <div class="benefit-notice-row" onclick="toggleNoticeExpand(this)">
+          <span class="benefit-notice-label">유의사항 더보기</span>
+          <span class="benefit-notice-chevron">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="display:block;transform:rotate(90deg);"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="#828c94" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+        </div>
+        ${item.noticeText ? `<div class="benefit-notice-content">${item.noticeText.replace(/\n/g,'<br>')}</div>` : ''}
+      ` : '';
+      const inner = cardBlock
+        ? `<div style="display:flex;flex-direction:column;gap:12px;">${titleBlock}<div style="display:flex;flex-direction:column;gap:6px;">${cardBlock}${noticeRow}</div></div>`
+        : titleBlock;
+      return `<div class="benefit-item-wrap"><div class="benefit-num">${num}</div>${inner}</div>${divider}`;
+    }).join('');
+  }
+
+  function renderCouponCard(item) {
+    return `<div style="width:100%;border-radius:8px;overflow:hidden;cursor:pointer;" onclick="downloadCouponNudge()"><img class="coupon-card-img" src="${couponDownloaded ? 'coupon-card-done.png' : 'coupon-card.png'}" style="width:100%;display:block;" alt="쿠폰"></div>`;
+  }
+
+  function renderPaymentCard(item) {
+    const logoSrc = 'https://www.figma.com/api/mcp/asset/359e7b63-fcdb-4bc3-a982-d3263426faee';
+    const items = (item && item.paymentItems && item.paymentItems.length > 0)
+      ? item.paymentItems
+      : [{ text: (item && item.subtext) || '카카오페이 결제 시 할인' }];
+
+    const rows = items.map(p => `
+      <div class="payment-card">
+        <span class="payment-text">${p.text || ''}</span>
+        <img class="kakao-logo" src="${p.logoSrc || logoSrc}" alt="pay">
+      </div>`).join('');
+    return `<div class="payment-rows">${rows}</div>`;
+  }
+
+  function renderGiftSlotInner(imgUrl, phId) {
+    if (imgUrl) {
+      return `<img class="gift-module-img" src="${imgUrl}" alt="">`;
+    }
+    return `<span class="gift-module-ph-icon" id="${phId}"></span>`;
+  }
+
+  function renderGiftCard(item, itemIdx) {
+    const modules = (item && item.giftModules) ? item.giftModules : [{ gridType: '1grid' }];
+    const rendered = modules.map((mod, modIdx) => {
+      // stable IDs based on item/module index — survive re-renders
+      const idA = `gift-${itemIdx}-${modIdx}-a`;
+      const idB = `gift-${itemIdx}-${modIdx}-b`;
+      const badgeHtml = mod.showBadge !== false ? `<span class="gift-img-badge">${mod.badge || 'N명'}</span>` : '';
+      const subtitleHtml = mod.showDesc !== false ? `<div class="gift-card-subtitle">${mod.descText || ''}</div>` : '';
+      const textBlock = subtitleHtml ? `<div class="gift-card-text">${subtitleHtml}</div>` : '';
+
+      if (mod.gridType === '1grid') {
+        return `
+          <div class="gift-img-module">
+            <div class="gift-img-1grid-box" onclick="document.getElementById('gf-${idA}').click()">
+              <input type="file" id="gf-${idA}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,${itemIdx},${modIdx},'a')">
+              <div class="gift-img-inner" id="gi-${idA}">
+                ${renderGiftSlotInner(mod.imgUrlA, 'gph-' + idA)}
+              </div>
+              ${badgeHtml}
+              ${textBlock}
+            </div>
+          </div>`;
+      } else {
+        return `
+          <div class="gift-img-module">
+            <div class="gift-img-2grid-wrap">
+              <div class="gift-img-2grid-slot" onclick="document.getElementById('gf-${idA}').click()">
+                <input type="file" id="gf-${idA}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,${itemIdx},${modIdx},'a')">
+                <div class="gift-img-inner" id="gi-${idA}">
+                  ${renderGiftSlotInner(mod.imgUrlA, 'gph-' + idA)}
+                </div>
+                ${badgeHtml}
+                ${textBlock}
+              </div>
+              <div class="gift-img-2grid-slot" onclick="document.getElementById('gf-${idB}').click()">
+                <input type="file" id="gf-${idB}" accept="image/*" style="display:none" onchange="handleGiftModuleUpload(event,${itemIdx},${modIdx},'b')">
+                <div class="gift-img-inner" id="gi-${idB}">
+                  ${renderGiftSlotInner(mod.imgUrlB, 'gph-' + idB)}
+                </div>
+                ${badgeHtml}
+                ${textBlock}
+              </div>
+            </div>
+          </div>`;
+      }
+    });
+    return `<div class="gift-module-list">${rendered.join('')}</div>`;
+  }
+
+  function handleGiftModuleUpload(event, itemIdx, modIdx, slot) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const key = slot === 'b' ? 'imgUrlB' : 'imgUrlA';
+    detailItems[itemIdx].giftModules[modIdx][key] = url;
+    renderDetailSection();
+  }
+
+  function handleGiftImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const placeholder = document.getElementById('giftPlaceholder');
+    const hint = document.getElementById('giftUploadHint');
+
+    placeholder.querySelectorAll('.gift-uploaded-img, .gift-action-bar, .gift-loading').forEach(el => el.remove());
+    placeholder.onclick = null;
+
+    // localhost(serve.py)로 열었을 때만 누끼 자동 실행
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      hint.style.display = 'none';
+      const loading = document.createElement('div');
+      loading.className = 'gift-loading';
+      loading.innerHTML = '<span class="gift-loading-spinner"></span><span>누끼 따는 중...</span>';
+      placeholder.insertBefore(loading, hint);
+      runNukiAuto(url, file, placeholder, hint, loading);
+    } else {
+      // file://로 열었을 때는 그냥 이미지 삽입
+      hint.style.display = 'none';
+      const img = document.createElement('img');
+      img.className = 'gift-uploaded-img';
+      img.src = url; img.alt = '사은품 이미지';
+      placeholder.insertBefore(img, hint);
+      const bar = document.createElement('div');
+      bar.className = 'gift-action-bar';
+      bar.innerHTML = `<button class="gift-action-btn" onclick="event.stopPropagation(); document.getElementById('giftFileInput').click()">🔄 이미지 변경</button>`;
+      placeholder.appendChild(bar);
+    }
+  }
+
+  async function runNukiAuto(url, file, placeholder, hint, loading) {
+    try {
+      const { removeBackground } = await import('https://esm.sh/@imgly/background-removal@1.4.5');
+      const resultBlob = await removeBackground(url, {
+        publicPath: 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/',
+        model: 'small',
+        debug: false,
+      });
+      const resultUrl = URL.createObjectURL(resultBlob);
+      loading.remove();
+      placeholder.style.background = 'repeating-conic-gradient(#e0e0e0 0% 25%, #f5f5f5 0% 50%) 0 0 / 12px 12px';
+      const img = document.createElement('img');
+      img.className = 'gift-uploaded-img';
+      img.src = resultUrl; img.alt = '사은품 이미지';
+      placeholder.insertBefore(img, hint);
+      const bar = document.createElement('div');
+      bar.className = 'gift-action-bar';
+      bar.innerHTML = `<button class="gift-action-btn" onclick="event.stopPropagation(); document.getElementById('giftFileInput').click()">🔄 이미지 변경</button>`;
+      placeholder.appendChild(bar);
+    } catch (err) {
+      console.error('누끼 오류:', err);
+      loading.remove();
+      placeholder.style.background = '#f5f5f5';
+      hint.style.display = 'flex';
+    }
+  }
+
+  // ─── 칩 필터 ───────────────────────────
+  const categoryChips = ['전체', '소파', '침대', '테이블', '수납'];
+  const brandChips = ['전체', '까사마루', '일룸', '한샘', '시디즈'];
+
+  function setFilterType(value) {
+    const strip = document.getElementById('chipStrip');
+    const chips = value === 'category' ? categoryChips : brandChips;
+    strip.innerHTML = chips.map((label, i) =>
+      `<button class="chip ${i === 0 ? 'active' : 'normal'}" onclick="selectChip(this)">${label}</button>`
+    ).join('');
+  }
+
+  function selectChip(el) {
+    document.querySelectorAll('.chip').forEach(c => { c.className = 'chip normal'; });
+    el.className = 'chip active';
+
+    const category = el.textContent.trim();
+    const allCards = document.querySelectorAll('.product-card');
+    const allRows = document.querySelectorAll('.product-row');
+
+    if (category === 'NEW IN' || category === '전체') {
+      // 전체 보기
+      allCards.forEach(c => c.style.display = '');
+      allRows.forEach(r => r.style.display = '');
+    } else if (category === 'BEST SELLER') {
+      // BEST SELLER: 전체 보기 + 순서 셔플
+      allCards.forEach(c => c.style.display = '');
+      allRows.forEach(r => {
+        r.style.display = '';
+        const cards = Array.from(r.children);
+        cards.sort(() => Math.random() - 0.5);
+        cards.forEach(c => r.appendChild(c));
+      });
+      // row 간 순서도 셔플
+      const grid = document.getElementById('productGrid');
+      if (grid) {
+        const rows = Array.from(grid.querySelectorAll('.product-row'));
+        rows.sort(() => Math.random() - 0.5);
+        rows.forEach(r => grid.appendChild(r));
+      }
+    } else {
+      // 카테고리 필터링
+      allCards.forEach(c => {
+        const cat = c.getAttribute('data-category') || '';
+        c.style.display = cat === category ? '' : 'none';
+      });
+      // 빈 row 숨기기
+      allRows.forEach(r => {
+        const visibleCards = r.querySelectorAll('.product-card:not([style*="display: none"])');
+        r.style.display = visibleCards.length > 0 ? '' : 'none';
+      });
+    }
+  }
+
+  // ─── 카운트다운 타이머 ──────────────────
+  const endTime = Date.now() + (3 * 3600 + 22 * 60 + 14) * 1000;
+  const totalDuration = (3 * 3600 + 22 * 60 + 14) * 1000;
+
+  function updateTimer() {
+    const remaining = Math.max(0, endTime - Date.now());
+    const s = Math.floor(remaining / 1000);
+    const d = Math.floor(s / 86400);
+    const h = Math.floor((s % 86400) / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    const el = document.getElementById('timerText');
+    if (el) el.textContent = `종료까지 ${d}일 ${h}시간 ${m}분 ${sec}초 남음`;
+    const fill = document.getElementById('progressFill');
+    const pct = Math.min(100, (1 - remaining / totalDuration) * 100);
+    if (fill) fill.style.width = pct + '%';
+  }
+
+  setInterval(() => { updateTimer(); }, 1000);
+  updateTimer();
+
+  // ─── 넛지바 상태 관리 ─────────────────
+  let nudgeClosed = false;
+  let couponDownloaded = false;
+
+  function initNudgeBar() {
+    // 초기: 모두 숨김 (쿠폰 넛지는 스크롤 시 표시)
+    document.getElementById('nudgeCoupon').style.display = 'none';
+    document.getElementById('nudgeComplete').style.display = 'none';
+  }
+
+  function downloadCouponNudge() {
+    couponDownloaded = true;
+    document.getElementById('nudgeCoupon').style.display = 'none';
+    document.getElementById('nudgeComplete').style.display = 'flex';
+    // 혜택 섹션 쿠폰 이미지 → 받기 완료로 교체
+    switchCouponToDone();
+    // 3초 후 완료 메시지 사라짐
+    setTimeout(() => {
+      document.getElementById('nudgeComplete').style.display = 'none';
+    }, 3000);
+  }
+
+  function switchCouponToDone() {
+    const img = document.getElementById('couponCardImg');
+    if (img) img.src = 'coupon-card-done.png';
+    document.querySelectorAll('.coupon-card-img').forEach(el => { el.src = 'coupon-card-done.png'; });
+  }
+
+  function closeNudgeBar() {
+    nudgeClosed = true;
+    document.getElementById('brandCta').style.display = 'none';
+    const fabWrap = document.querySelector('.fab-wrap');
+    if (fabWrap) fabWrap.style.bottom = '20px';
+  }
+
+  // ─── 스크롤 시 FAB + 넛지바 표시 ─────────────
+  const scrollArea = document.querySelector('.scroll-area');
+  if (scrollArea) {
+    scrollArea.addEventListener('scroll', function() {
+      const heroSection = document.getElementById('heroSection');
+      const scrolled = heroSection ? scrollArea.scrollTop > heroSection.offsetHeight : false;
+
+      // FAB
+      const fabWrap = document.querySelector('.fab-wrap');
+      if (fabWrap) {
+        fabWrap.style.display = scrolled ? 'flex' : 'none';
+      }
+
+      // 쿠폰 넛지: 혜택 섹션이 화면 밖이면 표시, 아니면 숨김
+      if (!couponDownloaded) {
+        const benefitSection = document.getElementById('benefitSection');
+        if (benefitSection) {
+          const benefitRect = benefitSection.getBoundingClientRect();
+          const scrollAreaRect = scrollArea.getBoundingClientRect();
+          const benefitHidden = benefitRect.bottom < scrollAreaRect.top;
+          document.getElementById('nudgeCoupon').style.display = benefitHidden ? 'flex' : 'none';
+        }
+      }
+    });
+  }
+
+  // 넛지바 초기 상태 설정
+  initNudgeBar();
+
+  // 혜택 타입 초기값: 서술형
+  setBenefitType('detail');
+
+  // ─── 칩 sticky 감지 ────────────────────
+  const chipObserver = new IntersectionObserver(
+    ([e]) => document.getElementById('chipStripWrap').classList.toggle('is-stuck', !e.isIntersecting),
+    { root: document.querySelector('.scroll-area'), threshold: 1 }
+  );
+  chipObserver.observe(document.getElementById('chipSentinel'));
+
+  // ─── 칩 좌우 스크롤 끝 감지 ─────────────
+  const chipStripEl = document.getElementById('chipStrip');
+  if (chipStripEl) {
+    const updateChipEnd = () => {
+      const atEnd = chipStripEl.scrollLeft + chipStripEl.clientWidth >= chipStripEl.scrollWidth - 1;
+      chipStripEl.classList.toggle('scroll-end', atEnd);
+    };
+    chipStripEl.addEventListener('scroll', updateChipEnd);
+    window.addEventListener('resize', updateChipEnd);
+    updateChipEnd();
+  }
+
+  // ─── 모바일 바텀시트 (UT용: 패널 없음, 방어 처리) ───────────────────
+  function openMobilePanel() {
+    const sheet = document.getElementById('mobilePanelSheet');
+    if (sheet) sheet.classList.add('open');
+  }
+  function closeMobilePanel() {
+    const sheet = document.getElementById('mobilePanelSheet');
+    if (sheet) sheet.classList.remove('open');
+  }
+  function syncToggle(masterId, mirrorId) {
+    const master = document.getElementById(masterId);
+    const mirror = document.getElementById(mirrorId);
+    if (master && mirror) master.checked = mirror.checked;
+  }
+
+  // ─── 전체보기 모드 ─────────────────────
+  function enterPreview() {
+    document.body.classList.add('preview-mode');
+    history.replaceState(null, '', '?preview');
+  }
+
+  function exitPreview() {
+    document.body.classList.remove('preview-mode');
+    history.replaceState(null, '', location.pathname);
+  }
+
+  // URL ?preview 파라미터 자동 감지
+  if (location.search.includes('preview')) {
+    document.body.classList.add('preview-mode');
+  }
+
+  // ─── FAB ───────────────────────────────
+  function scrollToTop() {
+    document.querySelector('.scroll-area').scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function sharePage() {
+    if (navigator.share) {
+      navigator.share({ title: document.title, url: location.href });
+    } else {
+      navigator.clipboard.writeText(location.href).then(() => {
+        alert('링크가 복사되었습니다.');
+      });
+    }
+  }
+
+  // ─── 스낵바 ──────────────────────────
+  let snackbarTimer = null;
+  function showScrapSnackbar() {
+    const sb = document.getElementById('snackbar');
+    sb.classList.add('show');
+    clearTimeout(snackbarTimer);
+    snackbarTimer = setTimeout(() => sb.classList.remove('show'), 3000);
+  }
+  function toggleScrap(btn) {
+    const svg = btn.querySelector('.scrap-svg');
+    if (!svg) return;
+    const isSelected = svg.getAttribute('data-selected') === 'true';
+    const outline = '<path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/>';
+    const filled = '<path d="M15.5 3C16.8058 3 17.9292 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47168 21.1144C6.46022 21.1207 6.44857 21.1269 6.43681 21.1327C5.91236 21.3919 5.33398 21.3417 4.88989 21.0391C4.45543 20.743 4.20001 20.2423 4.2 19.6944V7.3C4.2 5.99416 4.49789 4.8707 5.28432 4.08428C6.07076 3.29786 7.19422 3 8.5 3H15.5Z" fill="#00a1ff"/>';
+    if (isSelected) {
+      svg.innerHTML = outline;
+      svg.setAttribute('data-selected', 'false');
+    } else {
+      svg.innerHTML = filled;
+      svg.setAttribute('data-selected', 'true');
+    }
+  }
+
+  const BRAND_SCRAP_ICON_DEFAULT = "https://www.figma.com/api/mcp/asset/3b671328-9b15-4818-bba1-d61805cf479b";
+  const BRAND_SCRAP_ICON_FILLED  = "https://www.figma.com/api/mcp/asset/2b03cc3a-1b67-4ea4-8b03-e7e9cb399eee";
+  let brandScrapped = false;
+  function toggleBrandScrap() {
+    brandScrapped = !brandScrapped;
+    const svg = document.getElementById('nudgeBookmarkSvg');
+    if (!svg) return;
+    const outlinePath = '<path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="white"/>';
+    const filledPath = '<path d="M15.5 3C16.8058 3 17.9292 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47168 21.1144C6.46022 21.1207 6.44857 21.1269 6.43681 21.1327C5.91236 21.3919 5.33398 21.3417 4.88989 21.0391C4.45543 20.743 4.20001 20.2423 4.2 19.6944V7.3C4.2 5.99416 4.49789 4.8707 5.28432 4.08428C6.07076 3.29786 7.19422 3 8.5 3H15.5Z" fill="white"/>';
+    svg.innerHTML = brandScrapped ? filledPath : outlinePath;
+  }
+  function goToScrapbook() {
+    document.getElementById('snackbar').classList.remove('show');
+  }
+
+</script>
+</body>
+</html>
