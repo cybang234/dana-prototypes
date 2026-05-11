@@ -1008,15 +1008,33 @@ body.preview-mode .preview-toggle { display: block; }
 ────────────────────────────────── */
 .product-section { background: #fff; padding-top: 12px; }
 
-.chip-strip {
-  display: flex; gap: 6px;
-  padding: 8px 16px 12px;
-  overflow-x: auto; background: #fff;
+.chip-strip-wrap {
   position: sticky; top: 0; z-index: 15;
+  background: #fff;
+  padding: 8px 16px 12px;
+  display: flex; align-items: center;
+  gap: 12px;
   transition: padding-top 0.15s;
 }
-.chip-strip.is-stuck { padding-top: 4px; }
+.chip-strip-wrap.is-stuck { padding-top: 4px; }
+.chip-strip {
+  display: flex; gap: 6px;
+  flex: 1; min-width: 0;
+  overflow-x: auto;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
 .chip-strip::-webkit-scrollbar { display: none; }
+.chip-sort {
+  display: flex; align-items: center; gap: 2px;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px; font-weight: 400;
+  color: #141414;
+  line-height: 18px; letter-spacing: -0.3px;
+  flex-shrink: 0; cursor: pointer;
+  white-space: nowrap;
+}
+.chip-sort svg { display: block; }
 
 .chip {
   height: 32px;
@@ -1514,12 +1532,20 @@ body.preview-mode .preview-toggle { display: block; }
       <!-- sticky 감지용 센티넬 -->
       <div id="chipSentinel" style="height:1px;"></div>
       <!-- 칩 필터 -->
-      <div class="chip-strip" id="chipStrip">
-        <button class="chip active" onclick="selectChip(this)">전체</button>
-        <button class="chip normal" onclick="selectChip(this)">소파</button>
-        <button class="chip normal" onclick="selectChip(this)">침대</button>
-        <button class="chip normal" onclick="selectChip(this)">테이블</button>
-        <button class="chip normal" onclick="selectChip(this)">수납</button>
+      <div class="chip-strip-wrap" id="chipStripWrap">
+        <div class="chip-strip" id="chipStrip">
+          <button class="chip active" onclick="selectChip(this)">전체</button>
+          <button class="chip normal" onclick="selectChip(this)">NEW IN</button>
+          <button class="chip normal" onclick="selectChip(this)">BEST SELLER</button>
+          <button class="chip normal" onclick="selectChip(this)">침대</button>
+          <button class="chip normal" onclick="selectChip(this)">테이블</button>
+          <button class="chip normal" onclick="selectChip(this)">수납</button>
+          <button class="chip normal" onclick="selectChip(this)">의자</button>
+        </div>
+        <div class="chip-sort">
+          <span>최신순</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M8 10l4 4 4-4" stroke="#141414" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
       </div>
 
       <!-- 상품 그리드 -->
@@ -2586,7 +2612,7 @@ body.preview-mode .preview-toggle { display: block; }
   }
 
   // ─── 칩 필터 ───────────────────────────
-  const categoryChips = ['전체', '소파', '침대', '테이블', '수납'];
+  const categoryChips = ['전체', 'NEW IN', 'BEST SELLER', '침대', '테이블', '수납', '의자'];
   const brandChips = ['전체', '까사마루', '일룸', '한샘', '시디즈'];
 
   function setFilterType(value) {
@@ -2697,7 +2723,7 @@ body.preview-mode .preview-toggle { display: block; }
 
   // ─── 칩 sticky 감지 ────────────────────
   const chipObserver = new IntersectionObserver(
-    ([e]) => document.getElementById('chipStrip').classList.toggle('is-stuck', !e.isIntersecting),
+    ([e]) => document.getElementById('chipStripWrap').classList.toggle('is-stuck', !e.isIntersecting),
     { root: document.querySelector('.scroll-area'), threshold: 1 }
   );
   chipObserver.observe(document.getElementById('chipSentinel'));
