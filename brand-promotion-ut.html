@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
 <title>한샘 오세일 특가 | UT 프로토타입</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Figtree:wght@500&display=swap" rel="stylesheet">
@@ -11,6 +12,7 @@
 <!-- ODS Design Tokens -->
 <style>
 :root {
+  color-scheme: light;
   --foreground: #141414;
   --foregroundWeak: #8c8c8c;
   --foregroundBrand: #00a1ff;
@@ -1021,8 +1023,13 @@ body.preview-mode .preview-toggle { display: block; }
   display: flex; gap: 6px;
   flex: 1; min-width: 0;
   overflow-x: auto;
-  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
-  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  padding-right: 28px;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+}
+.chip-strip.scroll-end {
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 .chip-strip::-webkit-scrollbar { display: none; }
 .chip-sort {
@@ -2270,6 +2277,18 @@ body.preview-mode .preview-toggle { display: block; }
     { root: document.querySelector('.scroll-area'), threshold: 1 }
   );
   chipObserver.observe(document.getElementById('chipSentinel'));
+
+  // ─── 칩 좌우 스크롤 끝 감지 ─────────────
+  const chipStripEl = document.getElementById('chipStrip');
+  if (chipStripEl) {
+    const updateChipEnd = () => {
+      const atEnd = chipStripEl.scrollLeft + chipStripEl.clientWidth >= chipStripEl.scrollWidth - 1;
+      chipStripEl.classList.toggle('scroll-end', atEnd);
+    };
+    chipStripEl.addEventListener('scroll', updateChipEnd);
+    window.addEventListener('resize', updateChipEnd);
+    updateChipEnd();
+  }
 
   // ─── 모바일 바텀시트 (UT용: 패널 없음, 방어 처리) ───────────────────
   function openMobilePanel() {
