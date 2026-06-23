@@ -664,7 +664,18 @@ body {
 /* ====== 특가 탭 - timer header ====== */
 .deal-header { display: flex; flex-direction: column; gap: 4px; }
 .deal-title-row {
-  display: flex; align-items: baseline; gap: 6px;
+  display: flex; align-items: baseline; justify-content: space-between;
+  width: 100%;
+}
+/* 모듈 4 (만원 특가 미리보기): 좌측 타이틀+서브 / 우측 알림받기 */
+.deal-preview-header {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+}
+.deal-preview-title-block {
+  display: flex; flex-direction: column; gap: 4px;
+  flex: 1; min-width: 0;
 }
 .deal-title {
   font-size: 20px; font-weight: 700; line-height: 28px;
@@ -1579,8 +1590,13 @@ body {
     <!-- 특가 모듈 2 -->
     <section class="recommend-bundle">
       <div class="header-container">
-        <h2 class="bundle-header h24">1+1 특가</h2>
-        <p class="bundle-description">24시간 한정 특가 모음</p>
+        <div class="deal-header">
+          <div class="deal-title-row">
+            <h2 class="deal-title">1+1 특가</h2>
+            <span class="deal-timer">23:45:10</span>
+          </div>
+          <p class="bundle-description">24시간 한정 특가 모음</p>
+        </div>
       </div>
       <div class="chip-strip">
         <button class="chip chip-solid">전체</button>
@@ -1607,8 +1623,13 @@ body {
     <!-- 특가 모듈 3 -->
     <section class="recommend-bundle">
       <div class="header-container" style="gap: 4px;">
-        <h2 class="bundle-header h24">단독 특가</h2>
-        <p class="bundle-description">재고 소진 시 마감</p>
+        <div class="deal-header">
+          <div class="deal-title-row">
+            <h2 class="deal-title">단독 특가</h2>
+            <span class="deal-timer">03:20:45</span>
+          </div>
+          <p class="bundle-description">재고 소진 시 마감</p>
+        </div>
       </div>
       <div class="chip-strip">
         <button class="chip chip-solid">전체</button>
@@ -1632,11 +1653,19 @@ body {
 
     <div class="module-divider"></div>
 
-    <!-- 특가 모듈 4: 필터 없음 -->
+    <!-- 특가 모듈 4: 필터 없음, 만원 특가 미리보기 -->
     <section class="recommend-bundle no-chip">
       <div class="header-container">
-        <h2 class="bundle-header h24">만원 특가 미리보기</h2>
-        <p class="bundle-description">고객님이 가장 많이 구매한 특가 상품</p>
+        <div class="deal-preview-header">
+          <div class="deal-preview-title-block">
+            <h2 class="bundle-header h24">만원 특가 미리보기</h2>
+            <p class="bundle-description">06.08 오전 9시 오픈 예정</p>
+          </div>
+          <button class="box-button">
+            <span class="label">오픈 알림받기</span>
+            <span class="icon"><img src="./assets/icon-bell.svg" alt="bell"/></span>
+          </button>
+        </div>
       </div>
       <div class="recommend-item">
         <div class="product-section"><div class="product-row">
@@ -1652,8 +1681,13 @@ body {
     <!-- 특가 모듈 5 -->
     <section class="recommend-bundle">
       <div class="header-container">
-        <h2 class="bundle-header h24">원데이특가</h2>
-        <p class="bundle-description">이 가격은 오직 오늘의집에서만</p>
+        <div class="deal-header">
+          <div class="deal-title-row">
+            <h2 class="deal-title">원데이특가</h2>
+            <span class="deal-timer">11:59:30</span>
+          </div>
+          <p class="bundle-description">이 가격은 오직 오늘의집에서만</p>
+        </div>
       </div>
       <div class="chip-strip">
         <button class="chip chip-solid">전체</button>
@@ -1680,8 +1714,13 @@ body {
     <!-- 특가 모듈 6 -->
     <section class="recommend-bundle">
       <div class="header-container">
-        <h2 class="bundle-header h24">반값딜</h2>
-        <p class="bundle-description">신상품 첫 출시 기념 할인</p>
+        <div class="deal-header">
+          <div class="deal-title-row">
+            <h2 class="deal-title">반값딜</h2>
+            <span class="deal-timer">08:15:22</span>
+          </div>
+          <p class="bundle-description">신상품 첫 출시 기념 할인</p>
+        </div>
       </div>
       <div class="chip-strip">
         <button class="chip chip-solid">전체</button>
@@ -1708,8 +1747,13 @@ body {
     <!-- 특가 모듈 7 -->
     <section class="recommend-bundle">
       <div class="header-container">
-        <h2 class="bundle-header h24">첫 구매딜</h2>
-        <p class="bundle-description">계절 한정 마지막 기회</p>
+        <div class="deal-header">
+          <div class="deal-title-row">
+            <h2 class="deal-title">첫 구매딜</h2>
+            <span class="deal-timer">19:30:00</span>
+          </div>
+          <p class="bundle-description">계절 한정 마지막 기회</p>
+        </div>
       </div>
       <div class="chip-strip">
         <button class="chip chip-solid">전체</button>
