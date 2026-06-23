@@ -58,27 +58,64 @@ body {
   body {
     background: var(--background);
     padding: 0;
-    align-items: stretch;
+    display: block;
   }
+  /* phone 자체 scroll 제거 → body가 viewport scroll container */
   .phone {
     width: 100%;
-    height: 100vh;
-    height: 100dvh;
+    height: auto;
+    overflow: visible;
     box-shadow: none;
     border-radius: 0;
   }
-  /* 실제 OS status bar가 있으니 prototype status-bar 숨김 */
+  /* 실제 OS status bar 있으니 숨김 */
   .status-bar { display: none; }
-  .top-nav { top: 0; }
-  .tabs { top: 44px; }
+  .top-nav { top: 0; z-index: 50; }
+  .tabs { top: 44px; z-index: 49; }
   .benefit, .tab-pane { scroll-margin-top: 88px; }
-  /* KV 영상은 화면 폭에 맞춰 비율 유지 */
+
+  /* KV 영상 화면 폭 + 비율 유지 */
   .kv {
     width: 100%;
     height: auto;
     aspect-ratio: 375 / 516;
   }
-  .module-divider { width: 100%; }
+
+  /* 고정 width 모듈들 100% width */
+  .module-divider,
+  .benefit-title,
+  .benefit-container,
+  .benefit-content,
+  .benefit-pay,
+  .pay-list,
+  .pay-benefit,
+  .detail,
+  .coupon-pack,
+  .coupon,
+  .live-cal-header,
+  .header-container,
+  .deal-header,
+  .rank-tab,
+  .ranking-section,
+  .product-section,
+  .product-section .product-row {
+    width: auto !important;
+    max-width: 100%;
+  }
+  .coupon { width: 100% !important; }
+  .coupon-text { flex: 1; }
+
+  /* recommend-item 가로 스크롤 패딩 보정 */
+  .recommend-item { padding: 0 16px; }
+
+  /* 아이콘 크기 강제 (모바일 zoom 방지) */
+  .nav-icon, .nav-icon img { width: 24px !important; height: 24px !important; }
+  .box-button .icon, .box-button .icon img { width: 14px !important; height: 14px !important; }
+}
+
+/* IntersectionObserver root: 모바일에선 body가 scroll container */
+@media (max-width: 480px) {
+  html, body { height: auto; }
 }
 
 /* ====== Status Bar + Top Nav (총 94px) — figma Section 5 spec ====== */
@@ -1979,6 +2016,7 @@ tabItems.forEach(t => tabByTarget.set(t.dataset.target, t));
 const phoneEl = document.querySelector('.phone');
 const isNarrow = window.matchMedia('(max-width: 480px)').matches;
 const stickyOffset = isNarrow ? 88 : 138;
+const observerRoot = isNarrow ? null : phoneEl;
 const observer = new IntersectionObserver((entries) => {
   if (isClickScrolling) return;
 
@@ -1996,7 +2034,7 @@ const observer = new IntersectionObserver((entries) => {
   const dot = tab.querySelector('.tab-noti');
   if (dot) dot.remove();
 }, {
-  root: phoneEl,
+  root: observerRoot,
   rootMargin: `-${stickyOffset}px 0px -50% 0px`,
   threshold: 0
 });
