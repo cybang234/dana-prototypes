@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<title>빅프로모션 - 7개 탭 prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ====== ODS Tokens (figma variable_defs 그대로) ====== */
+:root {
+  --background: #FFFFFF;
+  --backgroundWeak: #F5F5F5;
+  --backgroundDisabled: #EDEDED;
+  --foreground: #141414;
+  --foregroundWeak: #8C8C8C;
+  --foregroundWeakAlt: #828C94;
+  --foregroundDisabled: #C1C1C1;
+  --foregroundInverse: #FFFFFF;
+  --foregroundBrand: #0AA5FF;
+  --border-default: #E0E0E0;
+  --border-thumbnail: rgba(0,0,0,0.05);
+  --accentBlue: #0079FA;
+  --accentRed: #FD3D4A;
+  --accentYellow: #FFF950;
+  --pink: #FB93E3;
+  --liveRed: #EC0100;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #E8E8E8;
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 24px 0 80px;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.phone {
+  width: 375px;
+  height: 812px;
+  background: var(--background);
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 12px 60px rgba(0,0,0,0.18);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.phone::-webkit-scrollbar { display: none; }
+
+/* ====== 모바일 풀 화면 대응 ====== */
+@media (max-width: 480px) {
+  body {
+    background: var(--background);
+    padding: 0;
+    align-items: stretch;
+  }
+  .phone {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    box-shadow: none;
+    border-radius: 0;
+  }
+  /* 실제 OS status bar가 있으니 prototype status-bar 숨김 */
+  .status-bar { display: none; }
+  .top-nav { top: 0; }
+  .tabs { top: 44px; }
+  .benefit, .tab-pane { scroll-margin-top: 88px; }
+  /* KV 영상은 화면 폭에 맞춰 비율 유지 */
+  .kv {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 375 / 516;
+  }
+  .module-divider { width: 100%; }
+}
+
+/* ====== Status Bar + Top Nav (총 94px) — figma Section 5 spec ====== */
+.status-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  height: 50px;
+  background: var(--background) url('./assets/status-bar.png') no-repeat center / 375px 50px;
+}
+
+.top-nav {
+  position: sticky;
+  top: 50px;
+  z-index: 35;
+  height: 44px;
+  background: var(--background);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+}
+.nav-icon {
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.nav-icon img {
+  width: 24px; height: 24px;
+  display: block;
+}
+.nav-right {
+  display: flex;
+  gap: 14px;
+}
+
+/* ====== 00_KV (375×516) - figma 영상 그대로 ====== */
+.kv {
+  width: 375px;
+  height: 516px;
+  display: block;
+  object-fit: cover;
+  background: #000;
+}
+
+/* ====== 🌀 Tab (375×44) - figma 파란 배경 + 노랑 강조 ====== */
+.tabs {
+  position: sticky;
+  top: 94px;
+  z-index: 30;
+  background: var(--accentBlue);
+}
+.tabs-list {
+  display: flex;
+  height: 44px;
+  position: relative;
+}
+.tab-item {
+  flex: 1;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  font-family: inherit;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  height: 44px;
+}
+.tab-label {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.3px;
+  color: rgba(255, 255, 255, 0.65);
+  position: relative;
+  padding-right: 6px;
+}
+.tab-item.on .tab-label {
+  color: var(--accentYellow);
+  font-weight: 700;
+}
+.tab-item.on::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 54px; height: 2px;
+  background: var(--accentYellow);
+  border-radius: 2px;
+}
+.tab-noti {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--accentYellow);
+  display: inline-block;
+  vertical-align: top;
+  margin-left: 2px;
+  margin-top: 0;
+  position: relative;
+  top: -1px;
+}
+.tabs-divider {
+  display: none;
+}
+
+/* ====== 공통 pane offset (sticky status+nav+tab 138px 보정) ====== */
+.benefit, .tab-pane {
+  scroll-margin-top: 138px;
+}
+
+/* ====== 모듈 사이 divider 12px ====== */
+.module-divider {
+  width: 375px;
+  height: 12px;
+  background: var(--backgroundWeak);
+  border: 0;
+}
+
+/* ====== Benefit (이벤트 탭) 영역 ====== */
+.benefit {
+  background: var(--background);
+  display: flex; flex-direction: column;
+  gap: 16px;
+  padding: 32px 16px;
+  align-items: flex-start;
+}
+
+.benefit-title {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 343px;
+}
+.benefit-title h2 {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+}
+
+.box-button {
+  display: inline-flex; align-items: center;
+  gap: 2px;
+  height: 28px;
+  padding: 0 8px;
+  background: var(--background);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.box-button:active { background: var(--backgroundWeak); }
+.box-button .label { padding: 0; }
+.box-button .icon {
+  width: 14px; height: 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.box-button .icon img {
+  width: 14px; height: 14px;
+  display: block;
+}
+
+.benefit-container {
+  display: flex; flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+.benefit-content {
+  display: flex; flex-direction: column;
+  gap: 12px;
+  width: 343px;
+}
+.benefit-content-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+}
+
+.coupon-list { display: flex; flex-direction: column; gap: 4px; }
+
+.coupon {
+  width: 344px; height: 62px;
+  position: relative;
+  display: flex; align-items: center;
+}
+.coupon-text {
+  flex: 1; height: 62px;
+  background: var(--accentBlue);
+  border-radius: 8px 0 0 8px;
+  padding: 12px 16px 14px;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+.coupon-text.pink { background: var(--pink); }
+.coupon-name {
+  font-size: 14px; font-weight: 600; line-height: 20px;
+  letter-spacing: -0.3px; color: var(--foregroundInverse);
+}
+.coupon-text.pink .coupon-name { color: var(--foreground); }
+.coupon-cond {
+  font-size: 11px; font-weight: 400; line-height: 14px;
+  letter-spacing: -0.3px; color: var(--foregroundInverse);
+}
+.coupon-text.pink .coupon-cond { color: var(--foreground); }
+.coupon-icon-wrap {
+  width: 56px; height: 62px;
+  background: var(--accentBlue);
+  border-radius: 0 8px 8px 0;
+  display: flex; align-items: center; justify-content: center;
+  margin-left: -1px;
+  position: relative;
+}
+.coupon-icon-wrap.pink { background: var(--pink); }
+.coupon-icon-wrap::before {
+  content: '';
+  position: absolute;
+  left: -1px; top: 20px;
+  width: 1px; height: 22px;
+  background: var(--foregroundDisabled);
+  opacity: 0.2;
+}
+.coupon-icon-wrap.pink::before { background: var(--foreground); opacity: 0.2; }
+.coupon-icon-wrap .download-icon {
+  width: 20px; height: 20px;
+  color: var(--foregroundInverse);
+}
+.coupon-icon-wrap.pink .download-icon { color: var(--foreground); }
+
+.divider {
+  width: 343px; height: 1px;
+  background: var(--border-default);
+}
+
+.benefit-pay {
+  display: flex; flex-direction: column;
+  gap: 12px;
+  width: 343px;
+}
+.benefit-pay-title-block { display: flex; flex-direction: column; gap: 2px; }
+.benefit-pay-title {
+  font-size: 16px; font-weight: 600; line-height: 20px;
+  letter-spacing: -0.3px; color: var(--foreground);
+}
+.benefit-pay-sub {
+  font-size: 14px; font-weight: 400; line-height: 18px;
+  letter-spacing: -0.3px; color: var(--foregroundWeak);
+}
+.pay-list { display: flex; flex-direction: column; gap: 4px; width: 343px; }
+.pay-benefit {
+  background: var(--backgroundWeak);
+  border-radius: 6px;
+  padding: 10px 16px 10px 12px;
+  display: flex; align-items: center;
+  gap: 40px;
+  width: 343px;
+}
+.pay-info {
+  flex: 1; min-width: 0;
+  font-size: 12px; font-weight: 400; line-height: 20px;
+  letter-spacing: -0.3px; color: var(--foreground);
+  opacity: 0.8;
+}
+.pay-logo {
+  width: 76px; height: 16px;
+  display: flex; align-items: center; justify-content: flex-end;
+  flex-shrink: 0;
+}
+.pay-logo img { height: 16px; display: block; }
+.naverpay-svg { display: block; height: 16px; }
+
+.detail {
+  width: 343px; height: 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.detail-text {
+  font-size: 12px; font-weight: 500; line-height: 20px;
+  letter-spacing: -0.3px; color: var(--foregroundWeak);
+  padding-left: 1px;
+}
+.detail-chevron { width: 12px; height: 12px; color: var(--foregroundWeak); }
+
+/* ====== 공통 Recommend Bundle ====== */
+.recommend-bundle {
+  background: #fff;
+  padding: 32px 0;
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+.recommend-bundle > .chip-strip,
+.recommend-bundle > .filter-container {
+  margin-top: 0;
+}
+/* 특가 탭: chip 있는 모듈 12, no-chip 모듈 8 */
+#tab-pane-special .recommend-bundle { gap: 12px; }
+#tab-pane-special .recommend-bundle.no-chip { gap: 8px; }
+/* 랭킹 탭 */
+.recommend-bundle.best-rank-bundle { gap: 12px; }
+.recommend-bundle.brand-rank-bundle { gap: 16px; }
+/* 라이브 탭 */
+.recommend-bundle.live-bundle { gap: 16px; }
+.recommend-bundle.live-bundle .header-container { gap: 8px; }
+.recommend-bundle.cal-bundle { gap: 12px; }
+.header-container {
+  display: flex; flex-direction: column;
+  gap: 4px;
+  padding: 0 16px;
+}
+.bundle-header {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 20px; font-weight: 700; line-height: 28px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+}
+.bundle-header.h24 {
+  font-size: 20px; line-height: 28px;
+}
+.bundle-description {
+  font-size: 16px; font-weight: 400; line-height: 20px;
+  letter-spacing: -0.3px;
+  color: var(--foregroundWeak);
+}
+.recommend-item {
+  display: flex; flex-direction: column;
+  gap: 24px;
+  overflow-x: auto;
+  padding: 8px 16px 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.recommend-item::-webkit-scrollbar { display: none; }
+.product-section {
+  width: max-content;
+  overflow: visible;
+  padding: 0;
+}
+.product-row {
+  display: flex;
+  gap: 8px;
+  width: max-content;
+}
+
+/* ====== Product Card (138) ====== */
+.product-card {
+  width: 138px;
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+.product-thumb {
+  width: 138px; height: 138px;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  background-color: #F4F4F4;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: inset 0 0 0 1px var(--border-thumbnail);
+}
+.product-thumb.v1 { background-image: url('./assets/prod-placeholder-1.png'); }
+.product-thumb.v2 { background-image: url('./assets/prod-placeholder-2.png'); }
+.product-thumb.v3 { background-image: url('./assets/prod-placeholder-3.png'); }
+.product-thumb.v4 { background-image: url('./assets/prod-placeholder-4.png'); }
+.product-thumb.v5 { background-image: url('./assets/prod-placeholder-5.png'); }
+.product-thumb.v6 { background-image: url('./assets/prod-placeholder-6.png'); }
+.product-info {
+  display: flex; flex-direction: column;
+  gap: 2px;
+}
+.product-brand {
+  font-size: 12px; font-weight: 400; line-height: 16px;
+  letter-spacing: -0.3px;
+  color: var(--foregroundWeakAlt);
+}
+.product-name {
+  font-size: 13px; font-weight: 400; line-height: 18px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.product-price {
+  display: flex; align-items: baseline;
+  gap: 4px;
+  margin-top: 4px;
+}
+.price-discount {
+  font-size: 18px; font-weight: 700; line-height: 24px;
+  letter-spacing: -0.3px;
+  color: var(--accentRed);
+}
+.price-amount {
+  font-size: 18px; font-weight: 700; line-height: 24px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+}
+.delivery-row {
+  display: flex; align-items: center; gap: 4px;
+  margin-top: 2px;
+}
+.delivery-text {
+  font-size: 12px; font-weight: 400; line-height: 16px;
+  letter-spacing: -0.3px;
+  color: var(--foregroundBrand);
+}
+.delivery-badge {
+  display: inline-flex; align-items: center;
+  background: var(--backgroundDisabled);
+  padding: 3px 5px;
+  border-radius: 4px;
+  font-size: 10px; font-weight: 600; line-height: 14px;
+  letter-spacing: -0.3px;
+  color: var(--foregroundWeak);
+  margin-top: 4px;
+  align-self: flex-start;
+}
+
+/* ====== Chip ====== */
+.chip-strip {
+  display: flex;
+  gap: 6px;
+  padding: 0 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.chip-strip::-webkit-scrollbar { display: none; }
+.chip-strip.gap10 { gap: 6px; padding: 0 16px; }
+.chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  font-family: inherit;
+  font-size: 14px; font-weight: 400; line-height: 18px;
+  letter-spacing: -0.3px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.chip-solid {
+  background: var(--foreground);
+  color: #fff;
+  border: 1px solid transparent;
+  font-weight: 600;
+}
+.chip-normal {
+  background: #fff;
+  color: var(--foreground);
+  border: 1px solid var(--border-default);
+}
+
+/* ====== 한샘 탭 - Section Header ====== */
+.hansam-section-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  gap: 24px;
+  margin-top: 8px;
+}
+.hansam-left {
+  display: flex; align-items: center; gap: 8px;
+}
+.brand-circle {
+  width: 44px; height: 44px;
+  border: 1.5px solid var(--foreground);
+  border-radius: 50%;
+  padding: 2px;
+  display: flex; align-items: center; justify-content: center;
+}
+.brand-circle .inner {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background-color: #F4F4F4;
+  background-image: url('./assets/brand-thumb-1.png');
+  background-size: cover;
+  background-position: center;
+}
+.hansam-center { display: flex; flex-direction: column; gap: 2px; }
+.section-title {
+  font-size: 17px; font-weight: 600; line-height: 22px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+}
+.section-desc {
+  font-size: 14px; font-weight: 400; line-height: 18px;
+  letter-spacing: -0.3px;
+  color: var(--foregroundWeak);
+}
+.hansam-right {
+  display: flex; gap: 2px;
+}
+.round-thumb {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  padding: 2px;
+  display: flex; align-items: center; justify-content: center;
+}
+.round-thumb .inner {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background-color: #F4F4F4;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('./assets/brand-thumb-2.png');
+}
+.round-thumb.r2 .inner { background-image: url('./assets/brand-thumb-3.png'); }
+.round-thumb.r3 .inner { background-image: url('./assets/brand-thumb-4.png'); }
+.round-thumb.r4 .inner { background-image: url('./assets/brand-thumb-5.png'); }
+
+/* ====== 특가 탭 - timer header ====== */
+.deal-header { display: flex; flex-direction: column; gap: 4px; }
+.deal-title-row {
+  display: flex; align-items: baseline; gap: 6px;
+}
+.deal-title {
+  font-size: 20px; font-weight: 700; line-height: 28px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+}
+.deal-timer {
+  font-size: 18px; font-weight: 700; line-height: 24px;
+  letter-spacing: -0.3px;
+  color: var(--accentRed);
+}
+
+/* ====== 랭킹 - 실시간 베스트 ====== */
+.best-list-wrap {
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 16px;
+}
+.best-list-wrap::-webkit-scrollbar { display: none; }
+.best-grid {
+  display: flex;
+  width: max-content;
+}
+.best-col {
+  width: 280px;
+  display: flex; flex-direction: column;
+}
+.best-row {
+  display: flex; align-items: center;
+  height: 80px;
+  gap: 12px;
+}
+.best-rank {
+  width: 20px;
+  font-size: 17px; font-weight: 600; line-height: 22px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+  text-align: center;
+  flex-shrink: 0;
+}
+.best-rank.top { color: var(--foreground); }
+.best-item {
+  flex: 1;
+  display: flex; align-items: center; gap: 12px;
+  min-width: 0;
+}
+.best-thumb {
+  width: 60px; height: 60px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #E8EEF3, #C8D2DC);
+  box-shadow: inset 0 0 0 1px var(--border-thumbnail);
+}
+.best-thumb.v1 { background-image: url('./assets/prod-placeholder-1.png'); }
+.best-thumb.v2 { background-image: url('./assets/prod-placeholder-2.png'); }
+.best-thumb.v3 { background-image: url('./assets/prod-placeholder-3.png'); }
+.best-thumb.v4 { background-image: url('./assets/prod-placeholder-4.png'); }
+.best-thumb { background-size: cover; background-position: center; }
+.best-info {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.best-name {
+  font-size: 13px; font-weight: 400; line-height: 18px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.best-price-row {
+  display: flex; align-items: baseline; gap: 4px;
+}
+.best-discount {
+  font-size: 13px; font-weight: 700; line-height: 18px;
+  color: var(--accentRed);
+}
+.best-price {
+  font-size: 13px; font-weight: 700; line-height: 18px;
+  color: var(--foreground);
+}
+
+/* ====== 랭킹 - 브랜드 랭킹 (accordion) ====== */
+.brand-rank-list {
+  display: flex; flex-direction: column;
+  gap: 0;
+  padding: 0 16px;
+}
+.brand-rank-item {
+  display: flex; flex-direction: column;
+  background: var(--background);
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+.brand-rank-item + .brand-rank-item:not(.expanded) {
+  /* rest items 사이 divider */
+  border-top: 1px solid var(--gray-100, #EDEDED);
+  border-radius: 0;
+}
+.brand-rank-item.expanded {
+  border-color: var(--foreground);
+  margin: 0 -4px;
+  padding: 8px 0;
+  gap: 8px;
+}
+.brand-rank-item.expanded + .brand-rank-item {
+  border-top: none;
+}
+.brand-rank-1-head {
+  display: flex; align-items: center;
+  padding: 8px 16px 8px 8px;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.brand-rank-item:not(.expanded) .brand-rank-1-head {
+  padding: 12px 8px;
+  gap: 8px;
+}
+.brand-rank-num {
+  width: 20px;
+  font-size: 15px; font-weight: 700; line-height: 24px;
+  text-align: center;
+  color: var(--foreground);
+  flex-shrink: 0;
+}
+.brand-rank-thumb-40 {
+  width: 40px; height: 40px;
+  border: 1.5px solid var(--foreground);
+  border-radius: 50%;
+  padding: 2px;
+  flex-shrink: 0;
+  background: var(--background);
+}
+.brand-rank-thumb-40 .inner {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background-color: #F4F4F4;
+  background-image: url('./assets/brand-thumb-1.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.brand-rank-item:not(.expanded) .brand-rank-thumb-40 {
+  width: 32px; height: 32px;
+  border: none;
+  padding: 0;
+}
+.brand-rank-item:not(.expanded) .brand-rank-thumb-40 .inner {
+  border-radius: 50%;
+}
+.brand-rank-center {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+}
+.brand-rank-name {
+  font-size: 17px; font-weight: 600; line-height: 22px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+}
+.brand-rank-desc {
+  font-size: 14px; font-weight: 400; line-height: 18px;
+  letter-spacing: -0.3px;
+  color: var(--foregroundWeak);
+}
+.brand-rank-item:not(.expanded) .brand-rank-name {
+  font-size: 16px; font-weight: 500; line-height: 28px;
+}
+.brand-rank-item:not(.expanded) .brand-rank-desc {
+  display: none;
+}
+.brand-rank-chev {
+  width: 20px; height: 20px;
+  color: var(--foreground);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+.brand-rank-item:not(.expanded) .brand-rank-chev {
+  transform: rotate(180deg);
+}
+.brand-rank-1-products {
+  padding: 0 0 16px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.brand-rank-1-products::-webkit-scrollbar { display: none; }
+.brand-rank-1-products .product-row {
+  padding-right: 16px;
+}
+.brand-rank-item:not(.expanded) .brand-rank-1-products {
+  display: none;
+}
+.product-card.sm { width: 120px; }
+.product-card.sm .product-thumb { width: 120px; height: 120px; }
+
+.brand-rank-rest {
+  padding: 0 16px;
+  display: flex; flex-direction: column;
+}
+.brand-rank-row {
+  display: flex; align-items: center;
+  height: 54px;
+  gap: 12px;
+}
+.brand-rank-thumb-32 {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background-color: #F4F4F4;
+  background-image: url('./assets/brand-thumb-2.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+}
+.brand-rank-thumb-32.r3 { background-image: url('./assets/brand-thumb-3.png'); }
+.brand-rank-thumb-32.r4 { background-image: url('./assets/brand-thumb-4.png'); }
+.brand-rank-thumb-32.r5 { background-image: url('./assets/brand-thumb-5.png'); }
+.brand-rank-row .brand-rank-name-md {
+  flex: 1;
+  font-size: 16px; font-weight: 500; line-height: 28px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+}
+.brand-row-divider {
+  height: 1px; background: var(--border-default);
+  border: 0;
+}
+
+.box-button-large {
+  display: flex; align-items: center; justify-content: center;
+  width: calc(100% - 32px);
+  margin: 12px 16px 0;
+  height: 44px;
+  background: var(--backgroundWeak);
+  border: 0;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 15px; font-weight: 700; line-height: 24px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+  cursor: pointer;
+}
+
+/* ====== 라이브 - 집요한라이브 ====== */
+.live-logo {
+  width: 122px;
+  height: 32px;
+  display: block;
+  object-fit: contain;
+  object-position: left center;
+}
+.live-feature-list {
+  display: flex; gap: 4px;
+  padding: 0 16px;
+}
+.live-kv-card {
+  flex: 1;
+  height: 340px;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 16px;
+  position: relative;
+  background-image:
+    linear-gradient(180deg, rgba(0,0,0,0) 46.56%, rgba(0,0,0,0.45) 100%),
+    url('./assets/live-thumb-main.png');
+  background-size: cover;
+  background-position: center;
+  background-color: #2a1f1c;
+  display: flex; flex-direction: column; justify-content: space-between;
+  color: #fff;
+}
+.live-kv-coupon {
+  align-self: flex-start;
+  background: rgba(34,34,34,0.6);
+  color: rgba(255,255,255,0.85);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px; font-weight: 500; line-height: 16px;
+  letter-spacing: -0.3px;
+}
+.live-kv-info {
+  display: flex; flex-direction: column;
+  gap: 10px;
+}
+.live-kv-text { padding: 0 2px; }
+.live-kv-title {
+  font-size: 20px; font-weight: 700; line-height: 28px;
+  letter-spacing: -0.3px;
+  color: #fff;
+}
+.live-kv-sub {
+  margin-top: 4px;
+  font-size: 14px; font-weight: 500; line-height: 20px;
+  letter-spacing: -0.3px;
+  color: rgba(255,255,255,0.7);
+}
+.live-kv-cta {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--liveRed);
+  border: 0;
+  border-radius: 6px;
+  padding: 10px 16px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px; font-weight: 600; line-height: 20px;
+  letter-spacing: -0.3px;
+  cursor: pointer;
+}
+.live-thumb-stack {
+  display: flex; flex-direction: column; gap: 4px;
+}
+.live-thumb {
+  width: 82px; height: 82px;
+  border-radius: 8px;
+  background-color: #F4F4F4;
+  background-image: url('./assets/live-thumb-side.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.live-thumb.t2 { background-image: url('./assets/brand-thumb-2.png'); }
+.live-thumb.t3 { background-image: url('./assets/brand-thumb-3.png'); }
+.live-thumb.t4 { background-image: url('./assets/brand-thumb-4.png'); }
+
+/* ====== 라이브 - 캘린더 ====== */
+.live-cal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px;
+}
+.cal-title {
+  font-size: 20px; font-weight: 700; line-height: 28px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+}
+.cal-alert-btn {
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--border-default);
+  background: #fff;
+  border-radius: 14px;
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: inherit;
+  font-size: 12px; font-weight: 500; line-height: 16px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+  cursor: pointer;
+}
+.cal-alert-btn svg { width: 14px; height: 14px; }
+
+.cal-list {
+  padding: 8px 16px;
+  display: flex; flex-direction: column;
+  gap: 4px;
+}
+.cal-row {
+  display: flex; align-items: center;
+  padding: 4px 6px;
+  gap: 16px;
+  min-height: 36px;
+}
+.cal-badge {
+  background: var(--backgroundWeak);
+  color: var(--foreground);
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 12px; font-weight: 500; line-height: 16px;
+  letter-spacing: -0.3px;
+  flex-shrink: 0;
+}
+.cal-brands { display: flex; gap: 12px; align-items: center; }
+.cal-brand {
+  display: flex; align-items: center; gap: 6px;
+}
+.cal-brand-thumb {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background-color: #F4F4F4;
+  background-image: url('./assets/brand-thumb-1.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.cal-brand-thumb.b2 { background-image: url('./assets/brand-thumb-2.png'); }
+.cal-brand-thumb.b3 { background-image: url('./assets/brand-thumb-3.png'); }
+.cal-brand-thumb.b4 { background-image: url('./assets/brand-thumb-4.png'); }
+.cal-brand-name {
+  font-size: 16px; font-weight: 500; line-height: 28px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+}
+.cal-divider {
+  height: 1px;
+  background: var(--border-default);
+  border: 0;
+}
+
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- Status Bar (50h) -->
+  <div class="status-bar"></div>
+
+  <!-- Top Nav (44h) - figma Section 5 spec -->
+  <div class="top-nav">
+    <div class="nav-icon" aria-label="back"><img src="./assets/icon-back.svg" alt="back"/></div>
+    <div class="nav-right">
+      <div class="nav-icon" aria-label="share"><img src="./assets/icon-share.svg" alt="share"/></div>
+      <div class="nav-icon" aria-label="cart"><img src="./assets/icon-cart.svg" alt="cart"/></div>
+    </div>
+  </div>
+
+  <!-- 00_KV (375×516) figma 영상 -->
+  <video class="kv" autoplay loop muted playsinline poster="./assets/kv-event.png">
+    <source src="./assets/kv-event.mp4" type="video/mp4">
+  </video>
+
+  <!-- 🌀 Tab (375×44) -->
+  <nav class="tabs">
+    <div class="tabs-list">
+      <button class="tab-item on" data-tab="event" data-target="tab-pane-event"><span class="tab-label">이벤트</span></button>
+      <button class="tab-item" data-tab="recommend" data-target="tab-pane-recommend"><span class="tab-label">추천</span></button>
+      <button class="tab-item" data-tab="hansam" data-target="tab-pane-hansam"><span class="tab-label">한샘<span class="tab-noti"></span></span></button>
+      <button class="tab-item" data-tab="bed" data-target="tab-pane-bed"><span class="tab-label">침대<span class="tab-noti"></span></span></button>
+      <button class="tab-item" data-tab="special" data-target="tab-pane-special"><span class="tab-label">특가</span></button>
+      <button class="tab-item" data-tab="ranking" data-target="tab-pane-ranking"><span class="tab-label">랭킹</span></button>
+      <button class="tab-item" data-tab="live" data-target="tab-pane-live"><span class="tab-label">라이브</span></button>
+    </div>
+    <div class="tabs-divider"></div>
+  </nav>
+
+  <!-- ============================== -->
+  <!-- 탭 1: 이벤트 (기존) -->
+  <!-- ============================== -->
+  <div class="benefit" id="tab-pane-event">
+
+    <div class="benefit-title">
+      <h2>Benefit</h2>
+      <button class="box-button">
+        <span class="label">쿠폰 알림받기</span>
+        <span class="icon"><img src="./assets/icon-bell.svg" alt="bell"/></span>
+      </button>
+    </div>
+
+    <div class="benefit-container">
+
+      <div class="benefit-content">
+        <div class="benefit-content-title">최대 3만 5천원 장바구니 쿠폰팩</div>
+        <div class="coupon-list">
+          <div class="coupon">
+            <div class="coupon-text">
+              <div class="coupon-name">선착순 ~5,000원 쿠폰</div>
+              <div class="coupon-cond">4만원 이상 8% 할인</div>
+            </div>
+            <div class="coupon-icon-wrap">
+              <svg class="download-icon" viewBox="0 0 20 20" fill="none">
+                <path d="M10 3v9.5m0 0L6 9m4 3.5L14 9M4 16h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="coupon">
+            <div class="coupon-text">
+              <div class="coupon-name">선착순 ~3,000원 쿠폰</div>
+              <div class="coupon-cond">20만원 이상 5% 할인</div>
+            </div>
+            <div class="coupon-icon-wrap">
+              <svg class="download-icon" viewBox="0 0 20 20" fill="none">
+                <path d="M10 3v9.5m0 0L6 9m4 3.5L14 9M4 16h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="benefit-content">
+        <div class="benefit-content-title">반가우니까 더 챙겨드려요</div>
+        <div class="coupon-list">
+          <div class="coupon">
+            <div class="coupon-text pink">
+              <div class="coupon-name">최대 15% 쿠폰받기</div>
+              <div class="coupon-cond">5만원 구매 시 최대 10자</div>
+            </div>
+            <div class="coupon-icon-wrap pink">
+              <svg class="download-icon" viewBox="0 0 20 20" fill="none">
+                <path d="M10 3v9.5m0 0L6 9m4 3.5L14 9M4 16h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="benefit-pay">
+        <div class="benefit-pay-title-block">
+          <div class="benefit-pay-title">카카오페이 7% 할인</div>
+          <div class="benefit-pay-sub">3만원 이상, 최대 5만원</div>
+        </div>
+        <div class="pay-list">
+          <div class="pay-benefit">
+            <div class="pay-info">네이버페이 9만원 이상 결제 시 1만원 할인</div>
+            <div class="pay-logo">
+              <svg class="naverpay-svg" viewBox="0 0 76 16" xmlns="http://www.w3.org/2000/svg">
+                <rect width="76" height="16" rx="3" fill="#03C75A"/>
+                <text x="38" y="11" font-family="Pretendard, sans-serif" font-size="9" font-weight="800" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">NAVER Pay</text>
+              </svg>
+            </div>
+          </div>
+          <div class="pay-benefit">
+            <div class="pay-info">카카오페이 9만원 이상 결제 시 1만원 할인</div>
+            <div class="pay-logo">
+              <img src="./assets/kakaopay-badge.png" alt="kakao pay"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail">
+        <span class="detail-text">혜택 유의사항 더보기</span>
+        <svg class="detail-chevron" viewBox="0 0 12 12" fill="none">
+          <path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="module-divider"></div>
+
+  <!-- ============================== -->
+  <!-- 탭 2: 추천 -->
+  <!-- ============================== -->
+  <div class="tab-pane" id="tab-pane-recommend">
+
+    <!-- Bundle 1: 채영님이 좋아할만한 -->
+    <section class="recommend-bundle">
+      <div class="header-container">
+        <h2 class="bundle-header"><span style="color: var(--accentBlue);">채영</span>님이 좋아할만한 상품</h2>
+        <p class="bundle-description">최근 둘러본 상품과 연관된 상품이에요</p>
+      </div>
+      <div class="recommend-item">
+        <div class="product-section">
+          <div class="product-row">
+            <article class="product-card">
+              <div class="product-thumb v1"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v2"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v3"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+          </div>
+        </div>
+        <div class="product-section">
+          <div class="product-row">
+            <article class="product-card">
+              <div class="product-thumb v4"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v5"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v6"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-divider"></div>
+
+    <!-- Bundle 2: 헤더만 + 1 section -->
+    <section class="recommend-bundle">
+      <div class="header-container">
+        <h2 class="bundle-header">스크랩한 상품이<br/><span style="color: var(--accentBlue);">180,000</span>원 더 저렴해요</h2>
+      </div>
+      <div class="recommend-item">
+        <div class="product-section">
+          <div class="product-row">
+            <article class="product-card">
+              <div class="product-thumb v2"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v3"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v4"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-divider"></div>
+
+    <!-- Bundle 3: 헤더만 + 1 section -->
+    <section class="recommend-bundle">
+      <div class="header-container">
+        <h2 class="bundle-header">담아둔 상품이<br/><span style="color: var(--accentBlue);">180,000</span>원 더 저렴해요</h2>
+      </div>
+      <div class="recommend-item">
+        <div class="product-section">
+          <div class="product-row">
+            <article class="product-card">
+              <div class="product-thumb v5"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v6"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v1"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="module-divider"></div>
+
+  <!-- ============================== -->
+  <!-- 탭 3: 한샘 -->
+  <!-- ============================== -->
+  <div class="tab-pane" id="tab-pane-hansam">
+    <section class="recommend-bundle">
+      <div class="header-container">
+        <h2 class="bundle-header"><span style="color: var(--accentBlue);">채영</span>님이 스크랩한 브랜드 상품</h2>
+      </div>
+      <div class="hansam-section-header">
+        <div class="hansam-left">
+          <div class="brand-circle"><div class="inner"></div></div>
+          <div class="hansam-center">
+            <div class="section-title">한샘</div>
+            <div class="section-desc">최대 15% 할인</div>
+          </div>
+        </div>
+        <div class="hansam-right">
+          <div class="round-thumb"><div class="inner"></div></div>
+          <div class="round-thumb r2"><div class="inner"></div></div>
+          <div class="round-thumb r3"><div class="inner"></div></div>
+          <div class="round-thumb r4"><div class="inner"></div></div>
+        </div>
+      </div>
+      <div class="recommend-item">
+        <div class="product-section">
+          <div class="product-row">
+            <article class="product-card">
+              <div class="product-thumb v1"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v2"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v3"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+          </div>
+        </div>
+        <div class="product-section">
+          <div class="product-row">
+            <article class="product-card">
+              <div class="product-thumb v4"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v5"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v6"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="module-divider"></div>
+
+  <!-- ============================== -->
+  <!-- 탭 4: 침대 -->
+  <!-- ============================== -->
+  <div class="tab-pane" id="tab-pane-bed">
+    <section class="recommend-bundle" style="gap: 12px;">
+      <div class="header-container">
+        <h2 class="bundle-header">최근 검색한 <span style="color: var(--accentBlue);">침대</span>와 연관된 상품</h2>
+      </div>
+      <div class="chip-strip">
+        <button class="chip chip-solid">전체</button>
+        <button class="chip chip-normal">슈퍼싱글</button>
+        <button class="chip chip-normal">퀸</button>
+        <button class="chip chip-normal">킹</button>
+        <button class="chip chip-normal">매트리스</button>
+        <button class="chip chip-normal">침대 프레임</button>
+      </div>
+      <div class="recommend-item">
+        <div class="product-section">
+          <div class="product-row">
+            <article class="product-card">
+              <div class="product-thumb v1"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v2"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+            <article class="product-card">
+              <div class="product-thumb v3"></div>
+              <div class="product-info">
+                <div class="product-brand">Brand Name</div>
+                <div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div>
+                <div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div>
+                <div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div>
+                <span class="delivery-badge">무료배송</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="module-divider"></div>
+
+  <!-- ============================== -->
+  <!-- 탭 5: 특가 (7 modules) -->
+  <!-- ============================== -->
+  <div class="tab-pane" id="tab-pane-special">
+
+    <!-- 특가 모듈 1: 집요한 특가 + timer -->
+    <section class="recommend-bundle">
+      <div class="header-container">
+        <div class="deal-header">
+          <div class="deal-title-row">
+            <h2 class="deal-title">집요한 특가</h2>
+            <span class="deal-timer">12:36:10</span>
+          </div>
+          <p class="bundle-description">단 24시간 최저가 도전!</p>
+        </div>
+      </div>
+      <div class="chip-strip">
+        <button class="chip chip-solid">전체</button>
+        <button class="chip chip-normal">가구</button>
+        <button class="chip chip-normal">패브릭</button>
+        <button class="chip chip-normal">조명</button>
+        <button class="chip chip-normal">생활용품</button>
+      </div>
+      <div class="recommend-item">
+        <div class="product-section">
+          <div class="product-row">
+            <article class="product-card"><div class="product-thumb v1"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+            <article class="product-card"><div class="product-thumb v2"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+            <article class="product-card"><div class="product-thumb v3"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          </div>
+        </div>
+        <div class="product-section">
+          <div class="product-row">
+            <article class="product-card"><div class="product-thumb v4"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+            <article class="product-card"><div class="product-thumb v5"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+            <article class="product-card"><div class="product-thumb v6"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-divider"></div>
+
+    <!-- 특가 모듈 2 -->
+    <section class="recommend-bundle">
+      <div class="header-container">
+        <h2 class="bundle-header h24">1+1 특가</h2>
+        <p class="bundle-description">24시간 한정 특가 모음</p>
+      </div>
+      <div class="chip-strip">
+        <button class="chip chip-solid">전체</button>
+        <button class="chip chip-normal">소파</button>
+        <button class="chip chip-normal">식탁</button>
+        <button class="chip chip-normal">수납장</button>
+      </div>
+      <div class="recommend-item">
+        <div class="product-section"><div class="product-row">
+          <article class="product-card"><div class="product-thumb v2"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v3"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v4"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+        </div></div>
+        <div class="product-section"><div class="product-row">
+          <article class="product-card"><div class="product-thumb v5"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v6"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v1"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+        </div></div>
+      </div>
+    </section>
+
+    <div class="module-divider"></div>
+
+    <!-- 특가 모듈 3 -->
+    <section class="recommend-bundle">
+      <div class="header-container" style="gap: 4px;">
+        <h2 class="bundle-header h24">단독 특가</h2>
+        <p class="bundle-description">재고 소진 시 마감</p>
+      </div>
+      <div class="chip-strip">
+        <button class="chip chip-solid">전체</button>
+        <button class="chip chip-normal">조명</button>
+        <button class="chip chip-normal">러그</button>
+        <button class="chip chip-normal">패브릭</button>
+      </div>
+      <div class="recommend-item">
+        <div class="product-section"><div class="product-row">
+          <article class="product-card"><div class="product-thumb v3"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v4"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v5"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+        </div></div>
+        <div class="product-section"><div class="product-row">
+          <article class="product-card"><div class="product-thumb v6"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v1"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v2"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+        </div></div>
+      </div>
+    </section>
+
+    <div class="module-divider"></div>
+
+    <!-- 특가 모듈 4: 필터 없음 -->
+    <section class="recommend-bundle no-chip">
+      <div class="header-container">
+        <h2 class="bundle-header h24">만원 특가 미리보기</h2>
+        <p class="bundle-description">고객님이 가장 많이 구매한 특가 상품</p>
+      </div>
+      <div class="recommend-item">
+        <div class="product-section"><div class="product-row">
+          <article class="product-card"><div class="product-thumb v4"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v5"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v6"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+        </div></div>
+      </div>
+    </section>
+
+    <div class="module-divider"></div>
+
+    <!-- 특가 모듈 5 -->
+    <section class="recommend-bundle">
+      <div class="header-container">
+        <h2 class="bundle-header h24">원데이특가</h2>
+        <p class="bundle-description">이 가격은 오직 오늘의집에서만</p>
+      </div>
+      <div class="chip-strip">
+        <button class="chip chip-solid">전체</button>
+        <button class="chip chip-normal">시몬스</button>
+        <button class="chip chip-normal">한샘</button>
+        <button class="chip chip-normal">에이스</button>
+      </div>
+      <div class="recommend-item">
+        <div class="product-section"><div class="product-row">
+          <article class="product-card"><div class="product-thumb v1"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v2"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v3"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+        </div></div>
+        <div class="product-section"><div class="product-row">
+          <article class="product-card"><div class="product-thumb v4"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v5"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v6"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+        </div></div>
+      </div>
+    </section>
+
+    <div class="module-divider"></div>
+
+    <!-- 특가 모듈 6 -->
+    <section class="recommend-bundle">
+      <div class="header-container">
+        <h2 class="bundle-header h24">반값딜</h2>
+        <p class="bundle-description">신상품 첫 출시 기념 할인</p>
+      </div>
+      <div class="chip-strip">
+        <button class="chip chip-solid">전체</button>
+        <button class="chip chip-normal">가구</button>
+        <button class="chip chip-normal">생활</button>
+        <button class="chip chip-normal">조명</button>
+      </div>
+      <div class="recommend-item">
+        <div class="product-section"><div class="product-row">
+          <article class="product-card"><div class="product-thumb v2"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v3"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v4"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+        </div></div>
+        <div class="product-section"><div class="product-row">
+          <article class="product-card"><div class="product-thumb v5"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v6"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v1"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+        </div></div>
+      </div>
+    </section>
+
+    <div class="module-divider"></div>
+
+    <!-- 특가 모듈 7 -->
+    <section class="recommend-bundle">
+      <div class="header-container">
+        <h2 class="bundle-header h24">첫 구매딜</h2>
+        <p class="bundle-description">계절 한정 마지막 기회</p>
+      </div>
+      <div class="chip-strip">
+        <button class="chip chip-solid">전체</button>
+        <button class="chip chip-normal">여름</button>
+        <button class="chip chip-normal">실내</button>
+        <button class="chip chip-normal">아웃도어</button>
+      </div>
+      <div class="recommend-item">
+        <div class="product-section"><div class="product-row">
+          <article class="product-card"><div class="product-thumb v3"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v4"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v5"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+        </div></div>
+        <div class="product-section"><div class="product-row">
+          <article class="product-card"><div class="product-thumb v6"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v1"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+          <article class="product-card"><div class="product-thumb v2"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div><div class="delivery-row"><span class="delivery-text">평일 12:00까지 결제시</span></div><span class="delivery-badge">무료배송</span></div></article>
+        </div></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="module-divider"></div>
+
+  <!-- ============================== -->
+  <!-- 탭 6: 랭킹 -->
+  <!-- ============================== -->
+  <div class="tab-pane" id="tab-pane-ranking">
+
+    <!-- 6-1 실시간 베스트 -->
+    <section class="recommend-bundle best-rank-bundle">
+      <div class="header-container">
+        <h2 class="bundle-header h24">실시간 베스트</h2>
+        <p class="bundle-description">지금 구매가 가장 많은 상품이에요</p>
+      </div>
+      <div class="chip-strip gap10">
+        <button class="chip chip-solid">전체</button>
+        <button class="chip chip-normal">가구</button>
+        <button class="chip chip-normal">생활</button>
+        <button class="chip chip-normal">패브릭</button>
+        <button class="chip chip-normal">조명/인테리어</button>
+      </div>
+      <div class="best-list-wrap">
+        <div class="best-grid">
+          <div class="best-col">
+            <div class="best-row"><span class="best-rank top">1</span><div class="best-item"><div class="best-thumb v1"></div><div class="best-info"><div class="best-name">시몬스 뷰티레스트 N32 퀸 매트리스</div><div class="best-price-row"><span class="best-discount">46%</span><span class="best-price">689,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank top">2</span><div class="best-item"><div class="best-thumb v2"></div><div class="best-info"><div class="best-name">한샘 유로 600 식탁 4인용 월넛</div><div class="best-price-row"><span class="best-discount">42%</span><span class="best-price">329,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank top">3</span><div class="best-item"><div class="best-thumb v3"></div><div class="best-info"><div class="best-name">에싸 린넨 침구 세트 슈퍼싱글</div><div class="best-price-row"><span class="best-discount">38%</span><span class="best-price">89,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank">4</span><div class="best-item"><div class="best-thumb v4"></div><div class="best-info"><div class="best-name">미마 우드 사이드 테이블 원형</div><div class="best-price-row"><span class="best-discount">35%</span><span class="best-price">79,000원</span></div></div></div></div>
+          </div>
+          <div class="best-col">
+            <div class="best-row"><span class="best-rank">5</span><div class="best-item"><div class="best-thumb v1"></div><div class="best-info"><div class="best-name">베베앙 패브릭 1인 암체어 크림</div><div class="best-price-row"><span class="best-discount">31%</span><span class="best-price">189,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank">6</span><div class="best-item"><div class="best-thumb v2"></div><div class="best-info"><div class="best-name">미닉스 스탠드 조명 우드 베이스</div><div class="best-price-row"><span class="best-discount">28%</span><span class="best-price">59,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank">7</span><div class="best-item"><div class="best-thumb v3"></div><div class="best-info"><div class="best-name">시디즈 T50 메쉬 의자 블랙</div><div class="best-price-row"><span class="best-discount">25%</span><span class="best-price">289,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank">8</span><div class="best-item"><div class="best-thumb v4"></div><div class="best-info"><div class="best-name">한샘 디자인 책장 5단 화이트</div><div class="best-price-row"><span class="best-discount">22%</span><span class="best-price">179,000원</span></div></div></div></div>
+          </div>
+          <div class="best-col">
+            <div class="best-row"><span class="best-rank">9</span><div class="best-item"><div class="best-thumb v1"></div><div class="best-info"><div class="best-name">에이스 하이브리드Z 슈퍼싱글</div><div class="best-price-row"><span class="best-discount">20%</span><span class="best-price">529,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank">10</span><div class="best-item"><div class="best-thumb v2"></div><div class="best-info"><div class="best-name">한샘 샘베딩 매트리스 퀸 사이즈</div><div class="best-price-row"><span class="best-discount">18%</span><span class="best-price">459,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank">11</span><div class="best-item"><div class="best-thumb v3"></div><div class="best-info"><div class="best-name">엘레강스 화장대 거울 포함</div><div class="best-price-row"><span class="best-discount">15%</span><span class="best-price">219,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank">12</span><div class="best-item"><div class="best-thumb v4"></div><div class="best-info"><div class="best-name">루즌 침대 프레임 슈퍼싱글</div><div class="best-price-row"><span class="best-discount">13%</span><span class="best-price">399,000원</span></div></div></div></div>
+          </div>
+          <div class="best-col">
+            <div class="best-row"><span class="best-rank">13</span><div class="best-item"><div class="best-thumb v1"></div><div class="best-info"><div class="best-name">유로 모듈 소파 3인용 라이트그레이</div><div class="best-price-row"><span class="best-discount">28%</span><span class="best-price">512,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank">14</span><div class="best-item"><div class="best-thumb v2"></div><div class="best-info"><div class="best-name">패브릭 카우치 소파 그레이</div><div class="best-price-row"><span class="best-discount">25%</span><span class="best-price">389,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank">15</span><div class="best-item"><div class="best-thumb v3"></div><div class="best-info"><div class="best-name">에이스 침대 매트리스 킹사이즈</div><div class="best-price-row"><span class="best-discount">22%</span><span class="best-price">789,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank">16</span><div class="best-item"><div class="best-thumb v4"></div><div class="best-info"><div class="best-name">우드 침대 헤드보드 월넛</div><div class="best-price-row"><span class="best-discount">19%</span><span class="best-price">259,000원</span></div></div></div></div>
+          </div>
+          <div class="best-col">
+            <div class="best-row"><span class="best-rank">17</span><div class="best-item"><div class="best-thumb v1"></div><div class="best-info"><div class="best-name">패브릭 침구 세트 퀸</div><div class="best-price-row"><span class="best-discount">17%</span><span class="best-price">129,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank">18</span><div class="best-item"><div class="best-thumb v2"></div><div class="best-info"><div class="best-name">디자인 행거 우드 스탠드</div><div class="best-price-row"><span class="best-discount">14%</span><span class="best-price">99,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank">19</span><div class="best-item"><div class="best-thumb v3"></div><div class="best-info"><div class="best-name">디퓨저 우드 베이스 화이트</div><div class="best-price-row"><span class="best-discount">12%</span><span class="best-price">49,000원</span></div></div></div></div>
+            <div class="best-row"><span class="best-rank">20</span><div class="best-item"><div class="best-thumb v4"></div><div class="best-info"><div class="best-name">감성 LED 무드등 우드</div><div class="best-price-row"><span class="best-discount">10%</span><span class="best-price">39,000원</span></div></div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-divider"></div>
+
+    <!-- 6-2 브랜드 랭킹 -->
+    <section class="recommend-bundle brand-rank-bundle">
+      <div class="header-container">
+        <h2 class="bundle-header h24">브랜드 랭킹</h2>
+        <p class="bundle-description">지금 주목받고 있는 브랜드에요</p>
+      </div>
+
+      <div class="brand-rank-list">
+        <div class="brand-rank-item expanded">
+          <div class="brand-rank-1-head">
+            <span class="brand-rank-num">1</span>
+            <div class="brand-rank-thumb-40"><div class="inner"></div></div>
+            <div class="brand-rank-center">
+              <div class="brand-rank-name">한샘</div>
+              <div class="brand-rank-desc">최대 15% 할인</div>
+            </div>
+            <svg class="brand-rank-chev" viewBox="0 0 20 20" fill="none">
+              <path d="M5 12.5l5-5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="brand-rank-1-products">
+            <div class="product-row">
+              <article class="product-card sm"><div class="product-thumb v1"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+              <article class="product-card sm"><div class="product-thumb v2"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+              <article class="product-card sm"><div class="product-thumb v3"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+            </div>
+          </div>
+        </div>
+        <div class="brand-rank-item">
+          <div class="brand-rank-1-head">
+            <span class="brand-rank-num">2</span>
+            <div class="brand-rank-thumb-40"><div class="inner" style="background:linear-gradient(135deg,#E8EAF1,#B0B5C9)"></div></div>
+            <div class="brand-rank-center">
+              <div class="brand-rank-name">시몬스</div>
+              <div class="brand-rank-desc">최대 12% 할인</div>
+            </div>
+            <svg class="brand-rank-chev" viewBox="0 0 20 20" fill="none">
+              <path d="M5 12.5l5-5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="brand-rank-1-products">
+            <div class="product-row">
+              <article class="product-card sm"><div class="product-thumb v2"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+              <article class="product-card sm"><div class="product-thumb v3"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+              <article class="product-card sm"><div class="product-thumb v4"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+            </div>
+          </div>
+        </div>
+        <div class="brand-rank-item">
+          <div class="brand-rank-1-head">
+            <span class="brand-rank-num">3</span>
+            <div class="brand-rank-thumb-40"><div class="inner" style="background:linear-gradient(135deg,#D2E0E2,#98B4B9)"></div></div>
+            <div class="brand-rank-center">
+              <div class="brand-rank-name">에이스</div>
+              <div class="brand-rank-desc">최대 10% 할인</div>
+            </div>
+            <svg class="brand-rank-chev" viewBox="0 0 20 20" fill="none">
+              <path d="M5 12.5l5-5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="brand-rank-1-products">
+            <div class="product-row">
+              <article class="product-card sm"><div class="product-thumb v5"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+              <article class="product-card sm"><div class="product-thumb v6"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+              <article class="product-card sm"><div class="product-thumb v1"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+            </div>
+          </div>
+        </div>
+        <div class="brand-rank-item">
+          <div class="brand-rank-1-head">
+            <span class="brand-rank-num">4</span>
+            <div class="brand-rank-thumb-40"><div class="inner" style="background:linear-gradient(135deg,#E0D8E2,#B0A0B5)"></div></div>
+            <div class="brand-rank-center">
+              <div class="brand-rank-name">에싸</div>
+              <div class="brand-rank-desc">최대 18% 할인</div>
+            </div>
+            <svg class="brand-rank-chev" viewBox="0 0 20 20" fill="none">
+              <path d="M5 12.5l5-5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="brand-rank-1-products">
+            <div class="product-row">
+              <article class="product-card sm"><div class="product-thumb v3"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+              <article class="product-card sm"><div class="product-thumb v4"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+              <article class="product-card sm"><div class="product-thumb v2"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+            </div>
+          </div>
+        </div>
+        <div class="brand-rank-item">
+          <div class="brand-rank-1-head">
+            <span class="brand-rank-num">5</span>
+            <div class="brand-rank-thumb-40"><div class="inner" style="background:linear-gradient(135deg,#DEE2D2,#B0B999)"></div></div>
+            <div class="brand-rank-center">
+              <div class="brand-rank-name">미마</div>
+              <div class="brand-rank-desc">최대 20% 할인</div>
+            </div>
+            <svg class="brand-rank-chev" viewBox="0 0 20 20" fill="none">
+              <path d="M5 12.5l5-5 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="brand-rank-1-products">
+            <div class="product-row">
+              <article class="product-card sm"><div class="product-thumb v6"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+              <article class="product-card sm"><div class="product-thumb v5"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+              <article class="product-card sm"><div class="product-thumb v1"></div><div class="product-info"><div class="product-brand">Brand Name</div><div class="product-name">원목 소품 우드 미니 수납함 빈티지 박스 가구</div><div class="product-price"><span class="price-discount">42%</span><span class="price-amount">33,200</span></div></div></article>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="box-button-large">랭킹 더보기</button>
+    </section>
+
+  </div>
+
+  <div class="module-divider"></div>
+
+  <!-- ============================== -->
+  <!-- 탭 7: 라이브 -->
+  <!-- ============================== -->
+  <div class="tab-pane" id="tab-pane-live">
+
+    <!-- 7-1 집요한라이브 -->
+    <section class="recommend-bundle live-bundle">
+      <div class="header-container">
+        <img class="live-logo" src="./assets/logo-jipyohan-live.png" alt="집요한라이브"/>
+        <p class="bundle-description">라이브에서 가장 좋은 혜택을 만나요</p>
+      </div>
+      <div class="live-feature-list">
+        <div class="live-kv-card">
+          <span class="live-kv-coupon">6.8 월 20:00</span>
+          <div class="live-kv-info">
+            <div class="live-kv-text">
+              <div class="live-kv-title">시몬스 스마트팩 ~46%</div>
+              <div class="live-kv-sub">오늘의집 단독 최저가</div>
+            </div>
+            <button class="live-kv-cta">
+              <span>지금 방송 보기</span>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="live-thumb-stack">
+          <div class="live-thumb"></div>
+          <div class="live-thumb t2"></div>
+          <div class="live-thumb t3"></div>
+          <div class="live-thumb t4"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="module-divider"></div>
+
+    <!-- 7-2 라이브 캘린더 -->
+    <section class="recommend-bundle cal-bundle">
+      <div class="live-cal-header">
+        <h2 class="cal-title">라이브 캘린더</h2>
+        <button class="box-button">
+          <span class="label">라이브 알림받기</span>
+          <span class="icon"><img src="./assets/icon-bell.svg" alt="bell"/></span>
+        </button>
+      </div>
+      <div class="chip-strip">
+        <button class="chip chip-solid">6.8 월</button>
+        <button class="chip chip-normal">6.9 화</button>
+        <button class="chip chip-normal">6.10 수</button>
+        <button class="chip chip-normal">6.11 목</button>
+        <button class="chip chip-normal">6.12 금</button>
+      </div>
+      <div class="cal-list">
+        <div class="cal-row">
+          <span class="cal-badge">20:00</span>
+          <div class="cal-brands">
+            <div class="cal-brand"><div class="cal-brand-thumb"></div><span class="cal-brand-name">베베앙</span></div>
+            <div class="cal-brand"><div class="cal-brand-thumb b2"></div><span class="cal-brand-name">미마</span></div>
+          </div>
+        </div>
+        <hr class="cal-divider">
+        <div class="cal-row">
+          <span class="cal-badge">21:00</span>
+          <div class="cal-brands">
+            <div class="cal-brand"><div class="cal-brand-thumb b3"></div><span class="cal-brand-name">에싸</span></div>
+          </div>
+        </div>
+        <hr class="cal-divider">
+        <div class="cal-row">
+          <span class="cal-badge">22:00</span>
+          <div class="cal-brands">
+            <div class="cal-brand"><div class="cal-brand-thumb b4"></div><span class="cal-brand-name">미닉스</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+</div>
+
+<script>
+// ====== Tab click → smooth scroll anchor ======
+const tabItems = document.querySelectorAll('.tab-item');
+const panes = [
+  document.getElementById('tab-pane-event'),
+  document.getElementById('tab-pane-recommend'),
+  document.getElementById('tab-pane-hansam'),
+  document.getElementById('tab-pane-bed'),
+  document.getElementById('tab-pane-special'),
+  document.getElementById('tab-pane-ranking'),
+  document.getElementById('tab-pane-live')
+];
+
+let isClickScrolling = false;
+let clickScrollTimeout = null;
+
+tabItems.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const targetId = tab.dataset.target;
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    // 즉시 .on 부여
+    tabItems.forEach(t => t.classList.toggle('on', t === tab));
+    const dot = tab.querySelector('.tab-noti');
+    if (dot) dot.remove();
+
+    // 스크롤 중 IntersectionObserver 무시
+    isClickScrolling = true;
+    clearTimeout(clickScrollTimeout);
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // 800ms 후 observer 다시 활성화
+    clickScrollTimeout = setTimeout(() => {
+      isClickScrolling = false;
+    }, 800);
+  });
+});
+
+// ====== Scroll sync → 탭 자동 active ======
+const tabByTarget = new Map();
+tabItems.forEach(t => tabByTarget.set(t.dataset.target, t));
+
+const phoneEl = document.querySelector('.phone');
+const isNarrow = window.matchMedia('(max-width: 480px)').matches;
+const stickyOffset = isNarrow ? 88 : 138;
+const observer = new IntersectionObserver((entries) => {
+  if (isClickScrolling) return;
+
+  const visible = entries
+    .filter(e => e.isIntersecting)
+    .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+  if (visible.length === 0) return;
+
+  const topPane = visible[0].target;
+  const tab = tabByTarget.get(topPane.id);
+  if (!tab) return;
+
+  tabItems.forEach(t => t.classList.toggle('on', t === tab));
+  const dot = tab.querySelector('.tab-noti');
+  if (dot) dot.remove();
+}, {
+  root: phoneEl,
+  rootMargin: `-${stickyOffset}px 0px -50% 0px`,
+  threshold: 0
+});
+
+panes.forEach(p => { if (p) observer.observe(p); });
+
+// ====== Brand ranking accordion (1개만 펼침) ======
+document.querySelectorAll('.brand-rank-item').forEach(item => {
+  const head = item.querySelector('.brand-rank-1-head');
+  if (!head) return;
+  head.addEventListener('click', () => {
+    if (item.classList.contains('expanded')) return; // 이미 펼친 거 클릭하면 그대로
+    document.querySelectorAll('.brand-rank-item.expanded').forEach(other => other.classList.remove('expanded'));
+    item.classList.add('expanded');
+  });
+});
+</script>
+
+</body>
+</html>

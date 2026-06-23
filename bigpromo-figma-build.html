@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>빅프로모션 기획전 — Figma Build (ODS)</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+ * ODS Design Tokens (light mode)
+ * Source: /Users/cy.bang/.claude/tools/ods-ui-build/design-tokens.js
+ * ============================================================ */
+:root {
+  color-scheme: light only;
+
+  /* Color — Neutral */
+  --bg-neutral: #FFFFFF;
+  --bg-neutral-weak: #F5F5F5;
+  --bg-neutral-inverse: #141414;
+  --bg-dim: rgba(0, 0, 0, 0.4);
+  --bg-overlay: rgba(0, 0, 0, 0.05);
+
+  --border-neutral: #E0E0E0;
+  --border-neutral-strong: #141414;
+  --border-thumbnail: rgba(0, 0, 0, 0.05);
+
+  --fg-neutral: #141414;
+  --fg-neutral-weak: #8C8C8C;
+  --fg-neutral-inverse: #FFFFFF;
+
+  /* Color — Brand / Accent / Semantic */
+  --brand: #00A1FF;
+  --brand-weak: #F0F8FC;
+  --accent-red: #FD3D4A;
+  --accent-purple: #6F3DDE;
+  --accent-yellow: #FFC300;
+  --fg-attention: #B27800;
+  --bg-attention-weak: #FCF4DD;
+  --fg-critical: #F05656;
+  --bg-critical-weak: #FFEDED;
+
+  --disabled-bg: #EDEDED;
+  --disabled-fg: #C1C1C1;
+}
+
+/* ============================================================
+ * Reset
+ * ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { color-scheme: light only; }
+body {
+  background: #E8E8E8;
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: 32px 0 80px;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+button { font-family: inherit; cursor: pointer; }
+
+/* ODS typography utility (몇 개만 헬퍼) */
+.t-heading24b { font-size: 24px; line-height: 32px; font-weight: 700; letter-spacing: -0.3px; }
+.t-heading20b { font-size: 20px; line-height: 28px; font-weight: 700; letter-spacing: -0.3px; }
+.t-heading18b { font-size: 18px; line-height: 24px; font-weight: 700; letter-spacing: -0.3px; }
+.t-heading17sb { font-size: 17px; line-height: 22px; font-weight: 600; letter-spacing: -0.3px; }
+.t-body16b { font-size: 16px; line-height: 24px; font-weight: 700; letter-spacing: -0.3px; }
+.t-body16sb { font-size: 16px; line-height: 24px; font-weight: 600; letter-spacing: -0.3px; }
+.t-body15sb { font-size: 15px; line-height: 24px; font-weight: 600; letter-spacing: -0.3px; }
+.t-body14sb { font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: -0.3px; }
+.t-body14m  { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: -0.3px; }
+.t-body14r  { font-size: 14px; line-height: 20px; font-weight: 400; letter-spacing: -0.3px; }
+.t-detail13m{ font-size: 13px; line-height: 18px; font-weight: 500; letter-spacing: -0.3px; }
+.t-detail12sb{font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: -0.3px; }
+.t-detail12m{ font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: -0.3px; }
+.t-detail11m{ font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: -0.3px; }
+
+/* ============================================================
+ * Phone shell
+ * ============================================================ */
+.phone {
+  width: 375px;
+  background: var(--bg-neutral);
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 12px 60px rgba(0,0,0,0.18);
+  position: relative;
+  color: var(--fg-neutral);
+}
+
+/* ============================================================
+ * Status bar (54)
+ * ============================================================ */
+.status-bar {
+  height: 54px;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 24px;
+  font-size: 14px; font-weight: 700; line-height: 20px;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+}
+
+/* ============================================================
+ * 00_KV — 배경 이미지 (h=516)
+ * ============================================================ */
+.kv {
+  position: relative;
+  height: 462px; /* 516 - 54 status bar visual offset */
+  background:
+    radial-gradient(120% 70% at 20% 10%, #6F3DDE 0%, transparent 60%),
+    radial-gradient(120% 80% at 90% 30%, #00A1FF 0%, transparent 55%),
+    linear-gradient(180deg, #141414 0%, #2A1B5C 100%);
+  color: var(--fg-neutral-inverse);
+  overflow: hidden;
+}
+.kv-title {
+  position: absolute;
+  left: 24px; top: 56px;
+  font-size: 32px; line-height: 42px; font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral-inverse);
+}
+.kv-sub {
+  position: absolute;
+  left: 24px; top: 152px;
+  font-size: 14px; line-height: 20px; font-weight: 500;
+  letter-spacing: -0.3px;
+  color: rgba(255,255,255,0.7);
+}
+.kv-stamp {
+  position: absolute;
+  right: 24px; bottom: 80px;
+  width: 88px; height: 88px;
+  border-radius: 50%;
+  background: var(--accent-yellow);
+  color: var(--fg-neutral);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700;
+  letter-spacing: -0.3px;
+  text-align: center;
+  transform: rotate(-8deg);
+}
+
+/* ============================================================
+ * 탭 메뉴 (44) — 7개 균등 분할
+ * ============================================================ */
+.tabs {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--bg-neutral);
+  border-bottom: 1px solid var(--border-neutral);
+}
+.tabs-list {
+  display: flex;
+  height: 44px;
+}
+.tab-item {
+  flex: 1 1 calc(100% / 7);
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500; line-height: 18px;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral-weak);
+  background: transparent;
+  border: none;
+  padding: 0;
+  transition: color 0.15s;
+}
+.tab-item.on {
+  color: var(--fg-neutral);
+  font-weight: 700;
+}
+.tab-item.on::after {
+  content: '';
+  position: absolute;
+  left: 50%; bottom: 0;
+  transform: translateX(-50%);
+  width: 54px; height: 2px;
+  background: var(--brand);
+}
+.tab-item .new-dot {
+  position: absolute;
+  top: 8px;
+  right: calc(50% - 24px);
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+.tab-pane { display: none; }
+.tab-pane.on { display: block; }
+
+/* ============================================================
+ * Sketch placeholder (필요 시)
+ * ============================================================ */
+.sketch {
+  margin: 16px;
+  padding: 56px 24px;
+  background: var(--bg-neutral-weak);
+  border: 1.5px dashed var(--border-neutral);
+  border-radius: 12px;
+  text-align: center;
+}
+.sketch .tag {
+  display: inline-block;
+  font-size: 11px; font-weight: 700; line-height: 14px;
+  letter-spacing: 1.2px;
+  color: var(--fg-neutral-weak);
+  margin-bottom: 8px;
+}
+.sketch .ttl {
+  font-size: 16px; font-weight: 700; line-height: 24px;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+  margin-bottom: 4px;
+}
+.sketch .desc {
+  font-size: 13px; line-height: 18px; font-weight: 400;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral-weak);
+}
+
+/* ============================================================
+ * ODS Section Header
+ * ============================================================ */
+.section-header {
+  padding: 24px 16px 12px;
+}
+.section-header .ttl {
+  font-size: 18px; line-height: 24px; font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+}
+.section-header .desc {
+  margin-top: 2px;
+  font-size: 13px; line-height: 18px; font-weight: 400;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral-weak);
+}
+
+/* ============================================================
+ * TAB 1 — 이벤트 (Benefit cards)
+ * ============================================================ */
+.benefit-list {
+  padding: 16px;
+  display: flex; flex-direction: column;
+  gap: 8px;
+}
+.benefit-card {
+  background: var(--bg-neutral);
+  border: 1px solid var(--border-neutral);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.benefit-icon {
+  flex-shrink: 0;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--bg-neutral-inverse);
+  color: var(--fg-neutral-inverse);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.benefit-icon.brand { background: var(--brand); color: var(--fg-neutral-inverse); }
+.benefit-icon.red   { background: var(--accent-red); color: var(--fg-neutral-inverse); }
+.benefit-icon.yellow{ background: var(--accent-yellow); color: var(--fg-neutral); }
+.benefit-icon.purple{ background: var(--accent-purple); color: var(--fg-neutral-inverse); }
+
+.benefit-info { flex: 1; min-width: 0; }
+.benefit-title {
+  font-size: 14px; font-weight: 700; line-height: 20px;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+}
+.benefit-cond {
+  margin-top: 2px;
+  font-size: 12px; font-weight: 500; line-height: 16px;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral-weak);
+}
+.benefit-cta {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  background: var(--fg-neutral);
+  color: var(--fg-neutral-inverse);
+  border: none;
+  border-radius: 100px;
+  font-size: 12px; font-weight: 700; line-height: 16px;
+  letter-spacing: -0.3px;
+}
+.benefit-cta.done {
+  background: var(--bg-neutral-weak);
+  color: var(--fg-neutral-weak);
+}
+
+.divider {
+  height: 1px;
+  background: var(--border-neutral);
+  margin: 8px 16px;
+}
+.divider.thick {
+  height: 8px;
+  background: var(--bg-neutral-weak);
+  margin: 16px 0 0;
+}
+
+/* Benefit content block (Discount summary) */
+.discount-block {
+  margin: 8px 16px 16px;
+  padding: 20px;
+  background: var(--brand-weak);
+  border-radius: 16px;
+}
+.discount-title {
+  font-size: 14px; font-weight: 600; line-height: 20px;
+  letter-spacing: -0.3px;
+  color: var(--brand);
+}
+.discount-conditions {
+  margin-top: 6px;
+  font-size: 20px; line-height: 28px; font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+}
+.discount-conditions strong { color: var(--brand); }
+.discount-pay {
+  margin-top: 12px;
+  font-size: 13px; font-weight: 500; line-height: 18px;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral-weak);
+}
+
+/* ============================================================
+ * Product Row (가로 캐러셀) — 추천/한샘/침대 공용
+ * ============================================================ */
+.product-row {
+  display: flex;
+  gap: 12px;
+  padding: 4px 16px 24px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.product-row::-webkit-scrollbar { display: none; }
+
+.product-card {
+  flex-shrink: 0;
+  width: 140px;
+  scroll-snap-align: start;
+}
+.product-thumb {
+  width: 140px; height: 140px;
+  border-radius: 8px;
+  background: var(--bg-neutral-weak);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-thumbnail);
+}
+.product-thumb::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(0,0,0,0.04), rgba(0,0,0,0));
+}
+.product-rank {
+  position: absolute;
+  left: 0; top: 0;
+  padding: 4px 8px;
+  background: var(--bg-neutral-inverse);
+  color: var(--fg-neutral-inverse);
+  font-size: 12px; font-weight: 700; line-height: 16px;
+  letter-spacing: -0.3px;
+  border-radius: 0 0 8px 0;
+}
+.product-badge {
+  position: absolute;
+  left: 8px; bottom: 8px;
+  padding: 4px 6px;
+  background: var(--accent-red);
+  color: var(--fg-neutral-inverse);
+  font-size: 11px; font-weight: 700; line-height: 14px;
+  letter-spacing: -0.3px;
+  border-radius: 4px;
+}
+.product-name {
+  margin-top: 10px;
+  font-size: 13px; line-height: 18px; font-weight: 400;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.product-price {
+  margin-top: 6px;
+  display: flex; align-items: baseline; gap: 4px;
+}
+.product-price .disc {
+  font-size: 14px; font-weight: 700; line-height: 20px;
+  letter-spacing: -0.3px;
+  color: var(--accent-red);
+}
+.product-price .now {
+  font-size: 14px; font-weight: 700; line-height: 20px;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+}
+.product-meta {
+  margin-top: 4px;
+  font-size: 11px; font-weight: 500; line-height: 14px;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral-weak);
+}
+
+/* ============================================================
+ * Recommend Bundle (큐레이션 묶음)
+ * ============================================================ */
+.bundle {
+  padding-top: 8px;
+}
+.bundle-header {
+  padding: 16px 16px 4px;
+}
+.bundle-header .ttl {
+  font-size: 17px; line-height: 22px; font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+}
+.bundle-header .desc {
+  margin-top: 4px;
+  font-size: 13px; line-height: 18px; font-weight: 400;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral-weak);
+}
+
+/* ============================================================
+ * TAB 3 / 4 — KV (브랜드/카테고리)
+ * ============================================================ */
+.tab-kv {
+  position: relative;
+  height: 200px;
+  background: linear-gradient(135deg, #141414 0%, #2A2A2A 100%);
+  color: var(--fg-neutral-inverse);
+  overflow: hidden;
+}
+.tab-kv.beige { background: linear-gradient(135deg, #C7B299 0%, #8B7355 100%); }
+.tab-kv-name {
+  position: absolute;
+  left: 16px; bottom: 56px;
+  font-size: 24px; line-height: 32px; font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral-inverse);
+}
+.tab-kv-meta {
+  position: absolute;
+  left: 16px; bottom: 24px;
+  font-size: 13px; line-height: 18px; font-weight: 500;
+  letter-spacing: -0.3px;
+  color: rgba(255,255,255,0.8);
+}
+.tab-kv-cta {
+  position: absolute;
+  right: 16px; bottom: 24px;
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.95);
+  color: var(--fg-neutral);
+  border: none;
+  border-radius: 100px;
+  font-size: 12px; font-weight: 700; line-height: 16px;
+  letter-spacing: -0.3px;
+}
+
+/* ============================================================
+ * TAB 5 — 특가 (2-column grid)
+ * ============================================================ */
+.deal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 8px;
+  padding: 8px 16px 24px;
+}
+.deal-card .deal-thumb {
+  width: 100%; aspect-ratio: 1;
+  border-radius: 8px;
+  background: var(--bg-neutral-weak);
+  position: relative;
+  border: 1px solid var(--border-thumbnail);
+}
+.deal-card .deal-name {
+  margin-top: 10px;
+  font-size: 13px; line-height: 18px; font-weight: 400;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.deal-card .deal-price {
+  margin-top: 6px;
+  display: flex; align-items: baseline; gap: 4px;
+}
+.deal-card .disc {
+  font-size: 14px; font-weight: 700; line-height: 20px;
+  color: var(--accent-red);
+}
+.deal-card .now {
+  font-size: 14px; font-weight: 700; line-height: 20px;
+  color: var(--fg-neutral);
+}
+
+/* ============================================================
+ * TAB 6 — 랭킹 (List column, 280 wide, chip strip)
+ * ============================================================ */
+.chip-strip {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid var(--border-neutral);
+}
+.chip-strip::-webkit-scrollbar { display: none; }
+
+.chip {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  background: var(--bg-neutral);
+  border: 1px solid var(--border-neutral);
+  border-radius: 100px;
+  font-size: 14px; font-weight: 500; line-height: 18px;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+}
+.chip.on {
+  background: var(--bg-neutral-inverse);
+  border-color: var(--bg-neutral-inverse);
+  color: var(--fg-neutral-inverse);
+  font-weight: 600;
+}
+
+.rank-section {
+  padding: 16px;
+}
+.rank-section + .rank-section { border-top: 8px solid var(--bg-neutral-weak); }
+.rank-title {
+  font-size: 17px; line-height: 22px; font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+  margin-bottom: 12px;
+}
+
+.rank-list { display: flex; flex-direction: column; gap: 12px; }
+.rank-row {
+  display: flex; align-items: center; gap: 12px;
+}
+.rank-num {
+  width: 24px; flex-shrink: 0;
+  font-size: 16px; font-weight: 700; line-height: 20px;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+  text-align: center;
+}
+.rank-row.top .rank-num { color: var(--accent-red); }
+.rank-thumb {
+  width: 64px; height: 64px; flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--bg-neutral-weak);
+  border: 1px solid var(--border-thumbnail);
+}
+.rank-info { flex: 1; min-width: 0; }
+.rank-name {
+  font-size: 13px; line-height: 18px; font-weight: 400;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.rank-price {
+  margin-top: 4px;
+  display: flex; align-items: baseline; gap: 4px;
+}
+.rank-price .disc {
+  font-size: 14px; font-weight: 700; color: var(--accent-red); line-height: 20px;
+}
+.rank-price .now {
+  font-size: 14px; font-weight: 700; color: var(--fg-neutral); line-height: 20px;
+}
+.rank-trend {
+  flex-shrink: 0;
+  font-size: 11px; font-weight: 600; line-height: 14px;
+  letter-spacing: -0.3px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: var(--bg-attention-weak);
+  color: var(--fg-attention);
+}
+.rank-trend.down {
+  background: var(--bg-critical-weak);
+  color: var(--fg-critical);
+}
+.rank-trend.same {
+  background: var(--bg-neutral-weak);
+  color: var(--fg-neutral-weak);
+}
+
+/* ============================================================
+ * TAB 7 — 라이브
+ * ============================================================ */
+.live-hero {
+  padding: 16px;
+  display: flex; gap: 8px;
+}
+.live-main {
+  position: relative;
+  width: 262px; height: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a1a1a, #444);
+  color: var(--fg-neutral-inverse);
+  flex-shrink: 0;
+}
+.live-side {
+  display: flex; flex-direction: column;
+  gap: 8px;
+  width: 77px;
+}
+.live-side .side-card {
+  width: 77px; height: 77px;
+  border-radius: 8px;
+  background: var(--bg-neutral-weak);
+  border: 1px solid var(--border-thumbnail);
+  position: relative;
+}
+.live-side .side-card.live::after {
+  content: 'LIVE';
+  position: absolute;
+  left: 6px; top: 6px;
+  padding: 2px 4px;
+  background: var(--accent-red);
+  color: var(--fg-neutral-inverse);
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.3px;
+  border-radius: 2px;
+}
+
+.live-badge {
+  position: absolute;
+  left: 12px; top: 12px;
+  padding: 4px 8px;
+  background: var(--accent-red);
+  color: var(--fg-neutral-inverse);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.5px;
+  border-radius: 4px;
+  display: flex; align-items: center; gap: 4px;
+}
+.live-badge::before {
+  content: ''; width: 4px; height: 4px;
+  border-radius: 50%; background: var(--fg-neutral-inverse);
+}
+.live-viewers {
+  position: absolute;
+  right: 12px; top: 12px;
+  padding: 4px 8px;
+  background: rgba(0,0,0,0.5);
+  color: var(--fg-neutral-inverse);
+  font-size: 11px; font-weight: 600;
+  border-radius: 100px;
+}
+.live-title {
+  position: absolute;
+  left: 12px; bottom: 40px; right: 12px;
+  font-size: 16px; line-height: 22px; font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral-inverse);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.live-host {
+  position: absolute;
+  left: 12px; bottom: 12px;
+  font-size: 12px; line-height: 16px; font-weight: 500;
+  letter-spacing: -0.3px;
+  color: rgba(255,255,255,0.8);
+}
+
+.live-upcoming {
+  padding: 8px 16px 24px;
+}
+.live-upcoming-title {
+  font-size: 17px; line-height: 22px; font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+  margin-bottom: 12px;
+}
+.upcoming-list { display: flex; flex-direction: column; gap: 12px; }
+.upcoming-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-neutral);
+  border-radius: 12px;
+}
+.upcoming-thumb {
+  width: 56px; height: 56px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--bg-neutral-weak);
+  border: 1px solid var(--border-thumbnail);
+}
+.upcoming-info { flex: 1; min-width: 0; }
+.upcoming-time {
+  font-size: 12px; font-weight: 600; line-height: 16px;
+  letter-spacing: -0.3px;
+  color: var(--brand);
+}
+.upcoming-name {
+  margin-top: 2px;
+  font-size: 14px; line-height: 20px; font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.upcoming-host {
+  margin-top: 2px;
+  font-size: 12px; font-weight: 500; line-height: 16px;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral-weak);
+}
+/* ODS BoxButton — Subtle (height 74 변형: padding 적용) */
+.notify-btn {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  background: var(--bg-neutral-weak);
+  color: var(--fg-neutral);
+  border: none;
+  border-radius: 100px;
+  font-size: 13px; font-weight: 700; line-height: 18px;
+  letter-spacing: -0.3px;
+  display: flex; align-items: center; gap: 4px;
+}
+.notify-btn.on {
+  background: var(--fg-neutral);
+  color: var(--fg-neutral-inverse);
+}
+
+/* ============================================================
+ * Section title (special — Tab2 큐레이션 헤더)
+ * ============================================================ */
+.curation-header {
+  padding: 24px 16px 8px;
+}
+.curation-header .ttl {
+  font-size: 20px; line-height: 28px; font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral);
+}
+.curation-header .desc {
+  margin-top: 4px;
+  font-size: 13px; line-height: 18px; font-weight: 400;
+  letter-spacing: -0.3px;
+  color: var(--fg-neutral-weak);
+}
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>● ○ ○ ◐</span>
+  </div>
+
+  <!-- 00_KV -->
+  <div class="kv">
+    <div class="kv-title">오늘의집<br>빅프로모션</div>
+    <div class="kv-sub">7.7 ~ 7.20 · 인생템 다 모았다</div>
+    <div class="kv-stamp">최대<br>70%</div>
+  </div>
+
+  <!-- Tab Menu -->
+  <div class="tabs">
+    <div class="tabs-list">
+      <button class="tab-item on" data-tab="event">이벤트</button>
+      <button class="tab-item" data-tab="recommend">추천</button>
+      <button class="tab-item" data-tab="hanssem">한샘<span class="new-dot"></span></button>
+      <button class="tab-item" data-tab="bed">침대<span class="new-dot"></span></button>
+      <button class="tab-item" data-tab="deal">특가</button>
+      <button class="tab-item" data-tab="rank">랭킹</button>
+      <button class="tab-item" data-tab="live">라이브</button>
+    </div>
+  </div>
+
+  <!-- ========== TAB 1 — 이벤트 ========== -->
+  <div class="tab-pane on" data-pane="event">
+
+    <div class="benefit-list">
+      <div class="benefit-card">
+        <div class="benefit-icon brand">15%</div>
+        <div class="benefit-info">
+          <div class="benefit-title">신규회원 단독 15% 쿠폰</div>
+          <div class="benefit-cond">최대 5만원 · 첫 주문 한정</div>
+        </div>
+        <button class="benefit-cta">받기</button>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon">10%</div>
+        <div class="benefit-info">
+          <div class="benefit-title">전 카테고리 10% 쿠폰</div>
+          <div class="benefit-cond">5만원 이상 구매 시</div>
+        </div>
+        <button class="benefit-cta">받기</button>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon red">5%</div>
+        <div class="benefit-info">
+          <div class="benefit-title">가구 카테고리 5% 추가 할인</div>
+          <div class="benefit-cond">10만원 이상 · 중복 사용 가능</div>
+        </div>
+        <button class="benefit-cta done">받음</button>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon yellow">3%</div>
+        <div class="benefit-info">
+          <div class="benefit-title">생활용품 3% 즉시 할인</div>
+          <div class="benefit-cond">2만원 이상 · 7월 한정</div>
+        </div>
+        <button class="benefit-cta">받기</button>
+      </div>
+
+      <div class="benefit-card">
+        <div class="benefit-icon purple">★</div>
+        <div class="benefit-info">
+          <div class="benefit-title">친구초대 5천원 적립</div>
+          <div class="benefit-cond">초대 친구 첫 구매 시</div>
+        </div>
+        <button class="benefit-cta">초대</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="discount-block">
+      <div class="discount-title">할인 적용 시 최대</div>
+      <div class="discount-conditions">
+        쿠폰 중복으로 <strong>최대 35%</strong><br>추가 혜택
+      </div>
+      <div class="discount-pay">
+        쿠폰은 결제 단계에서 자동 적용됩니다
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== TAB 2 — 추천 ========== -->
+  <div class="tab-pane" data-pane="recommend">
+
+    <div class="curation-header">
+      <div class="ttl">당신을 위한 인생템</div>
+      <div class="desc">최근 본 상품 기반 추천</div>
+    </div>
+    <div class="product-row">
+      <div class="product-card">
+        <div class="product-thumb"><span class="product-badge">31% 할인</span></div>
+        <div class="product-name">미니멀 우드 사이드 테이블 원형</div>
+        <div class="product-price"><span class="disc">31%</span><span class="now">59,000원</span></div>
+        <div class="product-meta">리뷰 1.2만 · 4.8</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"><span class="product-badge">22% 할인</span></div>
+        <div class="product-name">린넨 블렌드 4계절 차렵이불 SS</div>
+        <div class="product-price"><span class="disc">22%</span><span class="now">79,900원</span></div>
+        <div class="product-meta">리뷰 8.7천 · 4.9</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"><span class="product-badge">42% 할인</span></div>
+        <div class="product-name">무선 스탠드 조명 LED 색온도 조절</div>
+        <div class="product-price"><span class="disc">42%</span><span class="now">38,500원</span></div>
+        <div class="product-meta">리뷰 5.3천 · 4.7</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"></div>
+        <div class="product-name">패브릭 1인 소파 의자 라운지체어</div>
+        <div class="product-price"><span class="now">129,000원</span></div>
+        <div class="product-meta">리뷰 2.1천 · 4.6</div>
+      </div>
+    </div>
+
+    <div class="curation-header">
+      <div class="ttl">자취 5년차가 산 그것</div>
+      <div class="desc">독립 생활 완성템</div>
+    </div>
+    <div class="product-row">
+      <div class="product-card">
+        <div class="product-thumb"><span class="product-badge">35%</span></div>
+        <div class="product-name">접이식 좌식 테이블 1인용 미니</div>
+        <div class="product-price"><span class="disc">35%</span><span class="now">19,900원</span></div>
+        <div class="product-meta">리뷰 9.8천 · 4.7</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"></div>
+        <div class="product-name">소형 무선 가습기 USB 충전</div>
+        <div class="product-price"><span class="now">24,500원</span></div>
+        <div class="product-meta">리뷰 4.3천 · 4.5</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"><span class="product-badge">28%</span></div>
+        <div class="product-name">슬림 행거 옷걸이 회전 봉</div>
+        <div class="product-price"><span class="disc">28%</span><span class="now">34,900원</span></div>
+        <div class="product-meta">리뷰 6.5천 · 4.8</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"></div>
+        <div class="product-name">실리콘 욕실 매트 미끄럼 방지</div>
+        <div class="product-price"><span class="now">12,900원</span></div>
+        <div class="product-meta">리뷰 3.1천 · 4.6</div>
+      </div>
+    </div>
+
+    <div class="curation-header">
+      <div class="ttl">신혼부부 베스트</div>
+      <div class="desc">결혼 6개월 차가 다시 산 것</div>
+    </div>
+    <div class="product-row">
+      <div class="product-card">
+        <div class="product-thumb"><span class="product-badge">45%</span></div>
+        <div class="product-name">호텔식 구스 차렵 이불 Q size</div>
+        <div class="product-price"><span class="disc">45%</span><span class="now">189,000원</span></div>
+        <div class="product-meta">리뷰 1.8만 · 4.9</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"></div>
+        <div class="product-name">원목 식탁 4인용 + 의자 세트</div>
+        <div class="product-price"><span class="now">389,000원</span></div>
+        <div class="product-meta">리뷰 4.2천 · 4.8</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"><span class="product-badge">20%</span></div>
+        <div class="product-name">로보락 로봇청소기 S8</div>
+        <div class="product-price"><span class="disc">20%</span><span class="now">649,000원</span></div>
+        <div class="product-meta">리뷰 9.1천 · 4.9</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"></div>
+        <div class="product-name">스타일러 의류 관리기 5벌</div>
+        <div class="product-price"><span class="now">1,290,000원</span></div>
+        <div class="product-meta">리뷰 1.5천 · 4.7</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== TAB 3 — 한샘 ========== -->
+  <div class="tab-pane" data-pane="hanssem">
+    <div class="tab-kv">
+      <div class="tab-kv-name">한샘</div>
+      <div class="tab-kv-meta">공식 브랜드관 · 최대 50% 할인</div>
+      <button class="tab-kv-cta">브랜드홈 →</button>
+    </div>
+
+    <div class="curation-header">
+      <div class="ttl">한샘 베스트셀러</div>
+      <div class="desc">한샘 전체 카테고리 중 가장 많이 팔린</div>
+    </div>
+    <div class="product-row">
+      <div class="product-card">
+        <div class="product-thumb"><span class="product-badge">42%</span></div>
+        <div class="product-name">한샘 모던하우스 4인 식탁 세트</div>
+        <div class="product-price"><span class="disc">42%</span><span class="now">459,000원</span></div>
+        <div class="product-meta">리뷰 3.1천 · 4.8</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"><span class="product-badge">38%</span></div>
+        <div class="product-name">한샘 시아 책장 600 5단 화이트</div>
+        <div class="product-price"><span class="disc">38%</span><span class="now">189,000원</span></div>
+        <div class="product-meta">리뷰 5.4천 · 4.7</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"></div>
+        <div class="product-name">한샘 베이직 슬라이딩 옷장 1600</div>
+        <div class="product-price"><span class="now">829,000원</span></div>
+        <div class="product-meta">리뷰 2.2천 · 4.6</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"><span class="product-badge">30%</span></div>
+        <div class="product-name">한샘 유로 6인용 식탁 + 벤치</div>
+        <div class="product-price"><span class="disc">30%</span><span class="now">699,000원</span></div>
+        <div class="product-meta">리뷰 1.5천 · 4.8</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TAB 4 — 침대 ========== -->
+  <div class="tab-pane" data-pane="bed">
+    <div class="tab-kv beige">
+      <div class="tab-kv-name">침대 · 매트리스</div>
+      <div class="tab-kv-meta">전 카테고리 무이자 12개월</div>
+      <button class="tab-kv-cta">카테고리 →</button>
+    </div>
+
+    <div class="curation-header">
+      <div class="ttl">잘 자는 사람의 침대</div>
+      <div class="desc">평점 4.8 이상 인기 모델</div>
+    </div>
+    <div class="product-row">
+      <div class="product-card">
+        <div class="product-thumb"><span class="product-badge">28%</span></div>
+        <div class="product-name">에이스 침대 + 매트리스 Q</div>
+        <div class="product-price"><span class="disc">28%</span><span class="now">1,290,000원</span></div>
+        <div class="product-meta">리뷰 8.2천 · 4.9</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"></div>
+        <div class="product-name">시몬스 뷰티레스트 Q size</div>
+        <div class="product-price"><span class="now">2,490,000원</span></div>
+        <div class="product-meta">리뷰 3.4천 · 4.9</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"><span class="product-badge">35%</span></div>
+        <div class="product-name">자작나무 수납 침대 SS</div>
+        <div class="product-price"><span class="disc">35%</span><span class="now">389,000원</span></div>
+        <div class="product-meta">리뷰 5.7천 · 4.7</div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb"></div>
+        <div class="product-name">템퍼 매트리스 토퍼 K</div>
+        <div class="product-price"><span class="now">890,000원</span></div>
+        <div class="product-meta">리뷰 1.2천 · 4.8</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TAB 5 — 특가 ========== -->
+  <div class="tab-pane" data-pane="deal">
+
+    <div class="curation-header">
+      <div class="ttl">오늘의 단독 특가</div>
+      <div class="desc">7.7 ~ 7.20 한정 · 재고 소진 시 마감</div>
+    </div>
+
+    <div class="deal-grid">
+      <div class="deal-card">
+        <div class="deal-thumb"></div>
+        <div class="deal-name">무선 핸디 청소기 5단계 흡입</div>
+        <div class="deal-price"><span class="disc">52%</span><span class="now">79,900원</span></div>
+      </div>
+      <div class="deal-card">
+        <div class="deal-thumb"></div>
+        <div class="deal-name">호텔식 100수 거위털 베개</div>
+        <div class="deal-price"><span class="disc">48%</span><span class="now">29,900원</span></div>
+      </div>
+      <div class="deal-card">
+        <div class="deal-thumb"></div>
+        <div class="deal-name">접이식 캠핑 의자 경량 2개 세트</div>
+        <div class="deal-price"><span class="disc">40%</span><span class="now">49,800원</span></div>
+      </div>
+      <div class="deal-card">
+        <div class="deal-thumb"></div>
+        <div class="deal-name">아일랜드 식탁 1200 원목 화이트</div>
+        <div class="deal-price"><span class="disc">35%</span><span class="now">189,000원</span></div>
+      </div>
+      <div class="deal-card">
+        <div class="deal-thumb"></div>
+        <div class="deal-name">스테인레스 냄비 5종 세트 인덕션</div>
+        <div class="deal-price"><span class="disc">60%</span><span class="now">89,000원</span></div>
+      </div>
+      <div class="deal-card">
+        <div class="deal-thumb"></div>
+        <div class="deal-name">대용량 김치냉장고 3도어 300L</div>
+        <div class="deal-price"><span class="disc">25%</span><span class="now">1,290,000원</span></div>
+      </div>
+      <div class="deal-card">
+        <div class="deal-thumb"></div>
+        <div class="deal-name">캐시미어 블렌드 담요 라운드</div>
+        <div class="deal-price"><span class="disc">45%</span><span class="now">39,900원</span></div>
+      </div>
+      <div class="deal-card">
+        <div class="deal-thumb"></div>
+        <div class="deal-name">무드등 LED 침실 USB 충전식</div>
+        <div class="deal-price"><span class="disc">55%</span><span class="now">14,900원</span></div>
+      </div>
+    </div>
+
+    <div class="divider thick"></div>
+
+    <div class="sketch">
+      <div class="tag">SKETCH PLACEHOLDER</div>
+      <div class="ttl">단독 브랜드 그리드 ×6 묶음 추가</div>
+      <div class="desc">Figma spec — 7 묶음 × Header + 상품 4개<br>현재 1 묶음만 구현됨</div>
+    </div>
+
+  </div>
+
+  <!-- ========== TAB 6 — 랭킹 ========== -->
+  <div class="tab-pane" data-pane="rank">
+
+    <div class="chip-strip">
+      <button class="chip on">전체</button>
+      <button class="chip">가구</button>
+      <button class="chip">패브릭</button>
+      <button class="chip">조명</button>
+      <button class="chip">생활용품</button>
+    </div>
+
+    <div class="rank-section">
+      <div class="rank-title">실시간 급상승</div>
+      <div class="rank-list">
+        <div class="rank-row top">
+          <div class="rank-num">1</div>
+          <div class="rank-thumb"></div>
+          <div class="rank-info">
+            <div class="rank-name">미니멀 우드 사이드 테이블 원형</div>
+            <div class="rank-price"><span class="disc">31%</span><span class="now">59,000원</span></div>
+          </div>
+          <div class="rank-trend">▲ 12</div>
+        </div>
+        <div class="rank-row top">
+          <div class="rank-num">2</div>
+          <div class="rank-thumb"></div>
+          <div class="rank-info">
+            <div class="rank-name">린넨 블렌드 4계절 차렵이불 SS</div>
+            <div class="rank-price"><span class="disc">22%</span><span class="now">79,900원</span></div>
+          </div>
+          <div class="rank-trend">▲ 5</div>
+        </div>
+        <div class="rank-row top">
+          <div class="rank-num">3</div>
+          <div class="rank-thumb"></div>
+          <div class="rank-info">
+            <div class="rank-name">무선 스탠드 조명 LED 색온도 조절</div>
+            <div class="rank-price"><span class="disc">42%</span><span class="now">38,500원</span></div>
+          </div>
+          <div class="rank-trend down">▼ 2</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-num">4</div>
+          <div class="rank-thumb"></div>
+          <div class="rank-info">
+            <div class="rank-name">접이식 좌식 테이블 1인용 미니</div>
+            <div class="rank-price"><span class="disc">35%</span><span class="now">19,900원</span></div>
+          </div>
+          <div class="rank-trend same">-</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-num">5</div>
+          <div class="rank-thumb"></div>
+          <div class="rank-info">
+            <div class="rank-name">호텔식 구스 차렵 이불 Q size</div>
+            <div class="rank-price"><span class="disc">45%</span><span class="now">189,000원</span></div>
+          </div>
+          <div class="rank-trend">▲ 3</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rank-section">
+      <div class="rank-title">카테고리별 베스트</div>
+      <div class="rank-list">
+        <div class="rank-row top">
+          <div class="rank-num">1</div>
+          <div class="rank-thumb"></div>
+          <div class="rank-info">
+            <div class="rank-name">한샘 모던하우스 4인 식탁 세트</div>
+            <div class="rank-price"><span class="disc">42%</span><span class="now">459,000원</span></div>
+          </div>
+          <div class="rank-trend">▲ 8</div>
+        </div>
+        <div class="rank-row top">
+          <div class="rank-num">2</div>
+          <div class="rank-thumb"></div>
+          <div class="rank-info">
+            <div class="rank-name">에이스 침대 + 매트리스 Q</div>
+            <div class="rank-price"><span class="disc">28%</span><span class="now">1,290,000원</span></div>
+          </div>
+          <div class="rank-trend">▲ 2</div>
+        </div>
+        <div class="rank-row top">
+          <div class="rank-num">3</div>
+          <div class="rank-thumb"></div>
+          <div class="rank-info">
+            <div class="rank-name">로보락 로봇청소기 S8</div>
+            <div class="rank-price"><span class="disc">20%</span><span class="now">649,000원</span></div>
+          </div>
+          <div class="rank-trend same">-</div>
+        </div>
+        <div class="rank-row">
+          <div class="rank-num">4</div>
+          <div class="rank-thumb"></div>
+          <div class="rank-info">
+            <div class="rank-name">자작나무 수납 침대 SS</div>
+            <div class="rank-price"><span class="disc">35%</span><span class="now">389,000원</span></div>
+          </div>
+          <div class="rank-trend">▲ 4</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== TAB 7 — 라이브 ========== -->
+  <div class="tab-pane" data-pane="live">
+
+    <div class="live-hero">
+      <div class="live-main">
+        <span class="live-badge">LIVE</span>
+        <span class="live-viewers">2.1만</span>
+        <div class="live-title">한샘 모던하우스 전 라인 단독 라이브 특가</div>
+        <div class="live-host">호스트 · 한샘 공식</div>
+      </div>
+      <div class="live-side">
+        <div class="side-card live"></div>
+        <div class="side-card"></div>
+        <div class="side-card"></div>
+        <div class="side-card"></div>
+      </div>
+    </div>
+
+    <div class="live-upcoming">
+      <div class="live-upcoming-title">곧 시작해요</div>
+      <div class="upcoming-list">
+        <div class="upcoming-row">
+          <div class="upcoming-thumb"></div>
+          <div class="upcoming-info">
+            <div class="upcoming-time">오늘 21:00 시작</div>
+            <div class="upcoming-name">에이스 침대 단독 특가 라이브</div>
+            <div class="upcoming-host">호스트 · 에이스 공식</div>
+          </div>
+          <button class="notify-btn">알림받기</button>
+        </div>
+        <div class="upcoming-row">
+          <div class="upcoming-thumb"></div>
+          <div class="upcoming-info">
+            <div class="upcoming-time">내일 11:00 시작</div>
+            <div class="upcoming-name">홈데코 인기템 SHOW 라이브</div>
+            <div class="upcoming-host">호스트 · 오늘의집</div>
+          </div>
+          <button class="notify-btn on">알림 ON</button>
+        </div>
+        <div class="upcoming-row">
+          <div class="upcoming-thumb"></div>
+          <div class="upcoming-info">
+            <div class="upcoming-time">7.11 (목) 20:00</div>
+            <div class="upcoming-name">시몬스 매트리스 단독 라이브</div>
+            <div class="upcoming-host">호스트 · 시몬스 코리아</div>
+          </div>
+          <button class="notify-btn">알림받기</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const tabs = document.querySelectorAll('.tab-item');
+  const panes = document.querySelectorAll('.tab-pane');
+  tabs.forEach(t => {
+    t.addEventListener('click', () => {
+      const key = t.dataset.tab;
+      tabs.forEach(x => x.classList.toggle('on', x === t));
+      panes.forEach(p => p.classList.toggle('on', p.dataset.pane === key));
+      // scroll to top of phone tab content
+      const phoneEl = document.getElementById('phone');
+      window.scrollTo({ top: phoneEl.offsetTop, behavior: 'smooth' });
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
