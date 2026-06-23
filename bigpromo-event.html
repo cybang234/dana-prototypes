@@ -54,7 +54,7 @@ body {
 .phone::-webkit-scrollbar { display: none; }
 
 /* ====== 모바일 풀 화면 대응 ====== */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   html, body { height: auto; overflow-x: hidden; }
   body {
     background: var(--background);
@@ -2079,7 +2079,7 @@ const tabByTarget = new Map();
 tabItems.forEach(t => tabByTarget.set(t.dataset.target, t));
 
 const phoneEl = document.querySelector('.phone');
-const isNarrow = window.matchMedia('(max-width: 480px)').matches;
+const isNarrow = window.matchMedia('(max-width: 768px)').matches;
 const stickyOffset = isNarrow ? 88 : 138;
 const observerRoot = isNarrow ? null : phoneEl;
 const observer = new IntersectionObserver((entries) => {
