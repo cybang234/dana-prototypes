@@ -68,14 +68,13 @@ body {
     overflow: visible;
     box-shadow: none;
     border-radius: 0;
-    padding-top: 88px; /* fixed nav 44 + tabs 44 만큼 KV 시작 위치 보정 */
   }
   /* 실제 OS status bar 있으니 prototype status bar 숨김 */
   .status-bar { display: none; }
 
-  /* 가장 상단에 무조건 고정 — fixed로 */
+  /* sticky 동작 안정화 — body가 scroll container, 각각 sticky */
   .top-nav {
-    position: fixed;
+    position: sticky;
     top: 0; left: 0; right: 0;
     height: 44px;
     z-index: 100;
@@ -83,9 +82,9 @@ body {
     border-bottom: 0;
   }
   .tabs {
-    position: fixed;
+    position: sticky;
     top: 44px; left: 0; right: 0;
-    height: 44px;
+    height: auto; /* sub-tab 보이면 늘어남 */
     z-index: 99;
   }
 
@@ -100,8 +99,10 @@ body {
     display: block;
   }
 
-  /* 고정 width 모듈들 100% width override (px 단위 다 풀기) */
-  .module-divider,
+  /* module-divider는 100% (양쪽 여백 없는 분리선) */
+  .module-divider { width: 100% !important; }
+
+  /* 양쪽 16px 여백 + 폭 대응 모듈들 */
   .benefit-title,
   .benefit-container,
   .benefit-content,
@@ -117,12 +118,15 @@ body {
   .header-container,
   .deal-header,
   .rank-tab,
-  .ranking-section,
-  .oneday-coupon {
+  .ranking-section {
     width: calc(100% - 32px) !important;
     max-width: 100%;
   }
-  .oneday-coupon { max-width: 344px; }
+  .oneday-coupon { width: calc(100% - 32px) !important; max-width: 344px; }
+  /* oneday-list wrap (16px 양쪽 padding 안에서 border) */
+  .oneday-list-wrap { width: 100% !important; box-sizing: border-box; }
+  .oneday-list { width: 100% !important; box-sizing: border-box; }
+  .oneday-cal { width: 100% !important; box-sizing: border-box; }
   /* benefit 영역 자체 stretch */
   .benefit { align-items: stretch !important; }
   .benefit-title {
