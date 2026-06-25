@@ -55,17 +55,22 @@ body {
 
 /* ====== 모바일 풀 화면 대응 ====== */
 @media (max-width: 768px) {
-  html, body { height: auto; overflow-x: hidden; }
+  /* overflow-x: hidden은 sticky를 깨므로 제거 (iOS Safari 이슈) */
+  html, body { height: auto; overflow-x: visible; }
   body {
     background: var(--background);
     padding: 0;
+    margin: 0;
     display: block;
+    width: 100%;
   }
   /* phone 자체 scroll 제거 → body가 viewport scroll container */
   .phone {
     width: 100%;
+    max-width: 100%;
     height: auto;
     overflow: visible;
+    position: static; /* sticky context 깨지 않게 */
     box-shadow: none;
     border-radius: 0;
   }
