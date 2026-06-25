@@ -90,8 +90,7 @@ body {
   }
 
   .benefit, .tab-pane { scroll-margin-top: 88px; }
-  .sub-tabs { top: 88px; z-index: 98; }
-  #tab-pane-special .recommend-bundle { scroll-margin-top: 132px; }
+  #tab-pane-special .recommend-bundle { scroll-margin-top: 88px; }
 
   /* KV 화면 폭 + 비율 유지 */
   .kv {
@@ -261,9 +260,6 @@ body {
 
 /* ====== 특가 sub-tabs (figma 8523:25498, ODS TabItem) ====== */
 .sub-tabs {
-  position: sticky;
-  top: 138px;
-  z-index: 28;
   background: var(--background);
   border-top: 1px solid var(--border-default);
 }
@@ -303,9 +299,9 @@ body {
   height: 2px;
   background: var(--foreground);
 }
-/* 특가 모듈 anchor 보정 */
+/* 특가 모듈 anchor 보정 (sub-tab은 sticky 아님 — 메인 탭만 보정) */
 #tab-pane-special .recommend-bundle {
-  scroll-margin-top: 182px;
+  scroll-margin-top: 138px;
 }
 
 /* ====== 카테고리 원데이 캘린더 (figma 8615:12712) ====== */
@@ -2403,7 +2399,7 @@ const subTabs = document.querySelectorAll('.sub-tab');
 const subTabByTarget = new Map();
 subTabs.forEach(t => subTabByTarget.set(t.dataset.subTarget, t));
 const subPanes = Array.from(subTabs).map(t => document.getElementById(t.dataset.subTarget)).filter(Boolean);
-const subOffset = isNarrow ? 132 : 182;
+const subOffset = isNarrow ? 88 : 138;
 
 subTabs.forEach(tab => {
   tab.addEventListener('click', () => {
