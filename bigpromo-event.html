@@ -356,15 +356,14 @@ body {
   gap: 8px;
 }
 .oneday-cat-thumb {
-  width: 44px; height: 44px;
+  width: 40px; height: 40px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
-  border: 1.5px solid transparent;
-  padding: 2px;
-  box-sizing: border-box;
+  margin: 4px 0 0;
 }
 .oneday-cat-item.active .oneday-cat-thumb {
-  border-color: var(--foreground);
+  outline: 1.5px solid var(--foreground);
+  outline-offset: 2px;
 }
 .oneday-cat-thumb img {
   width: 40px; height: 40px;
@@ -1251,6 +1250,25 @@ body {
     <source src="./assets/kv-event.mp4" type="video/mp4">
   </video>
 
+  <!-- 🌀 Tab (375×44) -->
+  <nav class="tabs">
+    <div class="tabs-list">
+      <button class="tab-item on" data-tab="event" data-target="tab-pane-event"><span class="tab-label">이벤트</span></button>
+      <button class="tab-item" data-tab="recommend" data-target="tab-pane-recommend"><span class="tab-label">추천</span></button>
+      <button class="tab-item" data-tab="hansam" data-target="tab-pane-hansam"><span class="tab-label">한샘<span class="tab-noti"></span></span></button>
+      <button class="tab-item" data-tab="bed" data-target="tab-pane-bed"><span class="tab-label">침대<span class="tab-noti"></span></span></button>
+      <button class="tab-item" data-tab="special" data-target="tab-pane-special"><span class="tab-label">특가</span></button>
+      <button class="tab-item" data-tab="ranking" data-target="tab-pane-ranking"><span class="tab-label">랭킹</span></button>
+      <button class="tab-item" data-tab="live" data-target="tab-pane-live"><span class="tab-label">라이브</span></button>
+    </div>
+    <div class="tabs-divider"></div>
+  </nav>
+
+  <!-- ============================== -->
+  <!-- 탭 1: 이벤트 (기존) -->
+  <!-- ============================== -->
+  <div class="tab-pane" id="tab-pane-event">
+
   <!-- 카테고리 원데이 캘린더 (figma 8615:12712) -->
   <section class="oneday-cal">
     <div class="oneday-header">
@@ -1272,27 +1290,19 @@ body {
       <div class="oneday-list">
         <div class="oneday-cats">
           <div class="oneday-cat-item active">
-            <div class="oneday-cat-thumb">
-              <img src="./assets/oneday-furniture.png" alt="가구·수납"/>
-            </div>
+            <div class="oneday-cat-thumb"><img src="./assets/oneday-furniture.png" alt="가구·수납"/></div>
             <div class="oneday-cat-name">가구·수납</div>
           </div>
           <div class="oneday-cat-item">
-            <div class="oneday-cat-thumb">
-              <img src="./assets/oneday-kitchen.png" alt="주방"/>
-            </div>
+            <div class="oneday-cat-thumb"><img src="./assets/oneday-kitchen.png" alt="주방"/></div>
             <div class="oneday-cat-name">주방</div>
           </div>
           <div class="oneday-cat-item">
-            <div class="oneday-cat-thumb">
-              <img src="./assets/oneday-life.png" alt="생필용품"/>
-            </div>
+            <div class="oneday-cat-thumb"><img src="./assets/oneday-life.png" alt="생필용품"/></div>
             <div class="oneday-cat-name">생필용품</div>
           </div>
           <div class="oneday-cat-item">
-            <div class="oneday-cat-thumb">
-              <img src="./assets/oneday-food.png" alt="생필품·식품"/>
-            </div>
+            <div class="oneday-cat-thumb"><img src="./assets/oneday-food.png" alt="생필품·식품"/></div>
             <div class="oneday-cat-name">생필품·식품</div>
           </div>
         </div>
@@ -1304,24 +1314,9 @@ body {
     </div>
   </section>
 
-  <!-- 🌀 Tab (375×44) -->
-  <nav class="tabs">
-    <div class="tabs-list">
-      <button class="tab-item on" data-tab="event" data-target="tab-pane-event"><span class="tab-label">이벤트</span></button>
-      <button class="tab-item" data-tab="recommend" data-target="tab-pane-recommend"><span class="tab-label">추천</span></button>
-      <button class="tab-item" data-tab="hansam" data-target="tab-pane-hansam"><span class="tab-label">한샘<span class="tab-noti"></span></span></button>
-      <button class="tab-item" data-tab="bed" data-target="tab-pane-bed"><span class="tab-label">침대<span class="tab-noti"></span></span></button>
-      <button class="tab-item" data-tab="special" data-target="tab-pane-special"><span class="tab-label">특가</span></button>
-      <button class="tab-item" data-tab="ranking" data-target="tab-pane-ranking"><span class="tab-label">랭킹</span></button>
-      <button class="tab-item" data-tab="live" data-target="tab-pane-live"><span class="tab-label">라이브</span></button>
-    </div>
-    <div class="tabs-divider"></div>
-  </nav>
+  <div class="module-divider"></div>
 
-  <!-- ============================== -->
-  <!-- 탭 1: 이벤트 (기존) -->
-  <!-- ============================== -->
-  <div class="benefit" id="tab-pane-event">
+  <div class="benefit">
 
     <div class="benefit-title">
       <h2>Benefit</h2>
@@ -1415,6 +1410,8 @@ body {
 
     </div>
   </div>
+
+  </div><!-- tab-pane-event 닫기 -->
 
   <div class="module-divider"></div>
 
