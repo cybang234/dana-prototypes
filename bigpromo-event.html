@@ -216,6 +216,51 @@ body {
   scroll-margin-top: 182px;
 }
 
+/* 특가 탭 — 3x2 그리드 (만원특가만 3x1) */
+#tab-pane-special .recommend-item {
+  overflow-x: visible;
+  overflow: visible;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px 8px;
+  padding: 0 16px;
+}
+#tab-pane-special .recommend-item .product-section,
+#tab-pane-special .recommend-item .product-row {
+  display: contents;
+}
+#tab-pane-special .product-card {
+  width: auto;
+  min-width: 0;
+  max-width: 100%;
+}
+#tab-pane-special .product-thumb {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  height: auto;
+}
+
+/* 상품 더보기 버튼 */
+.more-products-btn {
+  width: calc(100% - 32px);
+  margin: 0 16px;
+  height: 44px;
+  border: 1px solid var(--border-default);
+  background: var(--background);
+  border-radius: 8px;
+  font-family: Pretendard, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
 /* ====== 카테고리 원데이 캘린더 (figma 8615:12712) ====== */
 .oneday-cal {
   width: 100%;
@@ -619,7 +664,7 @@ body {
 }
 .recommend-item {
   display: flex; flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   overflow-x: auto;
   padding: 8px 16px 0;
   -webkit-overflow-scrolling: touch;
@@ -2588,6 +2633,17 @@ if (oneDayCatsContainer) {
     }
   });
 }
+
+// ====== 특가 모듈에 "상품 더보기" 버튼 추가 (만원특가 미리보기 제외) ======
+document.querySelectorAll('#tab-pane-special .recommend-bundle').forEach(bundle => {
+  if (bundle.id === 'special-mod-4') return;
+  const recItem = bundle.querySelector('.recommend-item');
+  if (!recItem) return;
+  const btn = document.createElement('button');
+  btn.className = 'more-products-btn';
+  btn.innerHTML = '상품 더보기 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="margin-left:2px"><path d="M3 4.5L6 7.5L9 4.5" stroke="#141414" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  recItem.insertAdjacentElement('afterend', btn);
+});
 
 // ====== Brand ranking accordion (1개만 펼침) ======
 document.querySelectorAll('.brand-rank-item').forEach(item => {
