@@ -1334,15 +1334,17 @@ body {
   .cal-title { flex: 1 1 auto !important; }
   .live-cal-header .box-button { flex-shrink: 0 !important; margin-left: auto !important; }
 
-  /* badge 모바일에서도 높이 24 고정 */
+  /* badge 모바일에서도 높이 24 고정, 하단 마진 안 생기게 */
   .oneday-badge {
     height: 24px !important;
     min-height: 24px !important;
     max-height: 24px !important;
-    line-height: 24px !important;
+    line-height: 16px !important;
     padding: 0 8px !important;
+    margin: 0 !important;
     flex-shrink: 0 !important;
     box-sizing: border-box !important;
+    vertical-align: middle !important;
   }
 
   /* 가구데이 (oneday) — .oneday-cal에 양쪽 padding 16 직접 적용 */
