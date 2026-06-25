@@ -285,6 +285,11 @@ body {
 }
 .sheet-chips::-webkit-scrollbar { display: none; }
 .sheet-chips .chip-strip {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.sheet-chips::-webkit-scrollbar { display: none; }
+.sheet-chips .chip-strip {
   display: flex; gap: 6px;
   width: max-content;
 }
@@ -292,7 +297,9 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 4px 16px 24px;
+  scrollbar-width: none;
 }
+.sheet-body::-webkit-scrollbar { display: none; }
 .sheet-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
