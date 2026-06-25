@@ -716,6 +716,10 @@ body {
 #tab-pane-special .recommend-bundle.no-chip { gap: 8px; }
 /* 랭킹 탭 */
 .recommend-bundle.best-rank-bundle { gap: 12px; }
+.recommend-bundle.best-rank-bundle > .chip-strip.gap10 {
+  gap: 6px;
+  padding: 0 16px 12px;
+}
 .recommend-bundle.brand-rank-bundle { gap: 16px; }
 /* 라이브 탭 */
 .recommend-bundle.live-bundle { gap: 16px; }
@@ -851,7 +855,6 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 .chip-strip::-webkit-scrollbar { display: none; }
-.chip-strip.gap10 { gap: 6px; padding: 0 16px; }
 .chip {
   display: inline-flex; align-items: center; justify-content: center;
   height: 32px;
@@ -982,10 +985,12 @@ body {
 .best-col {
   width: 280px;
   display: flex; flex-direction: column;
+  gap: 12px;
+  height: fit-content;
 }
 .best-row {
   display: flex; align-items: center;
-  height: 80px;
+  height: fit-content;
   gap: 12px;
 }
 .best-rank {
@@ -1674,6 +1679,13 @@ body {
   .live-filter { padding: 12px 0 !important; margin: 0 !important; }
   .live-filter .chip-strip { padding: 0 16px !important; margin: 0 !important; }
   .live-cards { padding: 8px 16px 0 !important; }
+
+  /* 랭킹 모바일 마진 보장 */
+  .recommend-bundle.best-rank-bundle > .chip-strip.gap10 {
+    padding: 0 16px 12px !important;
+    margin: 0 !important;
+  }
+  .best-list-wrap { padding: 0 16px !important; margin: 0 !important; }
 }
 
 </style>
