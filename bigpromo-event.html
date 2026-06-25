@@ -725,6 +725,9 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  word-break: keep-all;
+  white-space: normal;
+  min-height: 36px;
 }
 .product-price {
   display: flex; align-items: baseline;
@@ -893,6 +896,13 @@ body {
   display: flex;
   width: max-content;
 }
+/* 가로 스크롤 끝에 우측 16px 여백 */
+.best-grid::after {
+  content: '';
+  display: block;
+  width: 16px;
+  flex-shrink: 0;
+}
 .best-col {
   width: 280px;
   display: flex; flex-direction: column;
@@ -940,6 +950,8 @@ body {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  word-break: keep-all;
+  white-space: normal;
 }
 .best-price-row {
   display: flex; align-items: baseline; gap: 4px;
@@ -2291,7 +2303,7 @@ body {
         <div class="brand-rank-item">
           <div class="brand-rank-1-head">
             <span class="brand-rank-num">2</span>
-            <div class="brand-rank-thumb-40"><div class="inner" style="background:linear-gradient(135deg,#E8EAF1,#B0B5C9)"></div></div>
+            <div class="brand-rank-thumb-40"><div class="inner" style="background:url('./assets/brand-thumb-2.png') center/cover"></div></div>
             <div class="brand-rank-center">
               <div class="brand-rank-name">시몬스</div>
               <div class="brand-rank-desc">최대 12% 할인</div>
@@ -2311,7 +2323,7 @@ body {
         <div class="brand-rank-item">
           <div class="brand-rank-1-head">
             <span class="brand-rank-num">3</span>
-            <div class="brand-rank-thumb-40"><div class="inner" style="background:linear-gradient(135deg,#D2E0E2,#98B4B9)"></div></div>
+            <div class="brand-rank-thumb-40"><div class="inner" style="background:url('./assets/brand-thumb-3.png') center/cover"></div></div>
             <div class="brand-rank-center">
               <div class="brand-rank-name">에이스</div>
               <div class="brand-rank-desc">최대 10% 할인</div>
@@ -2331,7 +2343,7 @@ body {
         <div class="brand-rank-item">
           <div class="brand-rank-1-head">
             <span class="brand-rank-num">4</span>
-            <div class="brand-rank-thumb-40"><div class="inner" style="background:linear-gradient(135deg,#E0D8E2,#B0A0B5)"></div></div>
+            <div class="brand-rank-thumb-40"><div class="inner" style="background:url('./assets/brand-thumb-4.png') center/cover"></div></div>
             <div class="brand-rank-center">
               <div class="brand-rank-name">에싸</div>
               <div class="brand-rank-desc">최대 18% 할인</div>
@@ -2351,7 +2363,7 @@ body {
         <div class="brand-rank-item">
           <div class="brand-rank-1-head">
             <span class="brand-rank-num">5</span>
-            <div class="brand-rank-thumb-40"><div class="inner" style="background:linear-gradient(135deg,#DEE2D2,#B0B999)"></div></div>
+            <div class="brand-rank-thumb-40"><div class="inner" style="background:url('./assets/brand-thumb-5.png') center/cover"></div></div>
             <div class="brand-rank-center">
               <div class="brand-rank-name">미마</div>
               <div class="brand-rank-desc">최대 20% 할인</div>
