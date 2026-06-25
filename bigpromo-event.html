@@ -241,7 +241,7 @@ body {
   height: auto;
 }
 
-/* 상품 더보기 — ODS Box Button subtle, size=medium */
+/* 상품 더보기 — ODS Box Button (variant=subtle, size=large), Body15L24_Medium */
 .more-products-btn {
   width: calc(100% - 32px);
   margin: 12px 16px 0; /* 위 12px + bundle gap 12 = 총 24px */
@@ -250,16 +250,15 @@ body {
   background: var(--backgroundWeak);
   border-radius: 8px;
   font-family: Pretendard, sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 20px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 24px;
   letter-spacing: -0.3px;
   color: var(--foreground);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
   padding: 0 16px;
 }
 .more-products-btn:active { background: #ebebeb; }
@@ -2644,7 +2643,7 @@ document.querySelectorAll('#tab-pane-special .recommend-bundle').forEach(bundle 
   if (!recItem) return;
   const btn = document.createElement('button');
   btn.className = 'more-products-btn';
-  btn.innerHTML = '상품 더보기 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style="margin-left:2px"><path d="M3 4.5L6 7.5L9 4.5" stroke="#141414" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  btn.textContent = '상품 더보기';
   recItem.insertAdjacentElement('afterend', btn);
 });
 
