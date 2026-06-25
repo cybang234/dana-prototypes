@@ -1260,11 +1260,11 @@ body {
   .benefit, .tab-pane { scroll-margin-top: 88px !important; }
   #tab-pane-special .recommend-bundle { scroll-margin-top: 132px !important; }
 
-  /* 특가 모듈 gap (chip strip ↔ 상품 위 8px 마진) */
+  /* 특가 모듈 gap */
   #tab-pane-special .recommend-bundle { gap: 12px !important; }
   #tab-pane-special .recommend-bundle.no-chip { gap: 8px !important; }
-  /* 상품 그리드 (.recommend-item 안 product-section) 위 마진 보강 */
-  .recommend-bundle > .recommend-item { margin-top: 0 !important; }
+  /* 상품 모듈(.recommend-item) 상단 8px 마진 — 위 element와 떨어지게 */
+  .recommend-bundle > .recommend-item { margin-top: 8px !important; }
   .recommend-item .product-section + .product-section { margin-top: 8px !important; }
 
   .kv {
