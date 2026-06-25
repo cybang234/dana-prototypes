@@ -313,6 +313,8 @@ body {
   display: flex; flex-direction: column;
   align-items: center;
   gap: 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 /* ODS Square Badge (gray solid / subtle, size=large) */
 .oneday-badge {
@@ -343,12 +345,14 @@ body {
   width: 40px; height: 40px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 50%;
-  outline: none;
-  outline-offset: 0;
+  outline: 0 solid transparent !important;
+  outline-offset: 0 !important;
+  border: 0;
+  box-shadow: none;
 }
 .oneday-cat-item.active .oneday-cat-thumb {
-  outline: 1.5px solid var(--foreground);
-  outline-offset: 2px;
+  outline: 1.5px solid var(--foreground) !important;
+  outline-offset: 2px !important;
 }
 .oneday-cat-thumb img {
   width: 40px; height: 40px;
@@ -2526,20 +2530,22 @@ const subObserver = new IntersectionObserver((entries) => {
 
 subPanes.forEach(p => subObserver.observe(p));
 
-// ====== 카테고리 원데이 클릭 인터랙션 ======
-document.querySelectorAll('.oneday-cat-item').forEach(item => {
-  item.addEventListener('click', () => {
-    const allCats = document.querySelectorAll('.oneday-cat-item');
+// ====== 카테고리 원데이 클릭 인터랙션 (event delegation — 모바일 안정) ======
+const oneDayCatsContainer = document.querySelector('.oneday-cats');
+if (oneDayCatsContainer) {
+  oneDayCatsContainer.addEventListener('click', (e) => {
+    const item = e.target.closest('.oneday-cat-item');
+    if (!item) return;
+
+    const allCats = oneDayCatsContainer.querySelectorAll('.oneday-cat-item');
     const name = item.dataset.name;
     const titleColor = item.dataset.titleColor;
     const couponColor = item.dataset.couponColor;
     const pct = item.dataset.pct;
 
-    // active 토글 — add/remove로 명시
     allCats.forEach(c => c.classList.remove('active'));
     item.classList.add('active');
 
-    // 날짜 badge solid/subtle
     allCats.forEach(c => {
       const b = c.querySelector('.oneday-badge');
       if (!b) return;
@@ -2550,13 +2556,11 @@ document.querySelectorAll('.oneday-cat-item').forEach(item => {
       }
     });
 
-    // 타이틀 텍스트 + 카테고리 색
     const titleEl = document.querySelector('.oneday-title');
     if (titleEl) {
       titleEl.innerHTML = `오늘은 <span class="oneday-cat" style="color: ${titleColor}">${name}</span>데이`;
     }
 
-    // 쿠폰 텍스트 + 배경
     const couponTextEl = document.querySelector('.oneday-coupon-text');
     const couponIconEl = document.querySelector('.oneday-coupon-icon');
     if (couponTextEl) {
@@ -2567,7 +2571,7 @@ document.querySelectorAll('.oneday-cat-item').forEach(item => {
       couponIconEl.style.background = couponColor;
     }
   });
-});
+}
 
 // ====== Brand ranking accordion (1개만 펼침) ======
 document.querySelectorAll('.brand-rank-item').forEach(item => {
