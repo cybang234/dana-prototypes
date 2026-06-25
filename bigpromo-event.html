@@ -116,10 +116,12 @@ body {
   .header-container,
   .deal-header,
   .rank-tab,
-  .ranking-section {
-    width: 100% !important;
+  .ranking-section,
+  .oneday-coupon {
+    width: calc(100% - 32px) !important;
     max-width: 100%;
   }
+  .oneday-coupon { max-width: 344px; }
   /* benefit 영역 자체 stretch */
   .benefit { align-items: stretch !important; }
   .benefit-title {
@@ -254,6 +256,158 @@ body {
   background: var(--backgroundWeak);
   border: 0;
 }
+
+/* ====== 카테고리 원데이 캘린더 (figma 8615:12712) ====== */
+.oneday-cal {
+  width: 100%;
+  display: flex; flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 0;
+  background: var(--background);
+}
+.oneday-header {
+  display: flex; flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 16px;
+  text-align: center;
+  width: 100%;
+}
+.oneday-title {
+  font-family: Pretendard, sans-serif;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+  margin: 0;
+}
+.oneday-cat { color: #ff50d7; }
+.oneday-desc {
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  line-height: 20px;
+  font-weight: 400;
+  letter-spacing: -0.3px;
+  color: var(--foregroundWeak);
+  margin: 0;
+}
+.oneday-coupon {
+  width: 344px;
+  height: 48px;
+  display: flex;
+  align-items: stretch;
+}
+.oneday-coupon-text {
+  flex: 1;
+  background: #fb93e3;
+  border-radius: 8px 0 0 8px;
+  display: flex; align-items: center;
+  padding: 0 16px;
+  font-family: Pretendard, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+}
+.oneday-coupon-divider {
+  width: 1px;
+  height: 22px;
+  background: rgba(255,255,255,0.2);
+  align-self: center;
+}
+.oneday-coupon-icon {
+  width: 48px; height: 48px;
+  background: #fb93e3;
+  border: 0;
+  border-radius: 0 8px 8px 0;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+.oneday-coupon-icon svg { width: 20px; height: 20px; }
+
+.oneday-list-wrap {
+  width: 100%;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+.oneday-list {
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex; flex-direction: column;
+  gap: 16px;
+}
+.oneday-cats {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+}
+.oneday-cat-item {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.oneday-cat-thumb {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  padding: 2px;
+  box-sizing: border-box;
+}
+.oneday-cat-item.active .oneday-cat-thumb {
+  border-color: var(--foreground);
+}
+.oneday-cat-thumb img {
+  width: 40px; height: 40px;
+  display: block;
+  object-fit: contain;
+}
+.oneday-cat-name {
+  font-family: Pretendard, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
+  color: var(--foregroundWeak);
+  white-space: nowrap;
+}
+.oneday-cat-item.active .oneday-cat-name {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.oneday-alert {
+  width: 100%;
+  height: 44px;
+  background: var(--backgroundWeak);
+  border: 0;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 0 16px;
+  font-family: Pretendard, sans-serif;
+  color: var(--foreground);
+}
+.oneday-alert-label {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+.oneday-alert-icon {
+  width: 20px; height: 20px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.oneday-alert-icon img { width: 20px; height: 20px; display: block; }
 
 /* ====== Benefit (이벤트 탭) 영역 ====== */
 .benefit {
@@ -1096,6 +1250,59 @@ body {
   <video class="kv" autoplay loop muted playsinline poster="./assets/kv-event.png">
     <source src="./assets/kv-event.mp4" type="video/mp4">
   </video>
+
+  <!-- 카테고리 원데이 캘린더 (figma 8615:12712) -->
+  <section class="oneday-cal">
+    <div class="oneday-header">
+      <h2 class="oneday-title">오늘은 <span class="oneday-cat">가구</span>데이</h2>
+      <p class="oneday-desc">매일 바뀌는 카테고리 원데이 특가</p>
+    </div>
+
+    <div class="oneday-coupon">
+      <div class="oneday-coupon-text">가구/수납 쿠폰팩 ~23%</div>
+      <span class="oneday-coupon-divider"></span>
+      <button class="oneday-coupon-icon" aria-label="쿠폰 다운로드">
+        <svg viewBox="0 0 20 20" fill="none">
+          <path d="M10 3v10m0 0l-4-4m4 4l4-4M4 16.5h12" stroke="#141414" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="oneday-list-wrap">
+      <div class="oneday-list">
+        <div class="oneday-cats">
+          <div class="oneday-cat-item active">
+            <div class="oneday-cat-thumb">
+              <img src="./assets/oneday-furniture.png" alt="가구·수납"/>
+            </div>
+            <div class="oneday-cat-name">가구·수납</div>
+          </div>
+          <div class="oneday-cat-item">
+            <div class="oneday-cat-thumb">
+              <img src="./assets/oneday-kitchen.png" alt="주방"/>
+            </div>
+            <div class="oneday-cat-name">주방</div>
+          </div>
+          <div class="oneday-cat-item">
+            <div class="oneday-cat-thumb">
+              <img src="./assets/oneday-life.png" alt="생필용품"/>
+            </div>
+            <div class="oneday-cat-name">생필용품</div>
+          </div>
+          <div class="oneday-cat-item">
+            <div class="oneday-cat-thumb">
+              <img src="./assets/oneday-food.png" alt="생필품·식품"/>
+            </div>
+            <div class="oneday-cat-name">생필품·식품</div>
+          </div>
+        </div>
+        <button class="oneday-alert">
+          <span class="oneday-alert-label">원데이딜 오픈 알림받기</span>
+          <span class="oneday-alert-icon"><img src="./assets/icon-bell.svg" alt="bell"/></span>
+        </button>
+      </div>
+    </div>
+  </section>
 
   <!-- 🌀 Tab (375×44) -->
   <nav class="tabs">
