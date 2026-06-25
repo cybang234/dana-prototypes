@@ -90,6 +90,8 @@ body {
   }
 
   .benefit, .tab-pane { scroll-margin-top: 88px; }
+  .sub-tabs { top: 88px; z-index: 98; }
+  #tab-pane-special .recommend-bundle { scroll-margin-top: 132px; }
 
   /* KV 화면 폭 + 비율 유지 */
   .kv {
@@ -255,6 +257,55 @@ body {
   height: 12px;
   background: var(--backgroundWeak);
   border: 0;
+}
+
+/* ====== 특가 sub-tabs (figma 8523:25498, ODS TabItem) ====== */
+.sub-tabs {
+  position: sticky;
+  top: 138px;
+  z-index: 28;
+  background: var(--background);
+  border-top: 1px solid var(--border-default);
+}
+.sub-tabs-list {
+  display: flex;
+  gap: 10px;
+  padding: 0 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.sub-tabs-list::-webkit-scrollbar { display: none; }
+.sub-tab {
+  flex-shrink: 0;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: Pretendard, sans-serif;
+  font-size: 15px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--foregroundWeak);
+  position: relative;
+  white-space: nowrap;
+}
+.sub-tab.on {
+  font-weight: 700;
+  color: var(--foreground);
+}
+.sub-tab.on::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2px;
+  background: var(--foreground);
+}
+/* 특가 모듈 anchor 보정 */
+#tab-pane-special .recommend-bundle {
+  scroll-margin-top: 182px;
 }
 
 /* ====== 카테고리 원데이 캘린더 (figma 8615:12712) ====== */
@@ -1776,8 +1827,21 @@ body {
   <!-- ============================== -->
   <div class="tab-pane" id="tab-pane-special">
 
+    <!-- 특가 sub-tab (figma 8523:25498 spec, ODS TabItem) -->
+    <nav class="sub-tabs" aria-label="특가 카테고리">
+      <div class="sub-tabs-list">
+        <button class="sub-tab on" data-sub-target="special-mod-1">집요한 특가</button>
+        <button class="sub-tab" data-sub-target="special-mod-2">1+1 특가</button>
+        <button class="sub-tab" data-sub-target="special-mod-3">단독 특가</button>
+        <button class="sub-tab" data-sub-target="special-mod-4">만원 특가</button>
+        <button class="sub-tab" data-sub-target="special-mod-5">원데이 특가</button>
+        <button class="sub-tab" data-sub-target="special-mod-6">반값딜</button>
+        <button class="sub-tab" data-sub-target="special-mod-7">첫 구매딜</button>
+      </div>
+    </nav>
+
     <!-- 특가 모듈 1: 집요한 특가 + timer -->
-    <section class="recommend-bundle">
+    <section class="recommend-bundle" id="special-mod-1">
       <div class="header-container">
         <div class="deal-header">
           <div class="deal-title-row">
@@ -1815,7 +1879,7 @@ body {
     <div class="module-divider"></div>
 
     <!-- 특가 모듈 2 -->
-    <section class="recommend-bundle">
+    <section class="recommend-bundle" id="special-mod-2">
       <div class="header-container">
         <div class="deal-header">
           <div class="deal-title-row">
@@ -1848,7 +1912,7 @@ body {
     <div class="module-divider"></div>
 
     <!-- 특가 모듈 3 -->
-    <section class="recommend-bundle">
+    <section class="recommend-bundle" id="special-mod-3">
       <div class="header-container" style="gap: 4px;">
         <div class="deal-header">
           <div class="deal-title-row">
@@ -1881,7 +1945,7 @@ body {
     <div class="module-divider"></div>
 
     <!-- 특가 모듈 4: 필터 없음, 만원 특가 미리보기 -->
-    <section class="recommend-bundle no-chip">
+    <section class="recommend-bundle no-chip" id="special-mod-4">
       <div class="header-container">
         <div class="deal-preview-header">
           <div class="deal-preview-title-block">
@@ -1906,7 +1970,7 @@ body {
     <div class="module-divider"></div>
 
     <!-- 특가 모듈 5 -->
-    <section class="recommend-bundle">
+    <section class="recommend-bundle" id="special-mod-5">
       <div class="header-container">
         <div class="deal-header">
           <div class="deal-title-row">
@@ -1939,7 +2003,7 @@ body {
     <div class="module-divider"></div>
 
     <!-- 특가 모듈 6 -->
-    <section class="recommend-bundle">
+    <section class="recommend-bundle" id="special-mod-6">
       <div class="header-container">
         <div class="deal-header">
           <div class="deal-title-row">
@@ -1972,7 +2036,7 @@ body {
     <div class="module-divider"></div>
 
     <!-- 특가 모듈 7 -->
-    <section class="recommend-bundle">
+    <section class="recommend-bundle" id="special-mod-7">
       <div class="header-container">
         <div class="deal-header">
           <div class="deal-title-row">
@@ -2333,6 +2397,39 @@ const observer = new IntersectionObserver((entries) => {
 });
 
 panes.forEach(p => { if (p) observer.observe(p); });
+
+// ====== 특가 sub-tabs ======
+const subTabs = document.querySelectorAll('.sub-tab');
+const subTabByTarget = new Map();
+subTabs.forEach(t => subTabByTarget.set(t.dataset.subTarget, t));
+const subPanes = Array.from(subTabs).map(t => document.getElementById(t.dataset.subTarget)).filter(Boolean);
+const subOffset = isNarrow ? 132 : 182;
+
+subTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    subTabs.forEach(t => t.classList.toggle('on', t === tab));
+    const target = document.getElementById(tab.dataset.subTarget);
+    if (!target) return;
+    target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  });
+});
+
+const subObserver = new IntersectionObserver((entries) => {
+  const visible = entries.filter(e => e.isIntersecting);
+  if (!visible.length) return;
+  visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+  const topId = visible[0].target.id;
+  const tab = subTabByTarget.get(topId);
+  if (!tab) return;
+  subTabs.forEach(t => t.classList.toggle('on', t === tab));
+  try { tab.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' }); } catch (e) {}
+}, {
+  root: observerRoot,
+  rootMargin: `-${subOffset}px 0px -50% 0px`,
+  threshold: 0
+});
+
+subPanes.forEach(p => subObserver.observe(p));
 
 // ====== Brand ranking accordion (1개만 펼침) ======
 document.querySelectorAll('.brand-rank-item').forEach(item => {
