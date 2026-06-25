@@ -274,28 +274,11 @@ body {
   width: 36px; height: 4px;
   background: #d9d9d9;
   border-radius: 4px;
-  margin: 8px auto 4px;
+  margin: 8px auto 12px;
   flex-shrink: 0;
-}
-.sheet-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 16px 12px;
-  flex-shrink: 0;
-}
-.sheet-title {
-  font-size: 16px; font-weight: 700; line-height: 24px;
-  letter-spacing: -0.3px;
-  color: var(--foreground);
-}
-.sheet-close {
-  width: 24px; height: 24px;
-  background: transparent;
-  border: 0; padding: 0;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
 }
 .sheet-chips {
-  padding: 0 16px 12px;
+  padding: 0 16px 16px;
   overflow-x: auto;
   scrollbar-width: none;
   flex-shrink: 0;
@@ -313,7 +296,7 @@ body {
 .sheet-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px 12px;
+  gap: 16px 8px;
 }
 .sheet-grid .product-card {
   width: auto;
@@ -2770,12 +2753,6 @@ sheetOverlay.className = 'sheet-overlay';
 sheetOverlay.innerHTML = `
   <div class="sheet" role="dialog" aria-modal="true">
     <div class="sheet-handle"></div>
-    <div class="sheet-head">
-      <span></span>
-      <button class="sheet-close" aria-label="닫기">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="#141414" stroke-width="1.6" stroke-linecap="round"/></svg>
-      </button>
-    </div>
     <div class="sheet-chips" hidden></div>
     <div class="sheet-body">
       <div class="sheet-grid"></div>
@@ -2835,7 +2812,7 @@ window.addEventListener('resize', () => {
 });
 
 sheetOverlay.addEventListener('click', (e) => {
-  if (e.target === sheetOverlay || e.target.closest('.sheet-close')) closeSheet();
+  if (e.target === sheetOverlay) closeSheet();
 });
 
 document.querySelectorAll('.more-products-btn').forEach(btn => {
