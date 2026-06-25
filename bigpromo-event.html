@@ -114,7 +114,8 @@ body {
   /* module-divider는 100% (양쪽 여백 없는 분리선) */
   .module-divider { width: 100% !important; }
 
-  /* 양쪽 16px 여백 + 폭 대응 모듈들 */
+  /* benefit 영역 (.benefit padding 32 16 이미 있음) → 자식 100% width fill */
+  .benefit { align-items: stretch !important; padding: 32px 16px !important; }
   .benefit-title,
   .benefit-container,
   .benefit-content,
@@ -125,7 +126,14 @@ body {
   .coupon-pack,
   .coupon,
   .coupon-pink,
-  .pay-card,
+  .pay-card {
+    width: 100% !important;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .coupon-text, .coupon-icon-wrap { box-sizing: border-box; }
+
+  /* 외부 모듈 (자체 padding 없음) — 양쪽 16 보정 */
   .live-cal-header,
   .header-container,
   .deal-header,
@@ -135,10 +143,10 @@ body {
     max-width: 100%;
   }
   .oneday-coupon { width: calc(100% - 32px) !important; max-width: 344px; }
-  /* oneday-list wrap (16px 양쪽 padding 안에서 border) */
-  .oneday-list-wrap { width: 100% !important; box-sizing: border-box; }
-  .oneday-list { width: 100% !important; box-sizing: border-box; }
-  .oneday-cal { width: 100% !important; box-sizing: border-box; }
+  .oneday-list-wrap, .oneday-list, .oneday-cal {
+    width: 100% !important;
+    box-sizing: border-box;
+  }
   /* benefit 영역 자체 stretch */
   .benefit { align-items: stretch !important; }
   .benefit-title {
