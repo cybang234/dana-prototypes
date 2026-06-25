@@ -1196,20 +1196,27 @@ body {
   border: 0;
 }
 
+/* ODS Box Button (variant=subtle, size=large), Body15L24_Medium */
 .box-button-large {
   display: flex; align-items: center; justify-content: center;
   width: calc(100% - 32px);
-  margin: 12px 16px 0;
+  margin: 0 16px;
   height: 44px;
   background: var(--backgroundWeak);
   border: 0;
   border-radius: 8px;
-  font-family: inherit;
-  font-size: 15px; font-weight: 700; line-height: 24px;
+  font-family: Pretendard, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 24px;
   letter-spacing: -0.3px;
   color: var(--foreground);
   cursor: pointer;
+  padding: 0 16px;
 }
+.box-button-large:active { background: #ebebeb; }
+/* 브랜드 랭킹 bundle gap 16이라 더보기 버튼 위에 추가 -8px → 총 8px */
+.recommend-bundle.brand-rank-bundle > .box-button-large { margin-top: -8px; }
 
 /* ====== 라이브 - 집요한라이브 ====== */
 .live-logo {
