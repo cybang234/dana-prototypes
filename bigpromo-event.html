@@ -2770,7 +2770,7 @@ sheetOverlay.innerHTML = `
   <div class="sheet" role="dialog" aria-modal="true">
     <div class="sheet-handle"></div>
     <div class="sheet-head">
-      <div class="sheet-title">상품 전체보기</div>
+      <span></span>
       <button class="sheet-close" aria-label="닫기">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="#141414" stroke-width="1.6" stroke-linecap="round"/></svg>
       </button>
@@ -2784,14 +2784,10 @@ sheetOverlay.innerHTML = `
 // .phone 안에 append (데스크탑: phone 안에 표시 / 모바일: phone display contents라 body 직속)
 (document.querySelector('.phone') || document.body).appendChild(sheetOverlay);
 
-const sheetTitleEl = sheetOverlay.querySelector('.sheet-title');
 const sheetChipsEl = sheetOverlay.querySelector('.sheet-chips');
 const sheetGridEl = sheetOverlay.querySelector('.sheet-grid');
 
 function openSheet(bundle) {
-  const titleEl = bundle.querySelector('.bundle-header, .deal-title');
-  sheetTitleEl.textContent = (titleEl ? titleEl.textContent : '상품 전체보기').trim();
-
   const chipStrip = bundle.querySelector('.chip-strip');
   sheetChipsEl.innerHTML = '';
   if (chipStrip) {
