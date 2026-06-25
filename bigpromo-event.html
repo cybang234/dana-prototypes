@@ -1526,8 +1526,12 @@ body {
   .box-button .icon { width: 14px !important; height: 14px !important; }
   .box-button .icon img { width: 14px !important; height: 14px !important; display: block; }
 
-  /* 바텀시트 모바일 — viewport 전체 폭 */
+  /* 바텀시트 모바일 — viewport 전체 폭 + 마진 보장 */
   .sheet { width: 100% !important; }
+  .sheet-handle { margin: 10px auto !important; }
+  .sheet-chips { padding: 0 16px 12px !important; margin: 0 !important; }
+  .sheet-chips .chip-strip { padding: 0 !important; margin: 0 !important; }
+  .sheet-body { padding: 0 16px 24px !important; }
 }
 
 </style>
