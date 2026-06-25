@@ -55,8 +55,7 @@ body {
 
 /* ====== 모바일 풀 화면 대응 ====== */
 @media (max-width: 768px) {
-  /* overflow-x: hidden은 sticky를 깨므로 제거 (iOS Safari 이슈) */
-  html, body { height: auto; overflow-x: visible; }
+  html, body { height: auto; overflow-x: hidden; }
   body {
     background: var(--background);
     padding: 0;
@@ -70,28 +69,36 @@ body {
     max-width: 100%;
     height: auto;
     overflow: visible;
-    position: static; /* sticky context 깨지 않게 */
+    position: static;
     box-shadow: none;
     border-radius: 0;
+    padding-top: 88px; /* 메인 탭(44) + 서브 탭 영역 보정 */
   }
-  /* 실제 OS status bar 있으니 prototype status bar 숨김 */
+  .phone.with-sub-tabs { padding-top: 132px; }
+
+  /* OS status bar 영역 차지 */
   .status-bar { display: none; }
 
-  /* sticky 동작 안정화 — body가 scroll container, 각각 sticky */
+  /* fixed로 무조건 viewport 상단 고정 (iOS Safari 안정) */
   .top-nav {
-    position: sticky;
-    top: 0; left: 0; right: 0;
+    position: fixed;
+    top: env(safe-area-inset-top, 0);
+    left: 0; right: 0;
     height: 44px;
     z-index: 100;
     background: var(--background);
     border-bottom: 0;
+    padding: 0 16px;
   }
   .tabs {
-    position: sticky;
-    top: 44px; left: 0; right: 0;
-    height: auto; /* sub-tab 보이면 늘어남 */
+    position: fixed;
+    top: calc(44px + env(safe-area-inset-top, 0));
+    left: 0; right: 0;
+    height: auto;
     z-index: 99;
   }
+  /* body는 safe-area 만큼 위 여백 */
+  body { padding-top: env(safe-area-inset-top, 0); }
 
   .benefit, .tab-pane { scroll-margin-top: 88px; }
   #tab-pane-special .recommend-bundle { scroll-margin-top: 132px; }
@@ -2358,6 +2365,7 @@ tabItems.forEach(tab => {
     // 즉시 .on 부여
     tabItems.forEach(t => t.classList.toggle('on', t === tab));
     document.querySelector('.tabs').classList.toggle('show-sub-tabs', tab.dataset.tab === 'special');
+    document.querySelector('.phone').classList.toggle('with-sub-tabs', tab.dataset.tab === 'special');
     const dot = tab.querySelector('.tab-noti');
     if (dot) dot.remove();
 
@@ -2397,6 +2405,7 @@ const observer = new IntersectionObserver((entries) => {
 
   tabItems.forEach(t => t.classList.toggle('on', t === tab));
   document.querySelector('.tabs').classList.toggle('show-sub-tabs', tab.dataset.tab === 'special');
+  document.querySelector('.phone').classList.toggle('with-sub-tabs', tab.dataset.tab === 'special');
   const dot = tab.querySelector('.tab-noti');
   if (dot) dot.remove();
 }, {
