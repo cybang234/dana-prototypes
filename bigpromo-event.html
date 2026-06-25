@@ -242,7 +242,7 @@ body {
 }
 
 /* ====== 바텀시트 (상품 더보기) ====== */
-/* 바텀시트: 데스크탑은 375 centered, 모바일은 full */
+/* 바텀시트: 데스크탑은 phone bbox에 맞춤(JS 동기화), 모바일은 viewport 전체 */
 .sheet-overlay {
   position: fixed;
   inset: 0;
@@ -254,16 +254,13 @@ body {
 }
 .sheet-overlay.open { display: block; opacity: 1; }
 .sheet {
-  position: fixed;
-  left: 50%;
-  bottom: 0;
-  width: 375px;
-  max-width: 100%;
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
   background: var(--background);
   border-radius: 16px 16px 0 0;
-  height: 80vh;
-  max-height: 80vh;
-  transform: translate(-50%, 100%);
+  height: 80%;
+  max-height: 80%;
+  transform: translateY(100%);
   transition: transform 0.25s ease;
   display: flex;
   flex-direction: column;
@@ -271,7 +268,7 @@ body {
   overflow: hidden;
   will-change: transform;
 }
-.sheet-overlay.open .sheet { transform: translate(-50%, 0); }
+.sheet-overlay.open .sheet { transform: translateY(0); }
 .sheet-overlay.open .sheet { transform: translateY(0); }
 .sheet-handle {
   width: 36px; height: 4px;
@@ -2805,6 +2802,7 @@ function openSheet(bundle) {
   cards.forEach(card => frag.appendChild(card.cloneNode(true)));
   sheetGridEl.replaceChildren(frag);
 
+  positionSheetToPhone();
   sheetOverlay.classList.add('open');
   document.documentElement.style.overflow = 'hidden';
 }
@@ -2812,6 +2810,29 @@ function closeSheet() {
   sheetOverlay.classList.remove('open');
   document.documentElement.style.overflow = '';
 }
+
+function positionSheetToPhone() {
+  // 모바일은 viewport 전체 — JS 동기화 X
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    sheetOverlay.style.top = '';
+    sheetOverlay.style.left = '';
+    sheetOverlay.style.width = '';
+    sheetOverlay.style.height = '';
+    return;
+  }
+  // 데스크탑: phone bounding box에 맞춤
+  const phoneEl = document.querySelector('.phone');
+  if (!phoneEl) return;
+  const r = phoneEl.getBoundingClientRect();
+  sheetOverlay.style.top = r.top + 'px';
+  sheetOverlay.style.left = r.left + 'px';
+  sheetOverlay.style.width = r.width + 'px';
+  sheetOverlay.style.height = r.height + 'px';
+  sheetOverlay.style.inset = 'auto';
+}
+window.addEventListener('resize', () => {
+  if (sheetOverlay.classList.contains('open')) positionSheetToPhone();
+});
 
 sheetOverlay.addEventListener('click', (e) => {
   if (e.target === sheetOverlay || e.target.closest('.sheet-close')) closeSheet();
