@@ -1449,22 +1449,22 @@ body {
     <div class="oneday-list-wrap">
       <div class="oneday-list">
         <div class="oneday-cats">
-          <div class="oneday-cat-item active" data-name="가구·수납" data-full="가구·수납" data-title-color="#ff50d7" data-coupon-color="#fb93e3" data-date="6.8 월" data-pct="23">
+          <div class="oneday-cat-item active" data-name="가구·수납" data-full="가구·수납" data-title-color="#ff50d7" data-coupon-color="#fb93e3" data-coupon-text-color="#141414" data-date="6.8 월" data-pct="23">
             <span class="oneday-badge solid">6.8 월</span>
             <div class="oneday-cat-thumb"><img src="./assets/oneday-furniture.png?v=2" alt="가구·수납"/></div>
             <div class="oneday-cat-name">가구·수납</div>
           </div>
-          <div class="oneday-cat-item" data-name="주방" data-full="주방" data-title-color="#15b869" data-coupon-color="#15b869" data-date="6.9 화" data-pct="23">
+          <div class="oneday-cat-item" data-name="주방" data-full="주방" data-title-color="#15b869" data-coupon-color="#15b869" data-coupon-text-color="#141414" data-date="6.9 화" data-pct="23">
             <span class="oneday-badge subtle">6.9 화</span>
             <div class="oneday-cat-thumb"><img src="./assets/oneday-kitchen.png" alt="주방"/></div>
             <div class="oneday-cat-name">주방</div>
           </div>
-          <div class="oneday-cat-item" data-name="생필용품" data-full="생필용품" data-title-color="#0079FA" data-coupon-color="#0079FA" data-date="6.10 수" data-pct="18">
+          <div class="oneday-cat-item" data-name="생필용품" data-full="생필용품" data-title-color="#b27800" data-coupon-color="#ffc300" data-coupon-text-color="#141414" data-date="6.10 수" data-pct="18">
             <span class="oneday-badge subtle">6.10 수</span>
             <div class="oneday-cat-thumb"><img src="./assets/oneday-life.png" alt="생필용품"/></div>
             <div class="oneday-cat-name">생필용품</div>
           </div>
-          <div class="oneday-cat-item" data-name="생필품·식품" data-full="생필품·식품" data-title-color="#FF9500" data-coupon-color="#FF9500" data-date="6.11 목" data-pct="27">
+          <div class="oneday-cat-item" data-name="생필품·식품" data-full="생필품·식품" data-title-color="#6f3dde" data-coupon-color="#6f3dde" data-coupon-text-color="#ffffff" data-date="6.11 목" data-pct="27">
             <span class="oneday-badge subtle">6.11 목</span>
             <div class="oneday-cat-thumb"><img src="./assets/oneday-food.png" alt="생필품·식품"/></div>
             <div class="oneday-cat-name">생필품·식품</div>
@@ -2541,6 +2541,7 @@ if (oneDayCatsContainer) {
     const name = item.dataset.name;
     const titleColor = item.dataset.titleColor;
     const couponColor = item.dataset.couponColor;
+    const couponTextColor = item.dataset.couponTextColor || '#141414';
     const pct = item.dataset.pct;
 
     allCats.forEach(c => c.classList.remove('active'));
@@ -2566,9 +2567,13 @@ if (oneDayCatsContainer) {
     if (couponTextEl) {
       couponTextEl.textContent = `${name} 쿠폰팩 ~${pct}%`;
       couponTextEl.style.background = couponColor;
+      couponTextEl.style.color = couponTextColor;
     }
     if (couponIconEl) {
       couponIconEl.style.background = couponColor;
+      // 다운로드 아이콘 색
+      const svg = couponIconEl.querySelector('svg path');
+      if (svg) svg.setAttribute('stroke', couponTextColor);
     }
   });
 }
