@@ -90,7 +90,6 @@ body {
   }
 
   .benefit, .tab-pane { scroll-margin-top: 88px; }
-  .sub-tabs { top: 88px; z-index: 98; }
   #tab-pane-special .recommend-bundle { scroll-margin-top: 132px; }
 
   /* KV 화면 폭 + 비율 유지 */
@@ -260,13 +259,13 @@ body {
 }
 
 /* ====== 특가 sub-tabs (figma 8523:25498, ODS TabItem) ====== */
+/* 메인 nav 안에 있어서 메인 탭과 함께 sticky. 특가 탭일 때만 노출 */
 .sub-tabs {
-  position: sticky;
-  top: 138px; /* 메인 탭(94+44) 바로 아래 */
-  z-index: 28;
+  display: none;
   background: var(--background);
   border-top: 1px solid var(--border-default);
 }
+.tabs.show-sub-tabs .sub-tabs { display: block; }
 .sub-tabs-list {
   display: flex;
   gap: 10px;
@@ -1333,6 +1332,19 @@ body {
       <button class="tab-item" data-tab="live" data-target="tab-pane-live"><span class="tab-label">라이브</span></button>
     </div>
     <div class="tabs-divider"></div>
+
+    <!-- 특가 sub-tab (메인 nav 안에 묶임 — 특가 탭일 때만 노출) -->
+    <div class="sub-tabs" aria-label="특가 카테고리">
+      <div class="sub-tabs-list">
+        <button class="sub-tab on" data-sub-target="special-mod-1">집요한 특가</button>
+        <button class="sub-tab" data-sub-target="special-mod-2">1+1 특가</button>
+        <button class="sub-tab" data-sub-target="special-mod-3">단독 특가</button>
+        <button class="sub-tab" data-sub-target="special-mod-4">만원 특가</button>
+        <button class="sub-tab" data-sub-target="special-mod-5">원데이 특가</button>
+        <button class="sub-tab" data-sub-target="special-mod-6">반값딜</button>
+        <button class="sub-tab" data-sub-target="special-mod-7">첫 구매딜</button>
+      </div>
+    </div>
   </nav>
 
   <!-- ============================== -->
@@ -1826,19 +1838,6 @@ body {
   <!-- 탭 5: 특가 (7 modules) -->
   <!-- ============================== -->
   <div class="tab-pane" id="tab-pane-special">
-
-    <!-- 특가 sub-tab (figma 8523:25498 spec, ODS TabItem) -->
-    <nav class="sub-tabs" aria-label="특가 카테고리">
-      <div class="sub-tabs-list">
-        <button class="sub-tab on" data-sub-target="special-mod-1">집요한 특가</button>
-        <button class="sub-tab" data-sub-target="special-mod-2">1+1 특가</button>
-        <button class="sub-tab" data-sub-target="special-mod-3">단독 특가</button>
-        <button class="sub-tab" data-sub-target="special-mod-4">만원 특가</button>
-        <button class="sub-tab" data-sub-target="special-mod-5">원데이 특가</button>
-        <button class="sub-tab" data-sub-target="special-mod-6">반값딜</button>
-        <button class="sub-tab" data-sub-target="special-mod-7">첫 구매딜</button>
-      </div>
-    </nav>
 
     <!-- 특가 모듈 1: 집요한 특가 + timer -->
     <section class="recommend-bundle" id="special-mod-1">
@@ -2350,6 +2349,7 @@ tabItems.forEach(tab => {
 
     // 즉시 .on 부여
     tabItems.forEach(t => t.classList.toggle('on', t === tab));
+    document.querySelector('.tabs').classList.toggle('show-sub-tabs', tab.dataset.tab === 'special');
     const dot = tab.querySelector('.tab-noti');
     if (dot) dot.remove();
 
@@ -2388,6 +2388,7 @@ const observer = new IntersectionObserver((entries) => {
   if (!tab) return;
 
   tabItems.forEach(t => t.classList.toggle('on', t === tab));
+  document.querySelector('.tabs').classList.toggle('show-sub-tabs', tab.dataset.tab === 'special');
   const dot = tab.querySelector('.tab-noti');
   if (dot) dot.remove();
 }, {
