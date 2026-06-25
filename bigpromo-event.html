@@ -318,14 +318,18 @@ body {
 .oneday-badge {
   display: inline-flex; align-items: center; justify-content: center;
   height: 24px;
+  min-height: 24px;
+  max-height: 24px;
   padding: 0 8px;
   border-radius: 4px;
   font-family: Pretendard, sans-serif;
   font-size: 12px;
-  line-height: 16px;
+  line-height: 24px;
   font-weight: 500;
   letter-spacing: -0.3px;
   white-space: nowrap;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 .oneday-badge.solid {
   background: var(--foreground);
@@ -1325,6 +1329,17 @@ body {
   }
   .cal-title { flex: 1 1 auto !important; }
   .live-cal-header .box-button { flex-shrink: 0 !important; margin-left: auto !important; }
+
+  /* badge 모바일에서도 높이 24 고정 */
+  .oneday-badge {
+    height: 24px !important;
+    min-height: 24px !important;
+    max-height: 24px !important;
+    line-height: 24px !important;
+    padding: 0 8px !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+  }
 
   /* 가구데이 (oneday) — .oneday-cal에 양쪽 padding 16 직접 적용 */
   .oneday-cal {
