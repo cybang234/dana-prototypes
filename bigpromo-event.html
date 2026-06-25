@@ -240,13 +240,13 @@ body {
   height: auto;
 }
 
-/* 상품 더보기 버튼 */
+/* 상품 더보기 — ODS Box Button subtle, size=medium */
 .more-products-btn {
   width: calc(100% - 32px);
-  margin: 0 16px;
+  margin: 12px 16px 0; /* 위 12px + bundle gap 12 = 총 24px */
   height: 44px;
-  border: 1px solid var(--border-default);
-  background: var(--background);
+  border: 0;
+  background: var(--backgroundWeak);
   border-radius: 8px;
   font-family: Pretendard, sans-serif;
   font-size: 14px;
@@ -259,7 +259,9 @@ body {
   align-items: center;
   justify-content: center;
   gap: 4px;
+  padding: 0 16px;
 }
+.more-products-btn:active { background: #ebebeb; }
 
 /* ====== 카테고리 원데이 캘린더 (figma 8615:12712) ====== */
 .oneday-cal {
