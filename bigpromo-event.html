@@ -1301,16 +1301,18 @@ body {
     max-width: 100% !important;
     box-sizing: border-box !important;
   }
-  /* 라이브 캘린더 타이틀 fill */
+  /* 라이브 캘린더 헤더 — 100% + 내부 padding 0 16, space-between */
   .live-cal-header {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    width: calc(100% - 32px) !important;
-    margin: 0 16px !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 16px !important;
     box-sizing: border-box !important;
   }
   .cal-title { flex: 1 1 auto !important; }
+  .live-cal-header .box-button { flex-shrink: 0 !important; margin-left: auto !important; }
 
   /* 가구데이 (oneday) — .oneday-cal에 양쪽 padding 16 직접 적용 */
   .oneday-cal {
@@ -1416,22 +1418,22 @@ body {
     <div class="oneday-list-wrap">
       <div class="oneday-list">
         <div class="oneday-cats">
-          <div class="oneday-cat-item active">
+          <div class="oneday-cat-item active" data-name="가구" data-full="가구·수납" data-color="#fb93e3" data-date="6.8 월" data-pct="23">
             <span class="oneday-badge solid">6.8 월</span>
             <div class="oneday-cat-thumb"><img src="./assets/oneday-furniture.png" alt="가구·수납"/></div>
             <div class="oneday-cat-name">가구·수납</div>
           </div>
-          <div class="oneday-cat-item">
+          <div class="oneday-cat-item" data-name="주방" data-full="주방" data-color="#34c759" data-date="6.9 화" data-pct="23">
             <span class="oneday-badge subtle">6.9 화</span>
             <div class="oneday-cat-thumb"><img src="./assets/oneday-kitchen.png" alt="주방"/></div>
             <div class="oneday-cat-name">주방</div>
           </div>
-          <div class="oneday-cat-item">
+          <div class="oneday-cat-item" data-name="생필용품" data-full="생필용품" data-color="#5ac8fa" data-date="6.10 수" data-pct="18">
             <span class="oneday-badge subtle">6.10 수</span>
             <div class="oneday-cat-thumb"><img src="./assets/oneday-life.png" alt="생필용품"/></div>
             <div class="oneday-cat-name">생필용품</div>
           </div>
-          <div class="oneday-cat-item">
+          <div class="oneday-cat-item" data-name="생필품·식품" data-full="생필품·식품" data-color="#ffcc00" data-date="6.11 목" data-pct="27">
             <span class="oneday-badge subtle">6.11 목</span>
             <div class="oneday-cat-thumb"><img src="./assets/oneday-food.png" alt="생필품·식품"/></div>
             <div class="oneday-cat-name">생필품·식품</div>
@@ -2496,6 +2498,44 @@ const subObserver = new IntersectionObserver((entries) => {
 });
 
 subPanes.forEach(p => subObserver.observe(p));
+
+// ====== 카테고리 원데이 클릭 인터랙션 ======
+const oneDayCats = document.querySelectorAll('.oneday-cat-item');
+const oneDayTitleEl = document.querySelector('.oneday-title');
+const oneDayCouponTextEl = document.querySelector('.oneday-coupon-text');
+const oneDayCouponEl = document.querySelector('.oneday-coupon-text');
+const oneDayCouponIconEl = document.querySelector('.oneday-coupon-icon');
+
+oneDayCats.forEach(item => {
+  item.addEventListener('click', () => {
+    const name = item.dataset.name;
+    const color = item.dataset.color;
+    const pct = item.dataset.pct;
+
+    // active 토글
+    oneDayCats.forEach(c => c.classList.toggle('active', c === item));
+
+    // 날짜 badge solid/subtle
+    oneDayCats.forEach(c => {
+      const b = c.querySelector('.oneday-badge');
+      if (!b) return;
+      b.classList.toggle('solid', c === item);
+      b.classList.toggle('subtle', c !== item);
+    });
+
+    // 타이틀 텍스트 + 카테고리 색
+    oneDayTitleEl.innerHTML = `오늘은 <span class="oneday-cat" style="color: ${color}">${name}</span>데이`;
+
+    // 쿠폰 텍스트 + 배경
+    if (oneDayCouponTextEl) {
+      oneDayCouponTextEl.textContent = `${name} 쿠폰팩 ~${pct}%`;
+      oneDayCouponTextEl.style.background = color;
+    }
+    if (oneDayCouponIconEl) {
+      oneDayCouponIconEl.style.background = color;
+    }
+  });
+});
 
 // ====== Brand ranking accordion (1개만 펼침) ======
 document.querySelectorAll('.brand-rank-item').forEach(item => {
