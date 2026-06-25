@@ -1210,7 +1210,8 @@ body {
 
 /* ====== 모바일 풀 화면 대응 (CSS 끝에 위치 — 모든 데스크탑 정의 override) ====== */
 @media (max-width: 768px) {
-  html, body { height: auto !important; overflow-x: hidden !important; }
+  /* overflow-x hidden은 sticky 깸 → visible. .phone에서만 hidden 처리 */
+  html, body { height: auto !important; overflow-x: visible !important; }
   body {
     background: var(--background) !important;
     padding: 0 !important;
@@ -1223,7 +1224,8 @@ body {
     width: 100% !important;
     max-width: 100% !important;
     height: auto !important;
-    overflow: visible !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
     position: static !important;
     box-shadow: none !important;
     border-radius: 0 !important;
@@ -1293,16 +1295,20 @@ body {
     align-items: center !important;
   }
 
-  /* 외부 모듈 (자체 padding 없음) — 양쪽 16 보정 */
+  /* 외부 모듈 — width 100% + 자체 padding 0 16으로 좌우 보정 */
   .live-cal-header,
   .header-container,
   .deal-header,
   .rank-tab,
   .ranking-section {
-    width: calc(100% - 32px) !important;
+    width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
   }
+  /* 만원 특가 미리보기 헤더 — 버튼 우측 끝 */
+  .deal-preview-header { width: 100% !important; }
+  .deal-preview-title-block { flex: 1 1 auto !important; min-width: 0 !important; }
+  .deal-preview-header .box-button { flex-shrink: 0 !important; margin-left: auto !important; }
   /* 라이브 캘린더 헤더 — 100% + 내부 padding 0 16, space-between */
   .live-cal-header {
     display: flex !important;
