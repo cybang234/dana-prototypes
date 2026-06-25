@@ -2399,25 +2399,57 @@ const observer = new IntersectionObserver((entries) => {
 
 panes.forEach(p => { if (p) observer.observe(p); });
 
-// ====== 특가 sub-tabs (단순 click only, observer X — 스크롤 락 방지) ======
+// ====== 특가 sub-tabs ======
 const subTabs = document.querySelectorAll('.sub-tab');
 const subTabsList = document.querySelector('.sub-tabs-list');
+const subTabByTarget = new Map();
+subTabs.forEach(t => subTabByTarget.set(t.dataset.subTarget, t));
+const subPanes = Array.from(subTabs).map(t => document.getElementById(t.dataset.subTarget)).filter(Boolean);
+
+// active sub-tab을 sub-tabs-list 안에서만 가로 중앙으로 스크롤 (페이지 스크롤 영향 X)
+function centerSubTab(tab) {
+  if (!subTabsList || !tab) return;
+  const tabRect = tab.getBoundingClientRect();
+  const listRect = subTabsList.getBoundingClientRect();
+  const desiredLeft = tab.offsetLeft - (listRect.width - tabRect.width) / 2;
+  subTabsList.scrollTo({ left: desiredLeft, behavior: 'smooth' });
+}
+
+let isSubClickScrolling = false;
+let subClickTimeout;
 
 subTabs.forEach(tab => {
   tab.addEventListener('click', () => {
     subTabs.forEach(t => t.classList.toggle('on', t === tab));
-    // sub-tabs-list 안에서만 가로 스크롤 (페이지 세로 스크롤 영향 X)
-    if (subTabsList) {
-      const tabRect = tab.getBoundingClientRect();
-      const listRect = subTabsList.getBoundingClientRect();
-      const desiredLeft = tab.offsetLeft - (listRect.width - tabRect.width) / 2;
-      subTabsList.scrollTo({ left: desiredLeft, behavior: 'smooth' });
-    }
+    centerSubTab(tab);
     const target = document.getElementById(tab.dataset.subTarget);
     if (!target) return;
+    isSubClickScrolling = true;
+    clearTimeout(subClickTimeout);
     target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    subClickTimeout = setTimeout(() => { isSubClickScrolling = false; }, 800);
   });
 });
+
+// 스크롤 시 자동 active sub-tab 변경 (scrollIntoView 호출 X — 스크롤 락 방지)
+const subOffset = isNarrow ? 132 : 182;
+const subObserver = new IntersectionObserver((entries) => {
+  if (isSubClickScrolling) return;
+  const visible = entries
+    .filter(e => e.isIntersecting)
+    .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+  if (!visible.length) return;
+  const tab = subTabByTarget.get(visible[0].target.id);
+  if (!tab || tab.classList.contains('on')) return;
+  subTabs.forEach(t => t.classList.toggle('on', t === tab));
+  centerSubTab(tab);
+}, {
+  root: observerRoot,
+  rootMargin: `-${subOffset}px 0px -50% 0px`,
+  threshold: 0
+});
+
+subPanes.forEach(p => subObserver.observe(p));
 
 // ====== Brand ranking accordion (1개만 펼침) ======
 document.querySelectorAll('.brand-rank-item').forEach(item => {
