@@ -1225,17 +1225,18 @@ body {
     position: static !important;
     box-shadow: none !important;
     border-radius: 0 !important;
-    padding-top: 88px !important;
+    padding-top: 0 !important;
   }
-  .phone.with-sub-tabs { padding-top: 132px !important; }
+  .phone.with-sub-tabs { padding-top: 0 !important; }
 
   .status-bar { display: none !important; }
 
+  /* sticky로 PC와 동일 — 처음엔 일반 흐름, 스크롤 시 상단 고정 */
   .top-nav {
-    position: fixed !important;
-    top: env(safe-area-inset-top, 0) !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: sticky !important;
+    top: 0 !important;
+    left: auto !important;
+    right: auto !important;
     height: 44px !important;
     z-index: 100 !important;
     background: var(--background) !important;
@@ -1243,10 +1244,10 @@ body {
     padding: 0 16px !important;
   }
   .tabs {
-    position: fixed !important;
-    top: calc(44px + env(safe-area-inset-top, 0)) !important;
-    left: 0 !important;
-    right: 0 !important;
+    position: sticky !important;
+    top: 44px !important;
+    left: auto !important;
+    right: auto !important;
     height: auto !important;
     z-index: 99 !important;
   }
@@ -1300,21 +1301,35 @@ body {
     max-width: 100% !important;
     box-sizing: border-box !important;
   }
-  /* 라이브 캘린더 타이틀/내부 fill */
-  .live-cal-header { display: flex !important; justify-content: space-between !important; align-items: center !important; }
-  .cal-title { flex: 1 1 auto; }
-
-  /* 가구데이 (oneday) 쿠폰 / 리스트 폭 fill */
-  .oneday-cal { width: 100% !important; box-sizing: border-box !important; }
-  .oneday-coupon {
+  /* 라이브 캘린더 타이틀 fill */
+  .live-cal-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
     width: calc(100% - 32px) !important;
+    margin: 0 16px !important;
+    box-sizing: border-box !important;
+  }
+  .cal-title { flex: 1 1 auto !important; }
+
+  /* 가구데이 (oneday) — .oneday-cal에 양쪽 padding 16 직접 적용 */
+  .oneday-cal {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 32px 16px !important;
+    align-items: stretch !important;
+  }
+  .oneday-coupon {
+    width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
   }
-  .oneday-list-wrap, .oneday-list {
+  .oneday-list-wrap {
+    padding: 0 !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
+  .oneday-list { width: 100% !important; box-sizing: border-box !important; }
   .oneday-header { width: 100% !important; box-sizing: border-box !important; }
 
   .recommend-item { padding: 0 16px; }
