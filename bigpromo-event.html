@@ -65,37 +65,39 @@ body {
   }
   /* phone 자체 scroll 제거 → body가 viewport scroll container */
   .phone {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    overflow: visible;
-    position: static;
-    box-shadow: none;
-    border-radius: 0;
-    padding-top: 88px; /* 메인 탭(44) + 서브 탭 영역 보정 */
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    position: static !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding-top: 88px !important;
   }
-  .phone.with-sub-tabs { padding-top: 132px; }
+  .phone.with-sub-tabs { padding-top: 132px !important; }
 
   /* OS status bar 영역 차지 */
-  .status-bar { display: none; }
+  .status-bar { display: none !important; }
 
-  /* fixed로 무조건 viewport 상단 고정 (iOS Safari 안정) */
+  /* fixed로 무조건 viewport 상단 고정 */
   .top-nav {
-    position: fixed;
-    top: env(safe-area-inset-top, 0);
-    left: 0; right: 0;
-    height: 44px;
-    z-index: 100;
-    background: var(--background);
-    border-bottom: 0;
-    padding: 0 16px;
+    position: fixed !important;
+    top: env(safe-area-inset-top, 0) !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 44px !important;
+    z-index: 100 !important;
+    background: var(--background) !important;
+    border-bottom: 0 !important;
+    padding: 0 16px !important;
   }
   .tabs {
-    position: fixed;
-    top: calc(44px + env(safe-area-inset-top, 0));
-    left: 0; right: 0;
-    height: auto;
-    z-index: 99;
+    position: fixed !important;
+    top: calc(44px + env(safe-area-inset-top, 0)) !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: auto !important;
+    z-index: 99 !important;
   }
   /* body는 safe-area 만큼 위 여백 */
   body { padding-top: env(safe-area-inset-top, 0); }
