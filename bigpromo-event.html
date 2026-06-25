@@ -53,122 +53,6 @@ body {
 }
 .phone::-webkit-scrollbar { display: none; }
 
-/* ====== 모바일 풀 화면 대응 ====== */
-@media (max-width: 768px) {
-  html, body { height: auto; overflow-x: hidden; }
-  body {
-    background: var(--background);
-    padding: 0;
-    margin: 0;
-    display: block;
-    width: 100%;
-  }
-  /* phone 자체 scroll 제거 → body가 viewport scroll container */
-  .phone {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    overflow: visible !important;
-    position: static !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    padding-top: 88px !important;
-  }
-  .phone.with-sub-tabs { padding-top: 132px !important; }
-
-  /* OS status bar 영역 차지 */
-  .status-bar { display: none !important; }
-
-  /* fixed로 무조건 viewport 상단 고정 */
-  .top-nav {
-    position: fixed !important;
-    top: env(safe-area-inset-top, 0) !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 44px !important;
-    z-index: 100 !important;
-    background: var(--background) !important;
-    border-bottom: 0 !important;
-    padding: 0 16px !important;
-  }
-  .tabs {
-    position: fixed !important;
-    top: calc(44px + env(safe-area-inset-top, 0)) !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: auto !important;
-    z-index: 99 !important;
-  }
-  /* body는 safe-area 만큼 위 여백 */
-  body { padding-top: env(safe-area-inset-top, 0); }
-
-  .benefit, .tab-pane { scroll-margin-top: 88px; }
-  #tab-pane-special .recommend-bundle { scroll-margin-top: 132px; }
-
-  /* KV 화면 폭 + 비율 유지 */
-  .kv {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 375 / 516;
-    display: block;
-  }
-
-  /* module-divider는 100% (양쪽 여백 없는 분리선) */
-  .module-divider { width: 100% !important; }
-
-  /* benefit 영역 (.benefit padding 32 16 이미 있음) → 자식 100% width fill */
-  .benefit { align-items: stretch !important; padding: 32px 16px !important; }
-  .benefit-title,
-  .benefit-container,
-  .benefit-content,
-  .benefit-pay,
-  .pay-list,
-  .pay-benefit,
-  .detail,
-  .coupon-pack,
-  .coupon,
-  .coupon-pink,
-  .pay-card {
-    width: 100% !important;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-  .coupon-text, .coupon-icon-wrap { box-sizing: border-box; }
-
-  /* 외부 모듈 (자체 padding 없음) — 양쪽 16 보정 */
-  .live-cal-header,
-  .header-container,
-  .deal-header,
-  .rank-tab,
-  .ranking-section {
-    width: calc(100% - 32px) !important;
-    max-width: 100%;
-  }
-  .oneday-coupon { width: calc(100% - 32px) !important; max-width: 344px; }
-  .oneday-list-wrap, .oneday-list, .oneday-cal {
-    width: 100% !important;
-    box-sizing: border-box;
-  }
-  /* benefit 영역 자체 stretch */
-  .benefit { align-items: stretch !important; }
-  .benefit-title {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-  }
-  .coupon-text { flex: 1; min-width: 0; }
-  .coupon-icon-wrap { flex-shrink: 0; }
-
-  /* recommend-item 가로 스크롤 padding 모바일에서도 유지 */
-  .recommend-item { padding: 0 16px; }
-
-  /* 아이콘 크기 강제 (모바일 zoom 방지) */
-  .nav-icon { width: 24px !important; height: 24px !important; }
-  .nav-icon img { width: 24px !important; height: 24px !important; display: block; }
-  .box-button .icon { width: 14px !important; height: 14px !important; }
-  .box-button .icon img { width: 14px !important; height: 14px !important; display: block; }
-}
-
 /* ====== Status Bar + Top Nav (총 94px) — figma Section 5 spec ====== */
 .status-bar {
   position: sticky;
@@ -1320,6 +1204,126 @@ body {
   height: 1px;
   background: var(--border-default);
   border: 0;
+}
+
+/* ====== 모바일 풀 화면 대응 (CSS 끝에 위치 — 모든 데스크탑 정의 override) ====== */
+@media (max-width: 768px) {
+  html, body { height: auto !important; overflow-x: hidden !important; }
+  body {
+    background: var(--background) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    padding-top: env(safe-area-inset-top, 0) !important;
+  }
+  .phone {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    position: static !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding-top: 88px !important;
+  }
+  .phone.with-sub-tabs { padding-top: 132px !important; }
+
+  .status-bar { display: none !important; }
+
+  .top-nav {
+    position: fixed !important;
+    top: env(safe-area-inset-top, 0) !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 44px !important;
+    z-index: 100 !important;
+    background: var(--background) !important;
+    border-bottom: 0 !important;
+    padding: 0 16px !important;
+  }
+  .tabs {
+    position: fixed !important;
+    top: calc(44px + env(safe-area-inset-top, 0)) !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: auto !important;
+    z-index: 99 !important;
+  }
+
+  .benefit, .tab-pane { scroll-margin-top: 88px !important; }
+  #tab-pane-special .recommend-bundle { scroll-margin-top: 132px !important; }
+
+  .kv {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 375 / 516;
+    display: block;
+  }
+
+  .module-divider { width: 100% !important; }
+
+  /* benefit 영역 자식 100% fill */
+  .benefit {
+    align-items: stretch !important;
+    padding: 32px 16px !important;
+  }
+  .benefit-title,
+  .benefit-container,
+  .benefit-content,
+  .benefit-pay,
+  .pay-list,
+  .pay-benefit,
+  .detail,
+  .coupon-pack,
+  .coupon,
+  .coupon-pink,
+  .pay-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .coupon-text, .coupon-icon-wrap { box-sizing: border-box; }
+  .benefit-title {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+
+  /* 외부 모듈 (자체 padding 없음) — 양쪽 16 보정 */
+  .live-cal-header,
+  .header-container,
+  .deal-header,
+  .rank-tab,
+  .ranking-section {
+    width: calc(100% - 32px) !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  /* 라이브 캘린더 타이틀/내부 fill */
+  .live-cal-header { display: flex !important; justify-content: space-between !important; align-items: center !important; }
+  .cal-title { flex: 1 1 auto; }
+
+  /* 가구데이 (oneday) 쿠폰 / 리스트 폭 fill */
+  .oneday-cal { width: 100% !important; box-sizing: border-box !important; }
+  .oneday-coupon {
+    width: calc(100% - 32px) !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .oneday-list-wrap, .oneday-list {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .oneday-header { width: 100% !important; box-sizing: border-box !important; }
+
+  .recommend-item { padding: 0 16px; }
+
+  /* 아이콘 사이즈 강제 */
+  .nav-icon { width: 24px !important; height: 24px !important; }
+  .nav-icon img { width: 24px !important; height: 24px !important; display: block; }
+  .box-button .icon { width: 14px !important; height: 14px !important; }
+  .box-button .icon img { width: 14px !important; height: 14px !important; display: block; }
 }
 
 </style>
