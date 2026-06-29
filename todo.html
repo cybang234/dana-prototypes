@@ -322,22 +322,28 @@ img, video, iframe { max-width: 100%; }
 .nl-detail-page * { box-sizing: border-box; }
 .nl-actions { display: flex; gap: 6px; align-items: center; }
 .nl-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 8px;
-  font-family: Pretendard, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  height: 32px !important;
+  padding: 0 12px !important;
+  border-radius: 8px !important;
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1;
   letter-spacing: -0.3px;
-  text-decoration: none;
+  text-decoration: none !important;
   white-space: nowrap;
   cursor: pointer;
-  border: 0;
+  border: 0 !important;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
-.nl-btn-ghost { background: #F4F4F4; color: #141414; }
-.nl-btn-primary { background: #141414; color: #fff; }
+.nl-btn-ghost { background: #F4F4F4 !important; color: #141414 !important; }
+.nl-btn-primary { background: #141414 !important; color: #FFFFFF !important; }
 .nl-btn:active { opacity: 0.85; }
 .nl-detail-nav {
   display: flex; align-items: center; justify-content: space-between;
