@@ -7,9 +7,11 @@ const POLL_INTERVAL_MIN = 5;
 // 알람 등록 + 사이드 패널 동작
 chrome.runtime.onInstalled.addListener(async () => {
   chrome.alarms.create("poll", { periodInMinutes: POLL_INTERVAL_MIN });
-  // 아이콘 클릭 시 popup 대신 사이드 패널 열기 옵션
-  // (popup도 같이 쓰려면 false 유지)
-  await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false });
+  if (chrome.sidePanel?.setPanelBehavior) {
+    try {
+      await chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false });
+    } catch (e) { /* Chrome 114 미만 무시 */ }
+  }
   await fetchAndNotify();
 });
 
@@ -77,12 +79,11 @@ chrome.notifications.onClicked.addListener(async (notificationId) => {
   const todo = stored.data?.todos?.find(t => t.id === id);
   if (todo?.source) {
     chrome.tabs.create({ url: todo.source });
-  } else {
-    // 현재 윈도우에 사이드 패널 열기
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (tab) {
-      await chrome.sidePanel.open({ windowId: tab.windowId });
-    }
+  } else if (chrome.sidePanel?.open) {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab) await chrome.sidePanel.open({ windowId: tab.windowId });
+    } catch (e) { /* ignore */ }
   }
   chrome.notifications.clear(notificationId);
 });

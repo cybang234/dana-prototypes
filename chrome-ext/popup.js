@@ -33,8 +33,17 @@ document.getElementById("refresh").addEventListener("click", async () => {
   await load();
 });
 document.getElementById("open-panel").addEventListener("click", async () => {
-  const win = await chrome.windows.getCurrent();
-  await chrome.sidePanel.open({ windowId: win.id });
+  try {
+    const win = await chrome.windows.getCurrent();
+    if (chrome.sidePanel?.open) {
+      await chrome.sidePanel.open({ windowId: win.id });
+    } else {
+      // 사이드 패널 미지원 시 todo.html 새 탭으로
+      chrome.tabs.create({ url: "https://cybang234.github.io/dana-prototypes/todo.html" });
+    }
+  } catch (e) {
+    chrome.tabs.create({ url: "https://cybang234.github.io/dana-prototypes/todo.html" });
+  }
   window.close();
 });
 
