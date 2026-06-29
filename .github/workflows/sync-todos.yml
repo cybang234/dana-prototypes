@@ -1,0 +1,48 @@
+name: Sync Dana Todos
+
+on:
+  schedule:
+    # 매 5분마다 실행 (UTC 기준)
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {} # 수동 실행 가능
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-todos
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -q requests pywebpush
+
+      - name: Run sync
+        env:
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+          VAPID_PRIVATE_KEY_PEM: ${{ secrets.VAPID_PRIVATE_KEY_PEM }}
+          VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
+          PUSH_SUBSCRIPTIONS_JSON: ${{ secrets.PUSH_SUBSCRIPTIONS_JSON }}
+        run: python scripts/sync_todos.py
+
+      - name: Commit changes
+        run: |
+          if [[ -n "$(git status --porcelain data/)" ]]; then
+            git config user.name "dana-bot"
+            git config user.email "bot@dana-todo.local"
+            git add data/
+            git commit -m "sync: 새 todo 자동 동기화"
+            git push
+          else
+            echo "변경 없음"
+          fi
