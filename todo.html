@@ -258,6 +258,44 @@ body {
   font-size: 14px;
 }
 
+/* ============ Newsletter list ============ */
+.newsletter-list {
+  padding: 0 20px 100px;
+  display: flex; flex-direction: column;
+}
+.nl-row {
+  display: flex; flex-direction: column;
+  gap: 2px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+}
+.nl-row:active { opacity: 0.6; }
+.nl-row:last-child { border-bottom: 0; }
+.nl-meta {
+  font-size: 11px; font-weight: 500;
+  color: var(--fg-weak);
+  letter-spacing: -0.3px;
+}
+.nl-subject {
+  font-size: 15px; font-weight: 600;
+  color: var(--fg);
+  letter-spacing: -0.3px;
+  line-height: 22px;
+  word-break: keep-all;
+}
+.nl-snippet {
+  font-size: 12px; font-weight: 400;
+  color: var(--fg-weak);
+  letter-spacing: -0.3px;
+  line-height: 18px;
+  margin-top: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* ============ Todo Detail Page (full screen overlay) ============ */
 .detail-page {
   position: fixed;
@@ -400,36 +438,15 @@ body {
 <!-- Tab -->
 <nav class="tabs">
   <button class="tab on" data-tab="open">할 일<span class="count" id="open-count">0</span></button>
-  <button class="tab" data-tab="later">다음에<span class="count" id="later-count">0</span></button>
+  <button class="tab" data-tab="newsletter">뉴스레터<span class="count" id="newsletter-count">0</span></button>
 </nav>
 
 <!-- Todo list -->
 <section class="todo-list" id="todo-list"></section>
 
-<!-- Push 알림 셋업 (한 번만 — subscription 받은 뒤 숨김) -->
-<section style="padding: 12px 20px 0;">
-  <button id="btn-enable-push" style="
-    width: 100%; height: 40px; border: 0; border-radius: 10px;
-    background: #141414; color: #fff;
-    font-family: Pretendard, sans-serif; font-size: 13px; font-weight: 600;
-    cursor: pointer;
-  ">🔔 알림 켜기 (한 번만)</button>
-  <div id="sub-box" hidden style="margin-top: 8px;">
-    <p style="font-size: 11px; color: #999; margin: 4px 0;">아래 텍스트를 복사해서 채팅에 붙여주세요 ↓</p>
-    <textarea id="sub-text" readonly style="
-      width: 100%; height: 80px; font-size: 10px;
-      border: 1px solid #E0E0E0; border-radius: 8px; padding: 6px;
-      font-family: monospace;
-    "></textarea>
-    <button id="btn-copy-sub" style="
-      width: 100%; height: 32px; margin-top: 4px;
-      border: 0; border-radius: 8px;
-      background: #F2F2F2; color: #141414;
-      font-family: Pretendard, sans-serif; font-size: 12px; font-weight: 600;
-      cursor: pointer;
-    ">복사</button>
-  </div>
-</section>
+<!-- Newsletter list -->
+<section class="newsletter-list" id="newsletter-list" hidden></section>
+
 
 <!-- Detail overlay -->
 <div class="detail-page" id="detail-page">
@@ -482,6 +499,7 @@ body {
 <script>
 let SCHEDULE = [];
 let TODOS = [];
+let NEWSLETTERS = [];
 let activeTab = 'open';
 
 // 사용자가 직접 토글한 완료 상태 — localStorage
@@ -520,11 +538,16 @@ async function fetchData() {
   try {
     const todoRes = await fetch('./data/todos.json?t=' + Date.now());
     const todoData = await todoRes.json();
-    const open = (todoData.todos || []).map(t => ({ ...t, tab: 'open', done: LOCAL_DONE.has(t.id) }));
-    const later = (todoData.later || []).map(t => ({ ...t, tab: 'later', done: LOCAL_DONE.has(t.id) }));
-    TODOS = [...open, ...later];
+    TODOS = (todoData.todos || []).map(t => ({ ...t, tab: 'open', done: LOCAL_DONE.has(t.id) }));
   } catch (e) {
     TODOS = [];
+  }
+  try {
+    const nlRes = await fetch('./data/newsletters.json?t=' + Date.now());
+    const nlData = await nlRes.json();
+    NEWSLETTERS = nlData.newsletters || [];
+  } catch (e) {
+    NEWSLETTERS = [];
   }
 }
 
@@ -547,15 +570,27 @@ function prRank(p) { return { P1: 1, P2: 2, P3: 3, P4: 4 }[p] ?? 9; }
 
 function renderTodos() {
   // tab counts
-  document.getElementById('open-count').textContent = ' ' + TODOS.filter(t => t.tab === 'open' && !t.done).length;
-  document.getElementById('later-count').textContent = ' ' + TODOS.filter(t => t.tab === 'later' && !t.done).length;
+  document.getElementById('open-count').textContent = ' ' + TODOS.filter(t => !t.done).length;
+  document.getElementById('newsletter-count').textContent = ' ' + NEWSLETTERS.length;
 
   // active tab
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === activeTab));
 
+  const todoListEl = document.getElementById('todo-list');
+  const nlListEl = document.getElementById('newsletter-list');
+
+  if (activeTab === 'newsletter') {
+    todoListEl.hidden = true;
+    nlListEl.hidden = false;
+    renderNewsletters();
+    return;
+  }
+  todoListEl.hidden = false;
+  nlListEl.hidden = true;
+
   // list
-  const list = TODOS.filter(t => t.tab === activeTab).sort((a, b) => prRank(a.priority) - prRank(b.priority));
-  const el = document.getElementById('todo-list');
+  const list = TODOS.sort((a, b) => prRank(a.priority) - prRank(b.priority));
+  const el = todoListEl;
   el.innerHTML = '';
   if (list.length === 0) {
     el.innerHTML = '<div class="empty">모두 처리되었어요. 👏</div>';
@@ -590,6 +625,31 @@ function renderTodos() {
 document.querySelectorAll('.tab').forEach(t => {
   t.addEventListener('click', () => { activeTab = t.dataset.tab; renderTodos(); });
 });
+
+function renderNewsletters() {
+  const el = document.getElementById('newsletter-list');
+  el.innerHTML = '';
+  if (NEWSLETTERS.length === 0) {
+    el.innerHTML = '<div class="empty">새 뉴스레터가 없어요.</div>';
+    return;
+  }
+  NEWSLETTERS.forEach(n => {
+    const row = document.createElement('div');
+    row.className = 'nl-row';
+    row.innerHTML = `
+      <div class="nl-meta">${escapeHtml(n.sender || '')} · ${escapeHtml(n.date || '')}</div>
+      <div class="nl-subject">${escapeHtml(n.subject || '(제목 없음)')}</div>
+      ${n.snippet ? `<div class="nl-snippet">${escapeHtml(n.snippet)}</div>` : ''}
+    `;
+    row.addEventListener('click', () => {
+      if (n.url) window.open(n.url, '_blank');
+    });
+    el.appendChild(row);
+  });
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
 
 // ============ Detail overlay ============
 const detailEl = document.getElementById('detail-page');
