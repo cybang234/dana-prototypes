@@ -393,6 +393,31 @@ body {
 <!-- Todo list -->
 <section class="todo-list" id="todo-list"></section>
 
+<!-- Push 알림 셋업 (한 번만 — subscription 받은 뒤 숨김) -->
+<section style="padding: 12px 20px 0;">
+  <button id="btn-enable-push" style="
+    width: 100%; height: 40px; border: 0; border-radius: 10px;
+    background: #141414; color: #fff;
+    font-family: Pretendard, sans-serif; font-size: 13px; font-weight: 600;
+    cursor: pointer;
+  ">🔔 알림 켜기 (한 번만)</button>
+  <div id="sub-box" hidden style="margin-top: 8px;">
+    <p style="font-size: 11px; color: #999; margin: 4px 0;">아래 텍스트를 복사해서 채팅에 붙여주세요 ↓</p>
+    <textarea id="sub-text" readonly style="
+      width: 100%; height: 80px; font-size: 10px;
+      border: 1px solid #E0E0E0; border-radius: 8px; padding: 6px;
+      font-family: monospace;
+    "></textarea>
+    <button id="btn-copy-sub" style="
+      width: 100%; height: 32px; margin-top: 4px;
+      border: 0; border-radius: 8px;
+      background: #F2F2F2; color: #141414;
+      font-family: Pretendard, sans-serif; font-size: 12px; font-weight: 600;
+      cursor: pointer;
+    ">복사</button>
+  </div>
+</section>
+
 <!-- Detail overlay -->
 <div class="detail-page" id="detail-page">
   <div class="detail-nav">
@@ -581,10 +606,79 @@ detailCheckboxEl.addEventListener('click', () => {
   renderTodos();
 });
 
+// ============ Web Push 구독 ============
+const VAPID_PUBLIC_KEY = 'BDXsRe9zkoh4wbEDrZvsZtDDtLM_eXo7vlVZpE7CvcG4hH74IB73f3nBOeaurHD1Zg_U-xdbGT_emCVfU3lhU-A';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+async function setupPush() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    console.log('Push not supported');
+    return;
+  }
+  try {
+    const reg = await navigator.serviceWorker.register('./sw.js');
+    await navigator.serviceWorker.ready;
+
+    // 이미 구독했는지 확인
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      // 권한 요청은 사용자 액션(버튼 클릭) 필요. 자동 호출 X.
+      console.log('No subscription yet — tap 알림 켜기 버튼');
+      return;
+    }
+    // 기존 구독 endpoint를 화면에 표시
+    showSubscription(sub);
+  } catch (e) {
+    console.error('SW register failed', e);
+  }
+}
+
+async function requestPushPermission() {
+  const reg = await navigator.serviceWorker.ready;
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') {
+    alert('알림 권한을 허용해야 푸시를 받을 수 있어요');
+    return;
+  }
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+  });
+  showSubscription(sub);
+}
+
+function showSubscription(sub) {
+  const subJson = JSON.stringify(sub.toJSON(), null, 2);
+  const box = document.getElementById('sub-box');
+  const text = document.getElementById('sub-text');
+  if (box && text) {
+    text.value = subJson;
+    box.hidden = false;
+  }
+  console.log('Subscription:', subJson);
+}
+
+document.getElementById('btn-enable-push')?.addEventListener('click', requestPushPermission);
+document.getElementById('btn-copy-sub')?.addEventListener('click', () => {
+  const text = document.getElementById('sub-text');
+  if (text) {
+    text.select();
+    document.execCommand('copy');
+    alert('구독 정보를 복사했어요. 채팅에 붙여넣어주세요.');
+  }
+});
+
 async function init() {
   await fetchData();
   renderSchedule();
   renderTodos();
+  setupPush();
 }
 init();
 </script>

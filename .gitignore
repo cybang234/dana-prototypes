@@ -4,3 +4,5 @@
 .vscode/
 node_modules/
 *.log
+data/.vapid-private*
+*.vapid-private*
