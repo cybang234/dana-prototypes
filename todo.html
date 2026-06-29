@@ -513,7 +513,10 @@ body {
     <button id="nl-back" aria-label="뒤로">
       <svg viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
-    <a id="nl-open-gmail" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; padding:6px 10px; border-radius:8px; background:#F4F4F4; font-family:Pretendard,sans-serif; font-size:12px; font-weight:600; color:#141414; text-decoration:none;">Gmail에서 열기 ↗</a>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <a id="nl-open-gmail" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; padding:6px 10px; border-radius:8px; background:#F4F4F4; font-family:Pretendard,sans-serif; font-size:12px; font-weight:600; color:#141414; text-decoration:none;">Gmail ↗</a>
+      <button id="nl-mark-read" style="border:0; padding:6px 12px; border-radius:8px; background:#141414; color:#fff; font-family:Pretendard,sans-serif; font-size:12px; font-weight:600; cursor:pointer;">읽기 완료</button>
+    </div>
   </div>
   <div class="nl-detail-head">
     <span class="nl-detail-meta" id="nl-detail-meta"></span>
@@ -645,7 +648,7 @@ function prRank(p) { return { P1: 1, P2: 2, P3: 3, P4: 4 }[p] ?? 9; }
 function renderTodos() {
   // tab counts
   document.getElementById('open-count').textContent = ' ' + TODOS.filter(t => !t.done).length;
-  document.getElementById('newsletter-count').textContent = ' ' + NEWSLETTERS.length;
+  document.getElementById('newsletter-count').textContent = ' ' + NEWSLETTERS.filter(n => !NL_READ.has(n.id)).length;
 
   // active tab
   document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.tab === activeTab));
@@ -700,14 +703,25 @@ document.querySelectorAll('.tab').forEach(t => {
   t.addEventListener('click', () => { activeTab = t.dataset.tab; renderTodos(); });
 });
 
+function loadNlRead() {
+  try { return new Set(JSON.parse(localStorage.getItem('nlRead') || '[]')); }
+  catch { return new Set(); }
+}
+function saveNlRead(set) { localStorage.setItem('nlRead', JSON.stringify([...set])); }
+let NL_READ = loadNlRead();
+
 function renderNewsletters() {
   const el = document.getElementById('newsletter-list');
+  const visible = NEWSLETTERS.filter(n => !NL_READ.has(n.id));
+  // 카운트 갱신
+  const nlCountEl = document.getElementById('newsletter-count');
+  if (nlCountEl) nlCountEl.textContent = ' ' + visible.length;
   el.innerHTML = '';
-  if (NEWSLETTERS.length === 0) {
+  if (visible.length === 0) {
     el.innerHTML = '<div class="empty">새 뉴스레터가 없어요.</div>';
     return;
   }
-  NEWSLETTERS.forEach(n => {
+  visible.forEach(n => {
     const row = document.createElement('div');
     row.className = 'nl-row';
     row.innerHTML = `
@@ -741,6 +755,20 @@ async function openNewsletter(n) {
 }
 document.getElementById('nl-back').addEventListener('click', () => {
   nlDetailEl.classList.remove('open');
+});
+
+let nlCurrentId = null;
+const _openNewsletter = openNewsletter;
+openNewsletter = function(n) {
+  nlCurrentId = n.id;
+  return _openNewsletter(n);
+};
+document.getElementById('nl-mark-read').addEventListener('click', () => {
+  if (!nlCurrentId) return;
+  NL_READ.add(nlCurrentId);
+  saveNlRead(NL_READ);
+  nlDetailEl.classList.remove('open');
+  renderNewsletters();
 });
 
 function escapeHtml(s) {
