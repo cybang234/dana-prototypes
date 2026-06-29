@@ -15,9 +15,33 @@ ROOT = Path(__file__).resolve().parent.parent
 TODOS_PATH = ROOT / "data" / "todos.json"
 NL_PATH = ROOT / "data" / "newsletters.json"
 
+# Secret 누락 시 명확한 에러
+required = ["VAPID_PRIVATE_KEY_PEM", "VAPID_SUBJECT", "PUSH_SUBSCRIPTIONS_JSON"]
+missing = [k for k in required if not os.environ.get(k)]
+if missing:
+    print(f"❌ MISSING SECRETS: {', '.join(missing)}", file=sys.stderr)
+    print("   GitHub Repo Settings → Secrets and variables → Actions 에서 등록 필요", file=sys.stderr)
+    sys.exit(1)
+
 VAPID_PRIVATE_PEM = os.environ["VAPID_PRIVATE_KEY_PEM"]
-VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "mailto:cy.bang@bucketplace.net")
-SUBSCRIPTIONS = json.loads(os.environ.get("PUSH_SUBSCRIPTIONS_JSON", "[]"))
+VAPID_SUBJECT = os.environ["VAPID_SUBJECT"]
+
+# PEM 첫 줄 검증 (줄바꿈 손상 자주 발생)
+if "BEGIN PRIVATE KEY" not in VAPID_PRIVATE_PEM:
+    print("❌ VAPID_PRIVATE_KEY_PEM 형식 이상 — BEGIN/END 라인 누락", file=sys.stderr)
+    print(f"   현재 첫 60자: {VAPID_PRIVATE_PEM[:60]!r}", file=sys.stderr)
+    sys.exit(1)
+
+try:
+    SUBSCRIPTIONS = json.loads(os.environ["PUSH_SUBSCRIPTIONS_JSON"])
+    if not isinstance(SUBSCRIPTIONS, list) or len(SUBSCRIPTIONS) == 0:
+        raise ValueError("not a non-empty list")
+except (json.JSONDecodeError, ValueError) as e:
+    print(f"❌ PUSH_SUBSCRIPTIONS_JSON 파싱 실패: {e}", file=sys.stderr)
+    print(f"   현재 값 일부: {os.environ.get('PUSH_SUBSCRIPTIONS_JSON', '')[:80]!r}", file=sys.stderr)
+    sys.exit(1)
+
+print(f"✓ Secrets OK · subscriptions={len(SUBSCRIPTIONS)}")
 
 PRIORITY_RANK = {"P1": 1, "P2": 2, "P3": 3, "P4": 4}
 
