@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Dana Todo",
+  "version": "1.0.0",
+  "description": "슬랙 danachecking 이모지로 모인 할 일을 정리해서 보여주는 위젯",
+  "permissions": ["alarms", "notifications", "storage", "sidePanel"],
+  "host_permissions": ["https://cybang234.github.io/*"],
+  "action": {
+    "default_title": "Dana Todo",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon-16.png",
+      "48": "icon-48.png",
+      "128": "icon-128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  }
+}

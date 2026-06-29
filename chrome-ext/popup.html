@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Dana Todo</title>
+<style>
+:root {
+  --bg: #FFFFFF;
+  --fg: #141414;
+  --fg-mid: #4A4A4A;
+  --fg-weak: #999999;
+  --line: #F2F2F2;
+  --p1: #FF3B30;
+  --p2: #FF9500;
+  --p3: #FFCC00;
+  --p4: #B0B0B0;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  width: 320px;
+  font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+}
+.header {
+  padding: 14px 16px 8px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.title {
+  font-size: 13px; font-weight: 700;
+}
+.count {
+  font-size: 13px; font-weight: 700;
+  color: var(--p1);
+}
+.list {
+  padding: 4px 0 8px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+.row {
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--line);
+}
+.row:last-child { border-bottom: 0; }
+.row:hover { background: #FAFAFA; }
+.priority {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px;
+  border-radius: 4px;
+  font-size: 10px; font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+.p1 { background: var(--p1); }
+.p2 { background: var(--p2); }
+.p3 { background: var(--p3); color: #4a3500; }
+.p4 { background: var(--p4); }
+.title-text {
+  flex: 1;
+  font-size: 13px; font-weight: 500;
+  letter-spacing: -0.3px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.empty {
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--fg-weak);
+  font-size: 13px;
+}
+.footer {
+  display: flex; gap: 8px;
+  padding: 8px 12px 12px;
+  border-top: 1px solid var(--line);
+}
+.btn {
+  flex: 1;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: #F4F4F4;
+  font-family: inherit;
+  font-size: 12px; font-weight: 600;
+  color: var(--fg);
+  cursor: pointer;
+}
+.btn.primary {
+  background: var(--fg);
+  color: #fff;
+}
+.btn:active { opacity: 0.85; }
+</style>
+</head>
+<body>
+<div class="header">
+  <span class="title">Todo</span>
+  <span class="count" id="count">0</span>
+</div>
+<div class="list" id="list"></div>
+<div class="footer">
+  <button class="btn" id="refresh">새로고침</button>
+  <button class="btn primary" id="open-panel">전체 보기</button>
+</div>
+<script src="popup.js"></script>
+</body>
+</html>
