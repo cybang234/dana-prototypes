@@ -837,11 +837,14 @@ async function fetchData() {
     const calRes = await fetch('./data/calendar.json?t=' + Date.now());
     const calData = await calRes.json();
     SCHEDULE_FULL = calData.events || [];
-    // 끝난 미팅 자동 제외 (종료 시각이 현재보다 과거면 숨김)
+    // 끝난 미팅도 표시하되 state 자동 계산 (past는 disabled/strike-through)
     const now = nowHM();
-    SCHEDULE = SCHEDULE_FULL.filter(e => {
+    SCHEDULE = SCHEDULE_FULL.map(e => {
       const t = parseHM(e.time || '');
-      return t.end > now;
+      let state = 'next';
+      if (t.end <= now) state = 'past';
+      else if (t.start <= now && t.end > now) state = 'now';
+      return { ...e, state };
     });
   } catch (e) {
     SCHEDULE = [];
