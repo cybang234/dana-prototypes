@@ -37,14 +37,19 @@ html, body {
   color: var(--fg);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
 }
 body {
   padding-top: env(safe-area-inset-top, 0);
   padding-bottom: env(safe-area-inset-bottom, 0);
   min-height: 100vh;
   max-width: 480px;
+  width: 100%;
   margin: 0 auto;
+  overflow-x: hidden;
 }
+* { box-sizing: border-box; }
+img, video, iframe { max-width: 100%; }
 
 /* Top nav (시계 아이콘 + 추가 + 검색 + 차트 + 더보기) */
 .top-nav {
@@ -313,6 +318,27 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
 .nl-detail-page.open { transform: translateY(0); }
+.nl-detail-page,
+.nl-detail-page * { box-sizing: border-box; }
+.nl-actions { display: flex; gap: 6px; align-items: center; }
+.nl-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-family: Pretendard, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 0;
+  flex-shrink: 0;
+}
+.nl-btn-ghost { background: #F4F4F4; color: #141414; }
+.nl-btn-primary { background: #141414; color: #fff; }
+.nl-btn:active { opacity: 0.85; }
 .nl-detail-nav {
   display: flex; align-items: center; justify-content: space-between;
   padding: 16px 20px;
@@ -345,6 +371,7 @@ body {
 .nl-detail-body {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 0 20px 40px;
   font-size: 15px;
   font-weight: 400;
@@ -352,7 +379,14 @@ body {
   color: var(--fg);
   letter-spacing: -0.3px;
   white-space: pre-wrap;
-  word-break: keep-all;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.nl-detail-body a {
+  color: var(--fg);
+  word-break: break-all;
 }
 
 /* ============ Todo Detail Page (full screen overlay) ============ */
@@ -513,9 +547,9 @@ body {
     <button id="nl-back" aria-label="뒤로">
       <svg viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
-    <div style="display:flex; gap:8px; align-items:center;">
-      <a id="nl-open-gmail" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; padding:6px 10px; border-radius:8px; background:#F4F4F4; font-family:Pretendard,sans-serif; font-size:12px; font-weight:600; color:#141414; text-decoration:none;">Gmail ↗</a>
-      <button id="nl-mark-read" style="border:0; padding:6px 12px; border-radius:8px; background:#141414; color:#fff; font-family:Pretendard,sans-serif; font-size:12px; font-weight:600; cursor:pointer;">읽기 완료</button>
+    <div class="nl-actions">
+      <a id="nl-open-gmail" target="_blank" rel="noopener noreferrer" class="nl-btn nl-btn-ghost">Gmail ↗</a>
+      <button id="nl-mark-read" class="nl-btn nl-btn-primary">읽기 완료</button>
     </div>
   </div>
   <div class="nl-detail-head">
