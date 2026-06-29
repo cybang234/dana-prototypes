@@ -480,19 +480,44 @@ let SCHEDULE = [];
 let TODOS = [];
 let activeTab = 'open';
 
+// 사용자가 직접 토글한 완료 상태 — localStorage
+function loadLocalDone() {
+  try { return new Set(JSON.parse(localStorage.getItem('danaDone') || '[]')); }
+  catch { return new Set(); }
+}
+function saveLocalDone(set) {
+  localStorage.setItem('danaDone', JSON.stringify([...set]));
+}
+let LOCAL_DONE = loadLocalDone();
+
+function nowHM() { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+function parseHM(str) {
+  // "10:45" 또는 "10:45 - 11:30" 에서 종료 시각 추출
+  const m = str.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+  if (m) return { start: +m[1]*60+ +m[2], end: +m[3]*60+ +m[4] };
+  const m2 = str.match(/(\d{1,2}):(\d{2})/);
+  if (m2) return { start: +m2[1]*60+ +m2[2], end: +m2[1]*60+ +m2[2]+60 };
+  return { start: 0, end: 0 };
+}
+
 async function fetchData() {
   try {
     const calRes = await fetch('./data/calendar.json?t=' + Date.now());
     const calData = await calRes.json();
-    SCHEDULE = calData.events || [];
+    // 끝난 미팅 자동 제외 (종료 시각이 현재보다 과거면 숨김)
+    const now = nowHM();
+    SCHEDULE = (calData.events || []).filter(e => {
+      const t = parseHM(e.time || '');
+      return t.end > now;
+    });
   } catch (e) {
     SCHEDULE = [];
   }
   try {
     const todoRes = await fetch('./data/todos.json?t=' + Date.now());
     const todoData = await todoRes.json();
-    const open = (todoData.todos || []).map(t => ({ ...t, tab: 'open' }));
-    const later = (todoData.later || []).map(t => ({ ...t, tab: 'later' }));
+    const open = (todoData.todos || []).map(t => ({ ...t, tab: 'open', done: LOCAL_DONE.has(t.id) }));
+    const later = (todoData.later || []).map(t => ({ ...t, tab: 'later', done: LOCAL_DONE.has(t.id) }));
     TODOS = [...open, ...later];
   } catch (e) {
     TODOS = [];
@@ -545,6 +570,9 @@ function renderTodos() {
     row.querySelector('.checkbox').addEventListener('click', (e) => {
       e.stopPropagation();
       t.done = !t.done;
+      if (t.done) LOCAL_DONE.add(t.id);
+      else LOCAL_DONE.delete(t.id);
+      saveLocalDone(LOCAL_DONE);
       renderTodos();
     });
     row.addEventListener('click', (e) => {
@@ -602,6 +630,9 @@ document.getElementById('detail-back').addEventListener('click', closeDetail);
 detailCheckboxEl.addEventListener('click', () => {
   if (!detailCurrentTodo) return;
   detailCurrentTodo.done = !detailCurrentTodo.done;
+  if (detailCurrentTodo.done) LOCAL_DONE.add(detailCurrentTodo.id);
+  else LOCAL_DONE.delete(detailCurrentTodo.id);
+  saveLocalDone(LOCAL_DONE);
   detailCheckboxEl.classList.toggle('checked', detailCurrentTodo.done);
   renderTodos();
 });
