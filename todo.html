@@ -282,27 +282,28 @@ body {
 </div>
 
 <script>
-const SCHEDULE = [
-  { time: '11:00 - 12:00', title: '시안 리뷰', loc: '집중', state: 'past' },
-  { time: '13:00 - 14:00', title: '디자인 위클리', loc: '미팅룸 4.1 (6)', state: 'past' },
-  { time: '15:00 - 16:00', title: '커피챗', loc: '센터 11.8 (8)', state: 'now' },
-  { time: '20:00 - 22:00', title: '집중', loc: '집', state: 'next' },
-];
-
-const TODOS = [
-  { id: 1, title: '브랜드 프로모션 시안 검토', priority: 'P1', team: '디자인', requester: '김영업', createdAt: '6.29 11:00', tab: 'open', done: false },
-  { id: 2, title: 'UMS 푸시 알림 컨벤션 반영', priority: 'P1', team: '개발', requester: '한개발', createdAt: '6.29 09:30', tab: 'open', done: false },
-  { id: 3, title: '대출 해지 퍼널 화면 마무리', priority: 'P2', team: '개발', requester: '이개발', createdAt: '6.28 17:40', tab: 'open', done: false },
-  { id: 4, title: '대출 완료 화면 리팩토링', priority: 'P2', team: '개발', requester: '이개발', createdAt: '6.28 15:00', tab: 'open', done: false },
-  { id: 5, title: '위젯 새 기능 제안 검토', priority: 'P3', team: '디자인', requester: '박디자', createdAt: '6.28 10:30', tab: 'open', done: false },
-  { id: 6, title: '온라인 교육 이수', priority: 'P4', team: '인사', requester: '시스템', createdAt: '6.27 16:00', tab: 'open', done: false },
-
-  // 다음에
-  { id: 11, title: 'Q3 캠페인 톤 가이드 공유', priority: 'P3', team: '마케팅', requester: '강마케', createdAt: '6.27', tab: 'later', done: false },
-  { id: 12, title: '다음 분기 입점 브랜드 PRD 리뷰', priority: 'P3', team: '영업', requester: '윤영업', createdAt: '6.27', tab: 'later', done: false },
-];
-
+let SCHEDULE = [];
+let TODOS = [];
 let activeTab = 'open';
+
+async function fetchData() {
+  try {
+    const calRes = await fetch('./data/calendar.json?t=' + Date.now());
+    const calData = await calRes.json();
+    SCHEDULE = calData.events || [];
+  } catch (e) {
+    SCHEDULE = [];
+  }
+  try {
+    const todoRes = await fetch('./data/todos.json?t=' + Date.now());
+    const todoData = await todoRes.json();
+    const open = (todoData.todos || []).map(t => ({ ...t, tab: 'open' }));
+    const later = (todoData.later || []).map(t => ({ ...t, tab: 'later' }));
+    TODOS = [...open, ...later];
+  } catch (e) {
+    TODOS = [];
+  }
+}
 
 function renderSchedule() {
   const el = document.getElementById('schedule');
@@ -360,8 +361,12 @@ document.querySelectorAll('.tab').forEach(t => {
   t.addEventListener('click', () => { activeTab = t.dataset.tab; renderTodos(); });
 });
 
-renderSchedule();
-renderTodos();
+async function init() {
+  await fetchData();
+  renderSchedule();
+  renderTodos();
+}
+init();
 </script>
 
 </body>
