@@ -1,11 +1,30 @@
 // Dana Todo · Service Worker
-const VERSION = 'v1';
+const VERSION = 'v3';
 
 self.addEventListener('install', (e) => {
+  // 새 버전 즉시 활성화
   self.skipWaiting();
 });
 self.addEventListener('activate', (e) => {
-  e.waitUntil(self.clients.claim());
+  e.waitUntil((async () => {
+    // 모든 이전 캐시 삭제
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
+});
+
+// 네트워크 우선 (캐싱 X) — HTML/JSON 매번 새로
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  if (url.origin === self.location.origin) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' }).catch(() =>
+        // 오프라인 시에만 캐시 fallback (현재는 없음)
+        new Response('', { status: 504 })
+      )
+    );
+  }
 });
 
 // Push 이벤트 — 새 todo 알림
