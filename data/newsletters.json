@@ -1,12 +1,12 @@
 {
-  "syncedAt": "2026-06-29T17:50:00+09:00",
+  "syncedAt": "2026-06-29T18:30:00+09:00",
   "newsletters": [
     {
       "id": "19f0feeb0a221973",
       "subject": "삼전닉스 성과급이 동탄 집값 11% 올렸다고?",
       "sender": "NEWNEEK",
       "date": "6.29 05:32",
-      "snippet": "#동탄집값 #월드컵탈락 #검은금요일 뉴닉 데일리. 경기도 동탄을 비롯해 서울·수도권 집값이 오르고 있다는 소식, 그 원인이 반도체 초호황이라고 해서 시끌시끌해요.",
+      "bodyPath": "./data/newsletters/19f0feeb0a221973.txt",
       "url": "https://mail.google.com/mail/u/0/#inbox/19f0feeb0a221973"
     },
     {
@@ -14,7 +14,7 @@
       "subject": "내 주위 2030 여자들 다 말랑이에 진심이다",
       "sender": "NEWNEEK",
       "date": "6.26 12:13",
-      "snippet": "#백룸 #말랑이왁뿌볼 #삼척여행 고슴이의 비트 ㅣ 비욘드 트렌드. 6월의 마지막 한 주 잘 보내고 있나요?",
+      "bodyPath": "./data/newsletters/19f01ead0021c83c.txt",
       "url": "https://mail.google.com/mail/u/0/#inbox/19f01ead0021c83c"
     },
     {
@@ -22,55 +22,15 @@
       "subject": "챗GPT 쓸 때 나만 불안하고 걱정돼?",
       "sender": "NEWNEEK",
       "date": "6.26 06:13",
-      "snippet": "#AI블루 #남아공전 #베네수엘라강진 뉴닉 데일리. 회사에서, 일상에서 너도나도 적극적으로 활용하는 분위기인데, 근데 이렇게 쓰는 거 진짜 맞아…?",
+      "bodyPath": "./data/newsletters/19f00a1a39583bfa.txt",
       "url": "https://mail.google.com/mail/u/0/#inbox/19f00a1a39583bfa"
-    },
-    {
-      "id": "19f00395dfaf1ee0",
-      "subject": "New Customize Page: Extend Cursor from one place",
-      "sender": "Cursor",
-      "date": "6.26 04:19",
-      "snippet": "Settings for plugins, skills, and MCPs have moved to the Customize page.",
-      "url": "https://mail.google.com/mail/u/0/#inbox/19f00395dfaf1ee0"
-    },
-    {
-      "id": "19eff548249c9f24",
-      "subject": "Seedance 2.0 Mini and 4K have officially landed!",
-      "sender": "Artlist",
-      "date": "6.26 00:08",
-      "snippet": "Your newest models on Artlist are here. You just got four powerful new AI models in your toolkit.",
-      "url": "https://mail.google.com/mail/u/0/#inbox/19eff548249c9f24"
-    },
-    {
-      "id": "19efdb5739fc84c7",
-      "subject": "How is Criteo Helping Your Business?",
-      "sender": "Criteo",
-      "date": "6.25 16:36",
-      "snippet": "As a valued Criteo partner, we would like to ask you to share your thoughts through a short survey.",
-      "url": "https://mail.google.com/mail/u/0/#inbox/19efdb5739fc84c7"
-    },
-    {
-      "id": "19efc67a6f53f612",
-      "subject": "What launched: Config 2026",
-      "sender": "Figma",
-      "date": "6.25 10:31",
-      "snippet": "A more expressive canvas with code, motion, shaders, and more.",
-      "url": "https://mail.google.com/mail/u/0/#inbox/19efc67a6f53f612"
-    },
-    {
-      "id": "19efac7b3687bacd",
-      "subject": "Recommendation: Auto-review mode",
-      "sender": "Cursor",
-      "date": "6.25 02:57",
-      "snippet": "Cut down unnecessary pauses of your agents.",
-      "url": "https://mail.google.com/mail/u/0/#inbox/19efac7b3687bacd"
     },
     {
       "id": "19ef7b75995d53a0",
       "subject": "30년 차 투자 비법 내 꺼 만들고 싶다면 클릭",
       "sender": "NEWNEEK",
       "date": "6.24 12:40",
-      "snippet": "#투자인터뷰 #장마철습기 #청년미래적금 NEWNEEK 고슴이의 솔티라이프.",
+      "bodyPath": "./data/newsletters/19ef7b75995d53a0.txt",
       "url": "https://mail.google.com/mail/u/0/#inbox/19ef7b75995d53a0"
     },
     {
@@ -78,23 +38,15 @@
       "subject": "삼전·하닉 괜찮…나요? '슈퍼루키' 몰려오는 중국 증시",
       "sender": "NEWNEEK",
       "date": "6.24 05:25",
-      "snippet": "#중국 증시 #영국 총리 #지하철 무임승차 뉴닉 데일리.",
+      "bodyPath": "./data/newsletters/19ef6287b4d53e48.txt",
       "url": "https://mail.google.com/mail/u/0/#inbox/19ef6287b4d53e48"
-    },
-    {
-      "id": "19ef349e6764a2f8",
-      "subject": "Config kicks off soon—don't miss the keynote",
-      "sender": "Figma",
-      "date": "6.23 16:02",
-      "snippet": "Register now to build your virtual schedule.",
-      "url": "https://mail.google.com/mail/u/0/#inbox/19ef349e6764a2f8"
     },
     {
       "id": "19ef26ddc47f3429",
       "subject": "요즘 루틴만들기가 트렌드세요. 루틴앱 6개 추천",
       "sender": "NEWNEEK",
       "date": "6.23 12:02",
-      "snippet": "#루틴앱 #책추천 #맥파이앤타이거 고슴이의 비트 ㅣ 비트 큐레이션.",
+      "bodyPath": "./data/newsletters/19ef26ddc47f3429.txt",
       "url": "https://mail.google.com/mail/u/0/#inbox/19ef26ddc47f3429"
     },
     {
@@ -102,7 +54,7 @@
       "subject": "브렉시트 10년: 영국은 살림살이 좀 나아졌을까?",
       "sender": "NEWNEEK",
       "date": "6.23 06:12",
-      "snippet": "#영국EU관계 #모두의창업 #국민연금 뉴닉 데일리.",
+      "bodyPath": "./data/newsletters/19ef12daf5df196b.txt",
       "url": "https://mail.google.com/mail/u/0/#inbox/19ef12daf5df196b"
     }
   ]
