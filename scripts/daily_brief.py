@@ -7,6 +7,7 @@
 """
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from pywebpush import webpush, WebPushException
@@ -33,7 +34,10 @@ if "BEGIN PRIVATE KEY" not in VAPID_PRIVATE_PEM:
     sys.exit(1)
 
 try:
-    SUBSCRIPTIONS = json.loads(os.environ["PUSH_SUBSCRIPTIONS_JSON"])
+    raw = os.environ["PUSH_SUBSCRIPTIONS_JSON"]
+    # control character (줄바꿈, 탭 등) 자동 제거 — Secret에 붙여넣을 때 URL이 자동 줄바꿈 되는 경우 보호
+    cleaned = re.sub(r"[\x00-\x1f\x7f]", "", raw)
+    SUBSCRIPTIONS = json.loads(cleaned)
     if not isinstance(SUBSCRIPTIONS, list) or len(SUBSCRIPTIONS) == 0:
         raise ValueError("not a non-empty list")
 except (json.JSONDecodeError, ValueError) as e:
