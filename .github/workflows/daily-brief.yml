@@ -1,0 +1,30 @@
+name: Daily Brief Push
+
+on:
+  schedule:
+    # 매일 UTC 00:03 = KST 09:03 (GitHub cron은 5-15분 지연 가능)
+    - cron: "3 0 * * *"
+  workflow_dispatch: {} # 수동 테스트 가능
+
+permissions:
+  contents: read
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pywebpush
+        run: pip install -q pywebpush
+
+      - name: Send daily brief push
+        env:
+          VAPID_PRIVATE_KEY_PEM: ${{ secrets.VAPID_PRIVATE_KEY_PEM }}
+          VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
+          PUSH_SUBSCRIPTIONS_JSON: ${{ secrets.PUSH_SUBSCRIPTIONS_JSON }}
+        run: python scripts/daily_brief.py
