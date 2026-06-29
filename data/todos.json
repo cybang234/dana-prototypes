@@ -1,6 +1,41 @@
 {
-  "syncedAt": "2026-06-29T14:45:00+09:00",
+  "syncedAt": "2026-06-29T16:30:00+09:00",
   "note": "Slack todo-list 채널에서 danachecking 이모지 단 메시지를 모아 정리한 데이터입니다.",
-  "todos": [],
-  "later": []
+  "todos": [
+    {
+      "id": "t-1782716957",
+      "title": "고객확인정보 확인완료 모달 겹침 이슈 확인",
+      "priority": "P2",
+      "category": "버그",
+      "team": "페이",
+      "requester": "Ari",
+      "source": "https://ohou-se.slack.com/archives/C0AMA69NSHY/p1782716957290979",
+      "channel": "prj_ohouse_pay",
+      "createdAt": "6.29 16:09"
+    },
+    {
+      "id": "t-1782708203",
+      "title": "디자인 QA 진행 방식 협의",
+      "priority": "P3",
+      "category": "협의",
+      "team": "디자인",
+      "requester": "Dana",
+      "source": "https://ohou-se.slack.com/archives/C0A9QP6SYLS/p1782708203664219",
+      "channel": "proj-comm-promotion",
+      "createdAt": "6.29 14:43"
+    },
+    {
+      "id": "t-1782712358",
+      "title": "Yohan 님 요청 사항 (본문 확인 필요)",
+      "priority": "P3",
+      "category": "요청",
+      "team": "PD",
+      "requester": "Yohan",
+      "source": "https://ohou-se.slack.com/archives/C0AQJ1TA9DX",
+      "channel": "pd-smalltalk",
+      "createdAt": "6.29 14:52"
+    }
+  ],
+  "later": [],
+  "done": []
 }
