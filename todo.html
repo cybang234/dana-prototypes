@@ -68,7 +68,7 @@ img, video, iframe { max-width: 100%; }
   font-size: 22px;
 }
 .top-nav .right {
-  display: flex; align-items: center; gap: 16px;
+  display: flex; align-items: center; gap: 12px;
   color: var(--fg);
 }
 .top-nav .icon {
@@ -303,6 +303,132 @@ img, video, iframe { max-width: 100%; }
   overflow: hidden;
 }
 
+/* ============ Calendar page ============ */
+.cal-page {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 105;
+  display: flex; flex-direction: column;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+  max-width: 480px;
+  margin: 0 auto;
+  padding-top: env(safe-area-inset-top, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  overflow-y: auto;
+}
+.cal-page.open { transform: translateY(0); }
+.cal-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 8px;
+}
+.cal-nav button {
+  width: 28px; height: 28px;
+  background: none; border: 0; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--fg);
+}
+.cal-nav button svg { width: 20px; height: 20px; }
+.cal-month-switch {
+  display: flex; align-items: center; gap: 8px;
+}
+.cal-month-label {
+  font-size: 16px; font-weight: 700;
+  letter-spacing: -0.3px;
+  min-width: 110px;
+  text-align: center;
+}
+.cal-weekdays {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  padding: 12px 16px 8px;
+  font-size: 11px; font-weight: 600;
+  color: var(--fg-weak);
+  text-align: center;
+}
+.cal-weekdays span:first-child { color: var(--p1); }
+.cal-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  padding: 0 16px;
+  gap: 2px;
+}
+.cal-cell {
+  aspect-ratio: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  position: relative;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg);
+}
+.cal-cell.muted { color: #D5D5D5; }
+.cal-cell.today { font-weight: 800; }
+.cal-cell.today::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1.5px solid var(--fg);
+  border-radius: 10px;
+}
+.cal-cell.selected {
+  background: var(--fg);
+  color: #fff;
+}
+.cal-cell.selected.today::before { border-color: transparent; }
+.cal-cell .dot {
+  position: absolute;
+  bottom: 5px;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--p1);
+}
+.cal-cell.selected .dot { background: #fff; }
+
+.cal-divider {
+  margin: 16px 20px 0;
+  border-top: 1px solid var(--line);
+}
+.cal-day-section {
+  padding: 16px 20px 40px;
+}
+.cal-day-label {
+  font-size: 17px; font-weight: 700;
+  margin-bottom: 16px;
+  letter-spacing: -0.3px;
+}
+.cal-day-block {
+  margin-bottom: 18px;
+}
+.cal-day-block-title {
+  font-size: 12px; font-weight: 600;
+  color: var(--fg-weak);
+  margin-bottom: 6px;
+}
+.cal-day-events, .cal-day-todos {
+  display: flex; flex-direction: column;
+  gap: 4px;
+}
+.cal-evt-row, .cal-todo-row {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px; font-weight: 500;
+  color: var(--fg);
+  letter-spacing: -0.3px;
+}
+.cal-evt-row .time, .cal-todo-row .time {
+  color: var(--fg-weak);
+  font-size: 12px;
+  font-weight: 500;
+  margin-right: 6px;
+}
+.cal-empty {
+  padding: 12px 0;
+  font-size: 13px;
+  color: var(--fg-weak);
+}
+
 /* 뉴스레터 상세 페이지 */
 .nl-detail-page {
   position: fixed;
@@ -529,6 +655,9 @@ img, video, iframe { max-width: 100%; }
     <span class="logo">🔥</span>
   </div>
   <div class="right">
+    <button class="icon-btn" id="btn-calendar" aria-label="캘린더">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="5" width="17" height="15" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
     <button class="icon-btn" id="btn-refresh" aria-label="새로고침">
       <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 12a9 9 0 0 1 15.5-6.3M21 4v5h-5M21 12a9 9 0 0 1-15.5 6.3M3 20v-5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
@@ -550,6 +679,44 @@ img, video, iframe { max-width: 100%; }
 <!-- Newsletter list -->
 <section class="newsletter-list" id="newsletter-list" hidden></section>
 
+
+<!-- Calendar page overlay -->
+<div class="cal-page" id="cal-page">
+  <div class="cal-nav">
+    <button id="cal-back" aria-label="뒤로">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="cal-month-switch">
+      <button id="cal-prev" aria-label="이전 달">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <span class="cal-month-label" id="cal-month-label"></span>
+      <button id="cal-next" aria-label="다음 달">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <span style="width:28px"></span>
+  </div>
+
+  <div class="cal-weekdays">
+    <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+
+  <div class="cal-divider"></div>
+  <div class="cal-day-section">
+    <div class="cal-day-label" id="cal-day-label">날짜를 선택해주세요</div>
+
+    <div class="cal-day-block">
+      <div class="cal-day-block-title">📅 일정</div>
+      <div id="cal-day-events" class="cal-day-events"></div>
+    </div>
+    <div class="cal-day-block">
+      <div class="cal-day-block-title">✓ 완료한 일</div>
+      <div id="cal-day-todos" class="cal-day-todos"></div>
+    </div>
+  </div>
+</div>
 
 <!-- Newsletter detail overlay -->
 <div class="nl-detail-page" id="nl-detail-page">
@@ -619,7 +786,9 @@ img, video, iframe { max-width: 100%; }
 
 <script>
 let SCHEDULE = [];
+let SCHEDULE_FULL = []; // 캘린더 페이지용 (필터 안 한 전체)
 let TODOS = [];
+let TODOS_RAW = []; // done 기록용 (필터 무관)
 let NEWSLETTERS = [];
 let activeTab = 'open';
 
@@ -632,6 +801,26 @@ function saveLocalDone(set) {
   localStorage.setItem('danaDone', JSON.stringify([...set]));
 }
 let LOCAL_DONE = loadLocalDone();
+
+// 완료 시각 기록 (캘린더 history용) — {id: ISO date string}
+function loadDoneAt() {
+  try { return JSON.parse(localStorage.getItem('danaDoneAt') || '{}'); }
+  catch { return {}; }
+}
+function saveDoneAt(obj) { localStorage.setItem('danaDoneAt', JSON.stringify(obj)); }
+let DONE_AT = loadDoneAt();
+function markDone(id) {
+  LOCAL_DONE.add(id);
+  saveLocalDone(LOCAL_DONE);
+  DONE_AT[id] = new Date().toISOString();
+  saveDoneAt(DONE_AT);
+}
+function unmarkDone(id) {
+  LOCAL_DONE.delete(id);
+  saveLocalDone(LOCAL_DONE);
+  delete DONE_AT[id];
+  saveDoneAt(DONE_AT);
+}
 
 function nowHM() { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
 function parseHM(str) {
@@ -647,21 +836,25 @@ async function fetchData() {
   try {
     const calRes = await fetch('./data/calendar.json?t=' + Date.now());
     const calData = await calRes.json();
+    SCHEDULE_FULL = calData.events || [];
     // 끝난 미팅 자동 제외 (종료 시각이 현재보다 과거면 숨김)
     const now = nowHM();
-    SCHEDULE = (calData.events || []).filter(e => {
+    SCHEDULE = SCHEDULE_FULL.filter(e => {
       const t = parseHM(e.time || '');
       return t.end > now;
     });
   } catch (e) {
     SCHEDULE = [];
+    SCHEDULE_FULL = [];
   }
   try {
     const todoRes = await fetch('./data/todos.json?t=' + Date.now());
     const todoData = await todoRes.json();
-    TODOS = (todoData.todos || []).map(t => ({ ...t, tab: 'open', done: LOCAL_DONE.has(t.id) }));
+    TODOS_RAW = todoData.todos || [];
+    TODOS = TODOS_RAW.map(t => ({ ...t, tab: 'open', done: LOCAL_DONE.has(t.id) }));
   } catch (e) {
     TODOS = [];
+    TODOS_RAW = [];
   }
   try {
     const nlRes = await fetch('./data/newsletters.json?t=' + Date.now());
@@ -730,9 +923,8 @@ function renderTodos() {
     row.querySelector('.checkbox').addEventListener('click', (e) => {
       e.stopPropagation();
       t.done = !t.done;
-      if (t.done) LOCAL_DONE.add(t.id);
-      else LOCAL_DONE.delete(t.id);
-      saveLocalDone(LOCAL_DONE);
+      if (t.done) markDone(t.id);
+      else unmarkDone(t.id);
       renderTodos();
     });
     row.addEventListener('click', (e) => {
@@ -862,9 +1054,8 @@ document.getElementById('detail-back').addEventListener('click', closeDetail);
 detailCheckboxEl.addEventListener('click', () => {
   if (!detailCurrentTodo) return;
   detailCurrentTodo.done = !detailCurrentTodo.done;
-  if (detailCurrentTodo.done) LOCAL_DONE.add(detailCurrentTodo.id);
-  else LOCAL_DONE.delete(detailCurrentTodo.id);
-  saveLocalDone(LOCAL_DONE);
+  if (detailCurrentTodo.done) markDone(detailCurrentTodo.id);
+  else unmarkDone(detailCurrentTodo.id);
   detailCheckboxEl.classList.toggle('checked', detailCurrentTodo.done);
   renderTodos();
 });
@@ -943,6 +1134,132 @@ async function init() {
   renderTodos();
   setupPush();
 }
+
+// ============ Calendar 페이지 ============
+const calPageEl = document.getElementById('cal-page');
+let calViewYear = new Date().getFullYear();
+let calViewMonth = new Date().getMonth(); // 0-based
+let calSelectedDate = null; // 'YYYY-MM-DD'
+
+function fmtDate(y, m, d) {
+  return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+}
+
+function renderCalendar() {
+  const monthLabel = `${calViewYear}년 ${calViewMonth+1}월`;
+  document.getElementById('cal-month-label').textContent = monthLabel;
+
+  const first = new Date(calViewYear, calViewMonth, 1);
+  const firstDow = first.getDay(); // 0=Sun
+  const lastDay = new Date(calViewYear, calViewMonth+1, 0).getDate();
+  const prevLastDay = new Date(calViewYear, calViewMonth, 0).getDate();
+  const todayKey = fmtDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+
+  // 완료 날짜 인덱스 — DONE_AT 기반 (YYYY-MM-DD set)
+  const doneDates = new Set();
+  Object.values(DONE_AT).forEach(iso => doneDates.add(iso.slice(0, 10)));
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  // 이전 달 빈칸
+  for (let i = firstDow - 1; i >= 0; i--) {
+    const d = prevLastDay - i;
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell muted';
+    cell.textContent = d;
+    grid.appendChild(cell);
+  }
+  // 이번 달
+  for (let d = 1; d <= lastDay; d++) {
+    const key = fmtDate(calViewYear, calViewMonth, d);
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell';
+    if (key === todayKey) cell.classList.add('today');
+    if (key === calSelectedDate) cell.classList.add('selected');
+    cell.innerHTML = `${d}${doneDates.has(key) ? '<span class="dot"></span>' : ''}`;
+    cell.addEventListener('click', () => {
+      calSelectedDate = key;
+      renderCalendar();
+      renderDaySection(key);
+    });
+    grid.appendChild(cell);
+  }
+  // 다음 달 빈칸 (그리드 6주 채우기)
+  const rest = (7 - ((firstDow + lastDay) % 7)) % 7;
+  for (let d = 1; d <= rest; d++) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell muted';
+    cell.textContent = d;
+    grid.appendChild(cell);
+  }
+}
+
+function renderDaySection(dateKey) {
+  const [y, m, d] = dateKey.split('-').map(Number);
+  const dow = ['일','월','화','수','목','금','토'][new Date(y, m-1, d).getDay()];
+  document.getElementById('cal-day-label').textContent = `${m}월 ${d}일 (${dow})`;
+
+  const todayKey = fmtDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+
+  // 일정 — calendar.json은 오늘 일정만 있음. 오늘만 표시.
+  const evtEl = document.getElementById('cal-day-events');
+  evtEl.innerHTML = '';
+  if (dateKey === todayKey && SCHEDULE_FULL && SCHEDULE_FULL.length) {
+    SCHEDULE_FULL.forEach(e => {
+      const row = document.createElement('div');
+      row.className = 'cal-evt-row';
+      row.innerHTML = `<span class="time">${e.time || ''}</span>${escapeHtml(e.title || '')}`;
+      evtEl.appendChild(row);
+    });
+  } else {
+    evtEl.innerHTML = '<div class="cal-empty">일정 기록 없음</div>';
+  }
+
+  // 완료한 일 — DONE_AT + TODOS_RAW에서 매칭
+  const todoEl = document.getElementById('cal-day-todos');
+  todoEl.innerHTML = '';
+  const matched = [];
+  Object.entries(DONE_AT).forEach(([id, iso]) => {
+    if (iso.slice(0, 10) !== dateKey) return;
+    const t = TODOS_RAW.find(x => x.id === id);
+    if (t) matched.push({ ...t, doneAt: iso });
+  });
+  matched.sort((a, b) => a.doneAt.localeCompare(b.doneAt));
+  if (matched.length === 0) {
+    todoEl.innerHTML = '<div class="cal-empty">완료한 일 없음</div>';
+  } else {
+    matched.forEach(t => {
+      const hh = t.doneAt.slice(11, 16);
+      const row = document.createElement('div');
+      row.className = 'cal-todo-row';
+      row.innerHTML = `<span class="time">${hh}</span>${escapeHtml(t.title || '')}`;
+      todoEl.appendChild(row);
+    });
+  }
+}
+
+document.getElementById('btn-calendar')?.addEventListener('click', () => {
+  const todayKey = fmtDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+  calSelectedDate = todayKey;
+  calViewYear = new Date().getFullYear();
+  calViewMonth = new Date().getMonth();
+  calPageEl.classList.add('open');
+  renderCalendar();
+  renderDaySection(todayKey);
+});
+document.getElementById('cal-back')?.addEventListener('click', () => {
+  calPageEl.classList.remove('open');
+});
+document.getElementById('cal-prev')?.addEventListener('click', () => {
+  calViewMonth--;
+  if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+  renderCalendar();
+});
+document.getElementById('cal-next')?.addEventListener('click', () => {
+  calViewMonth++;
+  if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+  renderCalendar();
+});
 
 // 새로고침 버튼
 document.getElementById('btn-refresh')?.addEventListener('click', async (e) => {
