@@ -823,6 +823,10 @@ function unmarkDone(id) {
 }
 
 function nowHM() { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+function fmtDateNow() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
 function parseHM(str) {
   // "10:45" 또는 "10:45 - 11:30" 에서 종료 시각 추출
   const m = str.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
@@ -837,15 +841,18 @@ async function fetchData() {
     const calRes = await fetch('./data/calendar.json?t=' + Date.now());
     const calData = await calRes.json();
     SCHEDULE_FULL = calData.events || [];
-    // 끝난 미팅도 표시하되 state 자동 계산 (past는 disabled/strike-through)
+    // 메인 화면: 오늘 일정만 표시 + state 자동 계산 (past = strike-through)
+    const todayKey = fmtDateNow();
     const now = nowHM();
-    SCHEDULE = SCHEDULE_FULL.map(e => {
-      const t = parseHM(e.time || '');
-      let state = 'next';
-      if (t.end <= now) state = 'past';
-      else if (t.start <= now && t.end > now) state = 'now';
-      return { ...e, state };
-    });
+    SCHEDULE = SCHEDULE_FULL
+      .filter(e => !e.date || e.date === todayKey)
+      .map(e => {
+        const t = parseHM(e.time || '');
+        let state = 'next';
+        if (t.end <= now) state = 'past';
+        else if (t.start <= now && t.end > now) state = 'now';
+        return { ...e, state };
+      });
   } catch (e) {
     SCHEDULE = [];
     SCHEDULE_FULL = [];
@@ -1204,18 +1211,19 @@ function renderDaySection(dateKey) {
 
   const todayKey = fmtDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
 
-  // 일정 — calendar.json은 오늘 일정만 있음. 오늘만 표시.
+  // 일정 — calendar.json events 중 선택일 필터
   const evtEl = document.getElementById('cal-day-events');
   evtEl.innerHTML = '';
-  if (dateKey === todayKey && SCHEDULE_FULL && SCHEDULE_FULL.length) {
-    SCHEDULE_FULL.forEach(e => {
+  const dayEvents = (SCHEDULE_FULL || []).filter(e => e.date === dateKey);
+  if (dayEvents.length) {
+    dayEvents.forEach(e => {
       const row = document.createElement('div');
       row.className = 'cal-evt-row';
       row.innerHTML = `<span class="time">${e.time || ''}</span>${escapeHtml(e.title || '')}`;
       evtEl.appendChild(row);
     });
   } else {
-    evtEl.innerHTML = '<div class="cal-empty">일정 기록 없음</div>';
+    evtEl.innerHTML = '<div class="cal-empty">일정 없음</div>';
   }
 
   // 완료한 일 — DONE_AT + TODOS_RAW에서 매칭
