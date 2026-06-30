@@ -27,7 +27,7 @@ self.addEventListener('fetch', (event) => {
   }
 });
 
-// Push 이벤트 — 새 todo 알림
+// Push 이벤트 — 새 todo 알림 + 열린 PWA에 자동 갱신 메시지
 self.addEventListener('push', (event) => {
   let data = {};
   try {
@@ -45,7 +45,12 @@ self.addEventListener('push', (event) => {
     requireInteraction: false,
     vibrate: [100, 50, 100]
   };
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil((async () => {
+    await self.registration.showNotification(title, options);
+    // 열린 PWA 클라이언트에 갱신 메시지 전송
+    const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    clients.forEach(c => c.postMessage({ type: 'push-received', tag: data.tag }));
+  })());
 });
 
 // 알림 클릭 → 해당 URL 열기 (보통 슬랙 원본 또는 todo.html)

@@ -1195,6 +1195,17 @@ async function setupPush() {
     console.log('Push not supported');
     return;
   }
+  // 푸시 도착 시 SW가 메시지 보내면 자동 갱신
+  navigator.serviceWorker.addEventListener('message', async (e) => {
+    if (e.data?.type === 'push-received') {
+      console.log('Push received → auto refresh');
+      LOCAL_DONE = loadLocalDone();
+      DONE_AT = loadDoneAt();
+      await fetchData();
+      renderSchedule();
+      renderTodos();
+    }
+  });
   try {
     const reg = await navigator.serviceWorker.register('./sw.js');
     await navigator.serviceWorker.ready;
