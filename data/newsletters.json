@@ -1,6 +1,13 @@
 {
-  "syncedAt": "2026-06-29T18:30:00+09:00",
+  "syncedAt": "2026-06-30T10:30:00+09:00",
   "newsletters": [
+    {
+      "id": "19f15177f85aef17",
+      "subject": "광주❤️전남 \"우리 통합했어요\" 앞으로 뭐가 바뀔까?",
+      "sender": "NEWNEEK",
+      "date": "6.30 05:34",
+      "url": "https://mail.google.com/mail/u/0/#inbox/19f15177f85aef17"
+    },
     {
       "id": "19f0feeb0a221973",
       "subject": "삼전닉스 성과급이 동탄 집값 11% 올렸다고?",
