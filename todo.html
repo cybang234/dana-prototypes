@@ -884,17 +884,28 @@ function loadMyTodos() {
 }
 function saveMyTodos(arr) { localStorage.setItem('myTodos', JSON.stringify(arr)); }
 
-// 완료 시각 기록 (캘린더 history용) — {id: ISO date string}
+// 완료 시각 기록 (캘린더 history용)
+// 신 구조: {id: {at: ISO, title, priority, ...todo}} — 캘린더 history에서 title 바로 표시
+// 구 구조 호환: {id: ISO string}
 function loadDoneAt() {
   try { return JSON.parse(localStorage.getItem('danaDoneAt') || '{}'); }
   catch { return {}; }
 }
 function saveDoneAt(obj) { localStorage.setItem('danaDoneAt', JSON.stringify(obj)); }
 let DONE_AT = loadDoneAt();
-function markDone(id) {
+function doneAtIso(entry) { return typeof entry === 'string' ? entry : (entry?.at || ''); }
+
+function markDone(id, todoObj) {
   LOCAL_DONE.add(id);
   saveLocalDone(LOCAL_DONE);
-  DONE_AT[id] = new Date().toISOString();
+  DONE_AT[id] = {
+    at: new Date().toISOString(),
+    title: todoObj?.title || '',
+    priority: todoObj?.priority || '',
+    team: todoObj?.team || '',
+    category: todoObj?.category || '',
+    source: todoObj?.source || '',
+  };
   saveDoneAt(DONE_AT);
 }
 function unmarkDone(id) {
@@ -997,11 +1008,22 @@ function renderTodos() {
   todoListEl.hidden = false;
   nlListEl.hidden = true;
 
-  // 완료한 todo는 메인 리스트에서 숨김 (캘린더 페이지에서 history로 확인 가능)
-  const list = TODOS.filter(t => !t.done).sort((a, b) => prRank(a.priority) - prRank(b.priority));
-  // 열린 todo 카운트 갱신
+  // 완료한 todo: 당일은 strikethrough로 보임 (실수 시 해제 가능), 어제 이전은 hidden
+  const todayKey = fmtDateNow();
+  const list = TODOS
+    .filter(t => {
+      if (!t.done) return true;
+      const at = doneAtIso(DONE_AT[t.id]);
+      return at && at.slice(0, 10) === todayKey;
+    })
+    .sort((a, b) => {
+      // 미완료 먼저, 완료 나중에. 같은 그룹 내에서는 priority순
+      if (a.done !== b.done) return a.done ? 1 : -1;
+      return prRank(a.priority) - prRank(b.priority);
+    });
+  // 열린 todo 카운트 (미완료만)
   const openCountEl = document.getElementById('open-count');
-  if (openCountEl) openCountEl.textContent = ' ' + list.length;
+  if (openCountEl) openCountEl.textContent = ' ' + list.filter(t => !t.done).length;
   const el = todoListEl;
   el.innerHTML = '';
   if (list.length === 0) {
@@ -1021,7 +1043,7 @@ function renderTodos() {
     row.querySelector('.checkbox').addEventListener('click', (e) => {
       e.stopPropagation();
       t.done = !t.done;
-      if (t.done) markDone(t.id);
+      if (t.done) markDone(t.id, t);
       else unmarkDone(t.id);
       renderTodos();
     });
@@ -1152,7 +1174,7 @@ document.getElementById('detail-back').addEventListener('click', closeDetail);
 detailCheckboxEl.addEventListener('click', () => {
   if (!detailCurrentTodo) return;
   detailCurrentTodo.done = !detailCurrentTodo.done;
-  if (detailCurrentTodo.done) markDone(detailCurrentTodo.id);
+  if (detailCurrentTodo.done) markDone(detailCurrentTodo.id, detailCurrentTodo);
   else unmarkDone(detailCurrentTodo.id);
   detailCheckboxEl.classList.toggle('checked', detailCurrentTodo.done);
   renderTodos();
@@ -1314,14 +1336,25 @@ function renderDaySection(dateKey) {
     evtEl.innerHTML = '<div class="cal-empty">일정 없음</div>';
   }
 
-  // 완료한 일 — DONE_AT + TODOS_RAW에서 매칭
+  // 완료한 일 — DONE_AT 직접 사용 (title 정보 자체 저장된 것)
   const todoEl = document.getElementById('cal-day-todos');
   todoEl.innerHTML = '';
   const matched = [];
-  Object.entries(DONE_AT).forEach(([id, iso]) => {
-    if (iso.slice(0, 10) !== dateKey) return;
-    const t = TODOS_RAW.find(x => x.id === id);
-    if (t) matched.push({ ...t, doneAt: iso });
+  Object.entries(DONE_AT).forEach(([id, entry]) => {
+    const iso = doneAtIso(entry);
+    if (!iso || iso.slice(0, 10) !== dateKey) return;
+    let title, priority;
+    if (typeof entry === 'object') {
+      title = entry.title;
+      priority = entry.priority;
+    }
+    // 구 구조 (string) 또는 title 없으면 TODOS_RAW에서 fallback
+    if (!title) {
+      const t = TODOS_RAW.find(x => x.id === id);
+      title = t?.title || '(제목 없음)';
+      priority = t?.priority || '';
+    }
+    matched.push({ id, doneAt: iso, title, priority });
   });
   matched.sort((a, b) => a.doneAt.localeCompare(b.doneAt));
   if (matched.length === 0) {
