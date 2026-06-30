@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>하찮은 배경 패턴</title>
+<style>
+body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #e8f5e0; }
+canvas { image-rendering: pixelated; }
+</style>
+</head>
+<body>
+<canvas id="c" width="800" height="800"></canvas>
+<script>
+const c = document.getElementById('c').getContext('2d');
+
+// 배경 — 푸릇푸릇한 풀밭 느낌
+const grad = c.createRadialGradient(400, 400, 50, 400, 400, 500);
+grad.addColorStop(0, '#e8f5d8');
+grad.addColorStop(0.5, '#d4edbc');
+grad.addColorStop(1, '#c2e6a0');
+c.fillStyle = grad;
+c.fillRect(0, 0, 800, 800);
+
+// 풀밭 질감 노이즈
+for (let i = 0; i < 12000; i++) {
+  const x = Math.random() * 800;
+  const y = Math.random() * 800;
+  const a = Math.random() * 0.08;
+  const g = 120 + Math.floor(Math.random() * 60);
+  c.fillStyle = `rgba(60,${g},40,${a})`;
+  c.fillRect(x, y, 1, 1);
+}
+
+function wobbly(ctx, x1, y1, x2, y2, color, size) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = size;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  const steps = 6;
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    ctx.lineTo(
+      x1 + (x2 - x1) * t + (Math.random() - 0.5) * 4,
+      y1 + (y2 - y1) * t + (Math.random() - 0.5) * 4
+    );
+  }
+  ctx.stroke();
+}
+
+// 하찮은 음표 그리기
+function drawNote(x, y, scale, rot) {
+  c.save();
+  c.translate(x, y);
+  c.rotate(rot);
+  c.scale(scale, scale);
+
+  // 음표 머리
+  c.fillStyle = `rgba(30,80,30,${0.18 + Math.random() * 0.15})`;
+  c.beginPath();
+  c.ellipse(0, 0, 6, 4.5, -0.3, 0, Math.PI * 2);
+  c.fill();
+
+  // 음표 줄기
+  c.strokeStyle = c.fillStyle;
+  c.lineWidth = 1.5;
+  c.beginPath();
+  c.moveTo(5, -1);
+  c.lineTo(5 + (Math.random()-0.5)*2, -22);
+  c.stroke();
+
+  // 꼬리 (가끔)
+  if (Math.random() > 0.5) {
+    c.beginPath();
+    c.moveTo(5, -22);
+    c.quadraticCurveTo(12, -15, 8, -10);
+    c.stroke();
+  }
+
+  c.restore();
+}
+
+// 하찮은 풀잎
+function drawGrass(x, y, h, color) {
+  c.save();
+  c.strokeStyle = color;
+  c.lineWidth = 1.5;
+  c.beginPath();
+  c.moveTo(x, y);
+  c.quadraticCurveTo(
+    x + (Math.random() - 0.5) * 15,
+    y - h * 0.6,
+    x + (Math.random() - 0.5) * 10,
+    y - h
+  );
+  c.stroke();
+  c.restore();
+}
+
+// 하찮은 나뭇잎
+function drawLeaf(x, y, scale, rot) {
+  c.save();
+  c.translate(x, y);
+  c.rotate(rot);
+  c.scale(scale, scale);
+
+  const alpha = 0.18 + Math.random() * 0.15;
+  c.fillStyle = `rgba(50,160,50,${alpha})`;
+  c.beginPath();
+  c.moveTo(0, 0);
+  c.quadraticCurveTo(8, -12, 0, -25);
+  c.quadraticCurveTo(-8, -12, 0, 0);
+  c.fill();
+
+  // 잎맥
+  c.strokeStyle = `rgba(30,120,30,${alpha})`;
+  c.lineWidth = 0.5;
+  c.beginPath();
+  c.moveTo(0, -2);
+  c.lineTo(0, -22);
+  c.stroke();
+
+  c.restore();
+}
+
+// 하찮은 작은 벌레 (점+다리)
+function drawTinyBug(x, y, scale) {
+  c.save();
+  c.translate(x, y);
+  c.scale(scale, scale);
+
+  const alpha = 0.12 + Math.random() * 0.1;
+  const green = `rgba(40,140,50,${alpha + 0.05})`;
+
+  // 몸통
+  c.fillStyle = green;
+  c.beginPath();
+  c.ellipse(0, 0, 5, 3, 0, 0, Math.PI * 2);
+  c.fill();
+
+  // 머리
+  c.beginPath();
+  c.arc(-6, -1, 2.5, 0, Math.PI * 2);
+  c.fill();
+
+  // 다리 (대충)
+  c.strokeStyle = green;
+  c.lineWidth = 0.8;
+  for (let i = -1; i <= 1; i++) {
+    c.beginPath();
+    c.moveTo(i * 3, 3);
+    c.lineTo(i * 3 + (Math.random()-0.5)*3, 8);
+    c.stroke();
+  }
+
+  // 더듬이
+  c.beginPath();
+  c.moveTo(-7, -3);
+  c.lineTo(-12, -8);
+  c.moveTo(-6, -3);
+  c.lineTo(-9, -9);
+  c.stroke();
+
+  c.restore();
+}
+
+// 하찮은 꽃
+function drawFlower(x, y, scale) {
+  c.save();
+  c.translate(x, y);
+  c.scale(scale, scale);
+
+  const alpha = 0.12 + Math.random() * 0.1;
+
+  // 줄기
+  c.strokeStyle = `rgba(50,150,40,${alpha + 0.05})`;
+  c.lineWidth = 1.2;
+  c.beginPath();
+  c.moveTo(0, 0);
+  c.quadraticCurveTo(2, -15, -1, -28);
+  c.stroke();
+
+  // 꽃잎
+  const petalColor = Math.random() > 0.5
+    ? `rgba(220,240,120,${alpha + 0.1})`
+    : `rgba(180,230,150,${alpha + 0.1})`;
+  c.fillStyle = petalColor;
+  for (let i = 0; i < 5; i++) {
+    c.beginPath();
+    const angle = (i / 5) * Math.PI * 2;
+    const px = -1 + Math.cos(angle) * 5;
+    const py = -28 + Math.sin(angle) * 5;
+    c.arc(px, py, 3, 0, Math.PI * 2);
+    c.fill();
+  }
+
+  // 꽃 중심
+  c.fillStyle = `rgba(240,220,80,${alpha + 0.1})`;
+  c.beginPath();
+  c.arc(-1, -28, 2, 0, Math.PI * 2);
+  c.fill();
+
+  c.restore();
+}
+
+// 하찮은 악보 조각
+function drawSheetMusic(x, y, scale, rot) {
+  c.save();
+  c.translate(x, y);
+  c.rotate(rot);
+  c.scale(scale, scale);
+
+  const alpha = 0.08 + Math.random() * 0.07;
+  c.strokeStyle = `rgba(50,100,40,${alpha + 0.03})`;
+  c.lineWidth = 0.7;
+
+  // 오선지
+  for (let i = 0; i < 5; i++) {
+    c.beginPath();
+    c.moveTo(-15, i * 3);
+    c.lineTo(15, i * 3 + (Math.random()-0.5)*1);
+    c.stroke();
+  }
+
+  // 음표 점 몇개
+  c.fillStyle = `rgba(50,100,40,${alpha})`;
+  for (let i = 0; i < 3; i++) {
+    c.beginPath();
+    c.arc(-10 + i * 10, Math.floor(Math.random()*5) * 3, 1.5, 0, Math.PI * 2);
+    c.fill();
+  }
+
+  c.restore();
+}
+
+// 패턴 배치 — 타일처럼 반복
+const spacing = 120;
+
+for (let row = 0; row < 8; row++) {
+  for (let col = 0; col < 8; col++) {
+    const baseX = col * spacing + (row % 2 === 0 ? 0 : spacing / 2);
+    const baseY = row * spacing;
+    const offsetX = (Math.random() - 0.5) * 40;
+    const offsetY = (Math.random() - 0.5) * 40;
+    const x = baseX + offsetX;
+    const y = baseY + offsetY;
+
+    // 각 타일에 랜덤 요소 배치
+    const pick = Math.random();
+
+    if (pick < 0.12) {
+      drawNote(x, y, 0.8 + Math.random() * 0.6, (Math.random() - 0.5) * 0.5);
+    } else if (pick < 0.2) {
+      drawTinyBug(x, y, 0.7 + Math.random() * 0.8);
+    } else if (pick < 0.4) {
+      drawLeaf(x, y, 0.7 + Math.random() * 0.5, (Math.random() - 0.5) * 1.2);
+    } else if (pick < 0.55) {
+      drawFlower(x, y + 15, 0.7 + Math.random() * 0.5);
+    } else if (pick < 0.65) {
+      drawSheetMusic(x, y, 0.8 + Math.random() * 0.5, (Math.random() - 0.5) * 0.3);
+    } else {
+      // 풀잎 묶음
+      for (let g = 0; g < 3; g++) {
+        drawGrass(
+          x + (Math.random() - 0.5) * 10,
+          y + 10,
+          12 + Math.random() * 15,
+          `rgba(40,160,50,${0.15 + Math.random() * 0.15})`
+        );
+      }
+    }
+  }
+}
+
+// 추가 음표 흩뿌리기
+for (let i = 0; i < 20; i++) {
+  drawNote(
+    Math.random() * 800,
+    Math.random() * 800,
+    0.5 + Math.random() * 0.4,
+    (Math.random() - 0.5) * 0.8
+  );
+}
+
+// 추가 나뭇잎 듬성듬성
+for (let i = 0; i < 25; i++) {
+  drawLeaf(
+    Math.random() * 800,
+    Math.random() * 800,
+    0.5 + Math.random() * 0.6,
+    (Math.random() - 0.5) * 1.5
+  );
+}
+
+// 추가 풀잎 더 깔기
+for (let i = 0; i < 30; i++) {
+  drawGrass(
+    Math.random() * 800,
+    Math.random() * 800,
+    10 + Math.random() * 18,
+    `rgba(40,${140 + Math.floor(Math.random()*40)},45,${0.12 + Math.random() * 0.12})`
+  );
+}
+
+// 서명
+c.fillStyle = 'rgba(60,120,50,0.2)';
+c.font = '9px monospace';
+c.fillText('하찮은 패턴 by 마우스', 630, 790);
+</script>
+</body>
+</html>

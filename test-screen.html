@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=375, initial-scale=1.0" />
+  <title>고객 정보 입력</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+    /* ── 리셋 ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── 토큰 ── */
+    :root {
+      --bg:               #FFFFFF;
+      --bg-weak:          #F5F5F5;
+      --fg:               #141414;
+      --fg-weak:          #8C8C8C;
+      --fg-inverse:       #FFFFFF;
+      --brand:            #00A1FF;
+      --brand-weak:       #F0F8FC;
+      --border:           #E0E0E0;
+      --critical:         #F05656;
+      --disabled-bg:      #EDEDED;
+      --disabled-fg:      #C1C1C1;
+    }
+
+    /* ── 기반 ── */
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #F5F5F5;
+      display: flex;
+      justify-content: center;
+    }
+
+    .screen {
+      width: 375px;
+      min-height: 812px;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ── Status Bar ── */
+    .status-bar {
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+    .status-bar .time {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--fg);
+      letter-spacing: -0.3px;
+    }
+    .status-bar .icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-bar .icons svg { display: block; }
+
+    /* ── Top Navigation ── */
+    .top-nav {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      position: relative;
+    }
+    .top-nav .back-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .top-nav .title {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 20px;
+      letter-spacing: -0.3px;
+      color: var(--fg);
+    }
+
+    /* ── Content ── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 16px;
+      padding-bottom: 100px;
+    }
+
+    /* ── Page Heading ── */
+    .page-heading {
+      padding-top: 24px;
+      padding-bottom: 30px;
+    }
+    .page-heading h1 {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 30px;
+      letter-spacing: -0.3px;
+      color: var(--fg);
+    }
+    .page-heading p {
+      margin-top: 4px;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 20px;
+      letter-spacing: -0.3px;
+      color: var(--fg-weak);
+    }
+
+    /* ── Form ── */
+    .form { display: flex; flex-direction: column; gap: 24px; }
+
+    .field { display: flex; flex-direction: column; gap: 8px; }
+
+    .field-label {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 18px;
+      letter-spacing: -0.3px;
+      color: var(--fg);
+    }
+
+    /* Input */
+    .input-wrap { position: relative; }
+
+    input[type="text"],
+    input[type="date"] {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
+      letter-spacing: -0.3px;
+      color: var(--fg);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: border-color 0.15s;
+    }
+    input[type="text"]::placeholder,
+    input[type="date"]:invalid {
+      color: var(--fg-weak);
+    }
+    input[type="text"]:focus,
+    input[type="date"]:focus {
+      border-color: var(--brand);
+    }
+
+    /* 날짜 입력 clear 버튼 숨김 */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: pointer;
+    }
+    .date-wrap {
+      position: relative;
+    }
+    .date-placeholder {
+      position: absolute;
+      top: 50%;
+      left: 12px;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: var(--fg-weak);
+      letter-spacing: -0.3px;
+      pointer-events: none;
+      transition: opacity 0.1s;
+    }
+
+    /* Select (Dropdown) */
+    .select-wrap {
+      position: relative;
+    }
+    select {
+      width: 100%;
+      height: 40px;
+      padding: 0 36px 0 12px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
+      letter-spacing: -0.3px;
+      color: var(--fg-weak);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    select:focus { border-color: var(--brand); }
+    select.filled { color: var(--fg); }
+
+    .select-arrow {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--fg-weak);
+    }
+
+    /* ── Sticky Bottom Bar ── */
+    .sticky-bottom {
+      position: fixed;
+      bottom: 0;
+      width: 375px;
+      height: 80px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+    }
+
+    .cta-btn {
+      width: 100%;
+      height: 52px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 20px;
+      letter-spacing: -0.3px;
+      color: var(--fg-inverse);
+      background: var(--brand);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .cta-btn:disabled {
+      background: var(--disabled-bg);
+      color: var(--disabled-fg);
+      cursor: not-allowed;
+    }
+    .cta-btn:not(:disabled):active { opacity: 0.85; }
+  </style>
+</head>
+<body>
+  <div class="screen">
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="icons">
+        <!-- Signal -->
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
+          <rect x="0" y="7" width="3" height="5" rx="1" fill="#141414"/>
+          <rect x="4.5" y="4.5" width="3" height="7.5" rx="1" fill="#141414"/>
+          <rect x="9" y="2" width="3" height="10" rx="1" fill="#141414"/>
+          <rect x="13.5" y="0" width="3" height="12" rx="1" fill="#141414"/>
+        </svg>
+        <!-- WiFi -->
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+          <path d="M8 9.5C8.83 9.5 9.5 10.17 9.5 11S8.83 12.5 8 12.5 6.5 11.83 6.5 11 7.17 9.5 8 9.5z" fill="#141414"/>
+          <path d="M8 6c1.66 0 3.16.67 4.24 1.76l1.42-1.42A8 8 0 008 4 8 8 0 002.34 6.34l1.42 1.42A5.97 5.97 0 018 6z" fill="#141414"/>
+          <path d="M8 2C10.76 2 13.23 3.12 15 4.95l1.42-1.42A11.94 11.94 0 008 0C5.03 0 2.36 1.18.58 3.53L2 4.95C3.77 3.12 5.74 2 8 2z" fill="#141414" opacity="0.3"/>
+        </svg>
+        <!-- Battery -->
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+          <rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#141414" stroke-opacity="0.35"/>
+          <rect x="2" y="2" width="18" height="8" rx="2" fill="#141414"/>
+          <path d="M23 4.5V7.5A1.5 1.5 0 0023 4.5z" fill="#141414" opacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Top Nav -->
+    <div class="top-nav">
+      <button class="back-btn" aria-label="뒤로가기">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M15 18L9 12L15 6" stroke="#141414" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <span class="title">정보 등록</span>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- Heading -->
+      <div class="page-heading">
+        <h1>고객 정보를<br>입력해주세요</h1>
+        <p>안전한 서비스 이용을 위해 필요해요</p>
+      </div>
+
+      <!-- Form -->
+      <div class="form">
+
+        <!-- 이름 -->
+        <div class="field">
+          <label class="field-label" for="name">이름</label>
+          <div class="input-wrap">
+            <input
+              type="text"
+              id="name"
+              placeholder="이름을 입력해주세요"
+              autocomplete="off"
+              oninput="checkForm()"
+            />
+          </div>
+        </div>
+
+        <!-- 생년월일 -->
+        <div class="field">
+          <label class="field-label" for="birth">생년월일</label>
+          <div class="input-wrap date-wrap">
+            <input
+              type="text"
+              id="birth"
+              placeholder="YYYY.MM.DD"
+              maxlength="10"
+              inputmode="numeric"
+              autocomplete="off"
+              oninput="formatDate(this); checkForm()"
+            />
+          </div>
+        </div>
+
+        <!-- 직업 -->
+        <div class="field">
+          <label class="field-label" for="job">직업</label>
+          <div class="select-wrap">
+            <select id="job" onchange="handleSelect(this); checkForm()">
+              <option value="" disabled selected>직업을 선택해주세요</option>
+              <option value="employed">직장인</option>
+              <option value="self-employed">자영업자</option>
+              <option value="student">학생</option>
+              <option value="housewife">주부</option>
+              <option value="unemployed">무직</option>
+              <option value="etc">기타</option>
+            </select>
+            <span class="select-arrow">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M5 7.5L10 12.5L15 7.5" stroke="#8C8C8C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sticky Bottom -->
+    <div class="sticky-bottom">
+      <button class="cta-btn" id="cta" disabled onclick="handleSubmit()">다음</button>
+    </div>
+
+  </div>
+
+  <script>
+    function formatDate(input) {
+      let v = input.value.replace(/\D/g, '');
+      if (v.length >= 5) v = v.slice(0,4) + '.' + v.slice(4);
+      if (v.length >= 8) v = v.slice(0,7) + '.' + v.slice(7);
+      input.value = v.slice(0, 10);
+    }
+
+    function handleSelect(sel) {
+      sel.classList.toggle('filled', sel.value !== '');
+    }
+
+    function checkForm() {
+      const name  = document.getElementById('name').value.trim();
+      const birth = document.getElementById('birth').value;
+      const job   = document.getElementById('job').value;
+      const birthValid = /^\d{4}\.\d{2}\.\d{2}$/.test(birth);
+      document.getElementById('cta').disabled = !(name && birthValid && job);
+    }
+
+    function handleSubmit() {
+      alert('다음 단계로 이동합니다.');
+    }
+  </script>
+</body>
+</html>

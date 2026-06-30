@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    font-size: 13px;
+    color: #1a1a1a;
+    background: #fff;
+    padding: 16px;
+  }
+
+  .label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  /* 선택 프레임 */
+  .selection-box {
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0; }
+  .selection-box.active .dot { background: #18a0fb; }
+  .sel-text { color: #888; line-height: 1.4; }
+  .selection-box.active .sel-text { color: #1a1a1a; }
+
+  /* 프리셋 — 멀티셀렉트 */
+  .preset-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .preset-btn {
+    border: 1.5px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 9px 11px;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.1s;
+    position: relative;
+  }
+  .preset-btn:hover { border-color: #18a0fb; background: #f0f8ff; }
+  .preset-btn.selected { border-color: #18a0fb; background: #e8f4ff; }
+  .preset-name { font-weight: 600; font-size: 13px; }
+  .preset-size { font-size: 11px; color: #999; margin-top: 2px; }
+  .preset-btn.selected .preset-name { color: #0066cc; }
+  .preset-btn.selected .preset-size { color: #4a9fd4; }
+  .check-mark {
+    position: absolute;
+    top: 7px; right: 8px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #18a0fb;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .check-mark svg { width: 10px; height: 10px; }
+  .preset-btn.selected .check-mark { display: flex; }
+
+  /* 커스텀 */
+  .custom-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    align-items: flex-end;
+  }
+  .input-group { flex: 1; }
+  .input-group .input-label { font-size: 11px; color: #888; margin-bottom: 4px; }
+  .input-wrap { position: relative; }
+  .dim-input {
+    width: 100%;
+    height: 36px;
+    border: 1.5px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 0 28px 0 10px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.1s;
+  }
+  .dim-input:focus { border-color: #18a0fb; }
+  .unit { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #bbb; pointer-events: none; }
+  .custom-apply {
+    height: 36px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 8px;
+    background: #f0f0f0;
+    color: #555;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .custom-apply:hover { background: #e0e0e0; }
+
+  /* 선택된 타겟 요약 */
+  .targets-summary {
+    display: none;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+  .targets-summary.visible { display: flex; }
+  .target-chip {
+    background: #e8f4ff;
+    color: #0066cc;
+    border: 1px solid #b3d9ff;
+    border-radius: 5px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* 모드 토글 */
+  .mode-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .mode-btn {
+    flex: 1;
+    height: 34px;
+    border: 1.5px solid #e5e5e5;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    color: #555;
+    transition: all 0.1s;
+  }
+  .mode-btn:hover { border-color: #18a0fb; color: #18a0fb; }
+  .mode-btn.active { border-color: #18a0fb; background: #18a0fb; color: #fff; font-weight: 600; }
+
+  .mode-desc {
+    font-size: 11px;
+    color: #999;
+    margin-bottom: 14px;
+    line-height: 1.5;
+    padding: 8px 10px;
+    background: #f8f8f8;
+    border-radius: 6px;
+  }
+
+  /* Nav 모드 토글 */
+  .nav-mode-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .nav-mode-btn {
+    flex: 1;
+    height: 32px;
+    border: 1.5px solid #e5e5e5;
+    border-radius: 7px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.1s;
+  }
+  .nav-mode-btn:hover { border-color: #18a0fb; color: #18a0fb; }
+  .nav-mode-btn.active { border-color: #18a0fb; background: #e8f4ff; color: #0066cc; font-weight: 600; }
+  .nav-mode-btn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+
+  /* 옵션 */
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    background: #f8f8f8;
+    border-radius: 7px;
+  }
+  .option-row .opt-info { display: flex; flex-direction: column; gap: 1px; }
+  .opt-name { font-size: 12px; font-weight: 500; color: #333; }
+  .opt-desc { font-size: 10px; color: #aaa; }
+
+  .toggle { position: relative; width: 34px; height: 20px; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0;
+    background: #ddd;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .slider:before {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    left: 3px; top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  input:checked + .slider { background: #18a0fb; }
+  input:checked + .slider:before { transform: translateX(14px); }
+
+  .divider { border: none; border-top: 1px solid #eee; margin: 12px 0; }
+
+  .convert-btn {
+    width: 100%;
+    height: 44px;
+    background: #18a0fb;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.1s;
+    margin-bottom: 10px;
+  }
+  .convert-btn:hover { background: #0d8de8; }
+  .convert-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+  .message { text-align: center; font-size: 12px; min-height: 16px; white-space: pre-wrap; }
+  .message.success { color: #1a8a3c; }
+  .message.error { color: #e53935; }
+</style>
+</head>
+<body>
+
+<!-- 선택 프레임 -->
+<div class="label">선택한 프레임</div>
+<div class="selection-box" id="selBox">
+  <div class="dot"></div>
+  <div class="sel-text">프레임을 선택해주세요</div>
+</div>
+
+<!-- 프리셋 — 멀티셀렉트 -->
+<div class="label">해상도 프리셋 <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#bbb">(복수 선택 가능)</span></div>
+<div class="preset-grid">
+  <button class="preset-btn" data-w="375" data-h="812" data-label="Mobile" onclick="togglePreset(this)">
+    <div class="preset-name">Mobile</div>
+    <div class="preset-size">375 × 812</div>
+    <div class="check-mark"><svg viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </button>
+  <button class="preset-btn" data-w="768" data-h="1024" data-label="Tablet" onclick="togglePreset(this)">
+    <div class="preset-name">Tablet</div>
+    <div class="preset-size">768 × 1024</div>
+    <div class="check-mark"><svg viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </button>
+  <button class="preset-btn" data-w="1440" data-h="900" data-label="PC" onclick="togglePreset(this)">
+    <div class="preset-name">PC</div>
+    <div class="preset-size">1440 × 900</div>
+    <div class="check-mark"><svg viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </button>
+  <button class="preset-btn" data-w="1920" data-h="1080" data-label="Wide" onclick="togglePreset(this)">
+    <div class="preset-name">Wide</div>
+    <div class="preset-size">1920 × 1080</div>
+    <div class="check-mark"><svg viewBox="0 0 10 10" fill="none"><polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </button>
+</div>
+
+<!-- 커스텀 입력 -->
+<div class="label">직접 입력</div>
+<div class="custom-row">
+  <div class="input-group">
+    <div class="input-label">Width</div>
+    <div class="input-wrap">
+      <input class="dim-input" id="customW" type="number" min="1" max="9999" placeholder="1280" />
+      <span class="unit">px</span>
+    </div>
+  </div>
+  <div class="input-group">
+    <div class="input-label">Height</div>
+    <div class="input-wrap">
+      <input class="dim-input" id="customH" type="number" min="1" max="9999" placeholder="800" />
+      <span class="unit">px</span>
+    </div>
+  </div>
+  <button class="custom-apply" onclick="applyCustom()">추가</button>
+</div>
+
+<!-- 선택된 타겟 요약 -->
+<div class="targets-summary" id="targetsSummary"></div>
+
+<hr class="divider" />
+
+<!-- 레이아웃 모드 -->
+<div class="label">레이아웃 모드</div>
+<div class="mode-row">
+  <button class="mode-btn active" id="modeResponsive" onclick="setMode('responsive')">Responsive</button>
+  <button class="mode-btn" id="modeFixed" onclick="setMode('fixed')">Fixed</button>
+</div>
+<div class="mode-desc" id="modeDesc">
+  Status Bar 제거, 글로벌 Navigation 추가, 콘텐츠 width 대응, 상품 그리드 자동 변환.
+</div>
+
+<!-- Nav 모드 (Responsive 전용) -->
+<div id="navModeSection">
+  <div class="label">네비게이션 처리</div>
+  <div class="nav-mode-row">
+    <button class="nav-mode-btn" id="navReplace" onclick="setNavMode('replace')">웹 Nav 교체</button>
+    <button class="nav-mode-btn active" id="navKeep" onclick="setNavMode('keep')">모바일 Nav 유지</button>
+  </div>
+</div>
+
+<!-- 스케일 옵션 -->
+<div class="label">스케일 옵션 <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#bbb">Default: 레이아웃만 변환</span></div>
+<div class="options-grid">
+  <div class="option-row">
+    <div class="opt-info">
+      <div class="opt-name">폰트 ODS 토큰 + 패딩/갭 대응</div>
+      <div class="opt-desc">폰트: ODS 토큰 스냅 / 간격: Tablet +2px, PC +4px</div>
+    </div>
+    <label class="toggle"><input type="checkbox" id="optFont" /><span class="slider"></span></label>
+  </div>
+</div>
+
+<!-- 변환 버튼 -->
+<button class="convert-btn" id="convertBtn" disabled onclick="convert()">변환하기</button>
+<div class="message" id="message"></div>
+
+<script>
+  // 선택된 타겟 목록 (프리셋 + 커스텀)
+  var targets = []; // [{ w, h, label }]
+  var layoutMode = 'responsive';
+  var navMode = 'keep';
+
+  var modeDescs = {
+    responsive: 'Status Bar 제거, 글로벌 Navigation 추가, 콘텐츠 width 대응, 상품 그리드 자동 변환.',
+    fixed: '최대 568px 콘텐츠를 중앙 정렬. 결제/팝업 스크린용.',
+  };
+
+  function togglePreset(btn) {
+    var w = parseInt(btn.dataset.w);
+    var h = parseInt(btn.dataset.h);
+    var label = btn.dataset.label + ' ' + btn.dataset.w;
+    var idx = targets.findIndex(function(t) { return t.label === label; });
+
+    if (idx >= 0) {
+      // 이미 선택됨 → 제거
+      targets.splice(idx, 1);
+      btn.classList.remove('selected');
+    } else {
+      // 추가
+      targets.push({ w: w, h: h, label: label });
+      btn.classList.add('selected');
+    }
+
+    // PC(≥1024px) 선택 여부에 따라 모드 자동 전환
+    var hasPc    = targets.some(function(t) { return parseInt(t.w) >= 1024; });
+    var hasMobile = targets.some(function(t) { return parseInt(t.w) < 1024; });
+    if (hasPc && !hasMobile) {
+      setMode('fixed');
+    } else if (!hasPc && hasMobile) {
+      setMode('responsive');
+    }
+
+    updateNavModeDisable();
+    updateSummary();
+    updateConvertBtn();
+    showMessage('');
+  }
+
+  function applyCustom() {
+    var w = parseInt(document.getElementById('customW').value);
+    var h = parseInt(document.getElementById('customH').value);
+    if (!w || w <= 0) { showMessage('Width를 입력해주세요.', 'error'); return; }
+    if (!h || h <= 0) { showMessage('Height를 입력해주세요.', 'error'); return; }
+    var label = 'Custom ' + w + 'x' + h;
+    var exists = targets.some(function(t) { return t.label === label; });
+    if (!exists) {
+      targets.push({ w: w, h: h, label: label });
+    }
+    document.getElementById('customW').value = '';
+    document.getElementById('customH').value = '';
+    updateSummary();
+    updateConvertBtn();
+    showMessage('');
+  }
+
+  function removeTarget(label) {
+    targets = targets.filter(function(t) { return t.label !== label; });
+    // 프리셋 버튼 selected 해제
+    document.querySelectorAll('.preset-btn').forEach(function(btn) {
+      var btnLabel = btn.dataset.label + ' ' + btn.dataset.w;
+      if (btnLabel === label) btn.classList.remove('selected');
+    });
+    updateNavModeDisable();
+    updateSummary();
+    updateConvertBtn();
+  }
+
+  function updateSummary() {
+    var summary = document.getElementById('targetsSummary');
+    if (targets.length === 0) {
+      summary.classList.remove('visible');
+      summary.innerHTML = '';
+      return;
+    }
+    summary.classList.add('visible');
+    summary.innerHTML = targets.map(function(t) {
+      return '<span class="target-chip" onclick="removeTarget(\'' + t.label + '\')" style="cursor:pointer" title="클릭하여 제거">'
+        + t.label + ' ×</span>';
+    }).join('');
+  }
+
+  function setMode(mode) {
+    layoutMode = mode;
+    document.getElementById('modeResponsive').classList.toggle('active', mode === 'responsive');
+    document.getElementById('modeFixed').classList.toggle('active', mode === 'fixed');
+    document.getElementById('modeDesc').textContent = modeDescs[mode];
+
+    var el = document.getElementById('optFont');
+    el.disabled = mode === 'fixed';
+    el.closest('.option-row').style.opacity = mode === 'fixed' ? '0.4' : '1';
+
+    document.getElementById('navModeSection').style.display = mode === 'responsive' ? '' : 'none';
+
+    // Responsive + PC 선택 시 → Nav 모드 비활성화 상태 갱신
+    if (mode === 'responsive') updateNavModeDisable();
+  }
+
+  function setNavMode(mode) {
+    navMode = mode;
+    document.getElementById('navReplace').classList.toggle('active', mode === 'replace');
+    document.getElementById('navKeep').classList.toggle('active', mode === 'keep');
+  }
+
+  function updateNavModeDisable() {
+    var hasPc = targets.some(function(t) { return parseInt(t.w) >= 1024; });
+    document.getElementById('navKeep').disabled = hasPc;
+    if (hasPc) setNavMode('replace');
+  }
+
+  function updateConvertBtn() {
+    document.getElementById('convertBtn').disabled = targets.length === 0;
+    if (targets.length > 0) {
+      document.getElementById('convertBtn').textContent = targets.length + '개 해상도 변환하기';
+    } else {
+      document.getElementById('convertBtn').textContent = '변환하기';
+    }
+  }
+
+  function convert() {
+    if (targets.length === 0) return;
+    parent.postMessage({
+      pluginMessage: {
+        type: 'convert',
+        targets: targets,
+        layoutMode: layoutMode,
+        navMode: navMode,
+        scaleFont:    document.getElementById('optFont').checked,
+      }
+    }, '*');
+  }
+
+  function showMessage(text, type) {
+    var el = document.getElementById('message');
+    el.textContent = text;
+    el.className = 'message' + (type ? ' ' + type : '');
+  }
+
+  window.onmessage = function(event) {
+    var msg = event.data.pluginMessage;
+    if (!msg) return;
+
+    if (msg.type === 'selection') {
+      var box = document.getElementById('selBox');
+      if (msg.count === 0) {
+        box.className = 'selection-box';
+        box.innerHTML = '<div class="dot"></div><div class="sel-text">프레임을 선택해주세요</div>';
+      } else {
+        box.className = 'selection-box active';
+        var names = msg.names.length <= 2
+          ? msg.names.join(', ')
+          : msg.names.slice(0,2).join(', ') + ' 외 ' + (msg.names.length - 2) + '개';
+        var sizeStr = msg.sizes.length === 1
+          ? msg.sizes[0].w + ' × ' + msg.sizes[0].h + 'px'
+          : '';
+        box.innerHTML = '<div class="dot"></div><div class="sel-text"><strong>' + msg.count + '개 선택됨</strong>&nbsp;&nbsp;<span style="color:#aaa;font-size:11px">' + sizeStr + '</span><br>' + names + '</div>';
+      }
+    }
+
+    if (msg.type === 'success') showMessage(msg.message, 'success');
+    if (msg.type === 'error')   showMessage(msg.message, 'error');
+  };
+</script>
+</body>
+</html>

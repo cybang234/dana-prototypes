@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0">
+<title>기획전 V2</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-base: #EDE5DA;
+  --bg-card: #F5EFE7;
+  --bg-card-deep: #E8DFD3;
+  --bg-dark: #2C2520;
+  --bg-dark-soft: #3D342D;
+  --fg: #1A1614;
+  --fg-sub: #8A7E74;
+  --fg-light: #B5A99C;
+  --fg-inverse: #F5EFE7;
+  --accent: #C4956A;
+  --accent-deep: #A87B52;
+  --border: #D9CFBF;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: #b8ada2;
+  display: flex; justify-content: center;
+  padding: 32px 0 80px;
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  letter-spacing: -0.3px;
+  -webkit-font-smoothing: antialiased;
+}
+.phone {
+  width: 375px; background: var(--bg-base);
+  border-radius: 44px; overflow: hidden;
+  box-shadow: 0 12px 60px rgba(0,0,0,0.25);
+}
+
+/* ── Status Bar ── */
+.status-bar { height: 54px; }
+
+/* ── Top Nav ── */
+.top-nav {
+  height: 44px; display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+.nav-icon {
+  width: 36px; height: 36px;
+  background: var(--bg-card);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.nav-icon svg { width: 18px; height: 18px; stroke: var(--fg); fill: none; stroke-width: 1.8; }
+
+/* ── Hero ── */
+.hero {
+  padding: 24px 20px 0;
+}
+.hero-eyebrow {
+  font-size: 11px; font-weight: 600; color: var(--accent-deep);
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px; font-weight: 500;
+  color: var(--fg); line-height: 38px;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+.hero-sub {
+  font-size: 14px; font-weight: 400;
+  color: var(--fg-sub); line-height: 20px;
+}
+
+/* ── 메인 상품 카드 (큰 이미지) ── */
+.main-card {
+  margin: 24px 20px 0;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+}
+.main-card-img {
+  width: 100%; height: 340px;
+  background: linear-gradient(160deg, #D4C4B0 0%, #C8B49C 40%, #BFA88C 100%);
+  position: relative;
+}
+.main-card-brand {
+  position: absolute; top: 16px; left: 16px;
+  font-size: 13px; font-weight: 700; color: var(--fg);
+  letter-spacing: 0.5px;
+}
+.main-card-badge {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--accent); color: white;
+  font-size: 10px; font-weight: 700;
+  padding: 4px 10px; border-radius: 100px;
+  letter-spacing: 0.3px;
+}
+.main-card-cart {
+  position: absolute; bottom: 16px; right: 16px;
+  width: 44px; height: 44px;
+  background: var(--bg-dark);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.main-card-cart svg { width: 20px; height: 20px; stroke: var(--fg-inverse); fill: none; stroke-width: 1.6; }
+.main-card-info {
+  padding: 16px 16px 18px;
+}
+.main-card-name {
+  font-size: 15px; font-weight: 500; color: var(--fg);
+  line-height: 22px; margin-bottom: 6px;
+}
+.main-card-price-row {
+  display: flex; align-items: baseline; gap: 6px;
+}
+.main-card-discount {
+  font-size: 20px; font-weight: 800; color: var(--accent-deep);
+}
+.main-card-price {
+  font-size: 20px; font-weight: 700; color: var(--fg);
+}
+.main-card-original {
+  font-size: 13px; color: var(--fg-light);
+  text-decoration: line-through;
+}
+
+/* ── 혜택 배너 ── */
+.coupon-bar {
+  margin: 20px 20px 0;
+  background: var(--bg-dark);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.coupon-text {
+  color: var(--fg-inverse);
+}
+.coupon-label {
+  font-size: 11px; font-weight: 400;
+  opacity: 0.6; margin-bottom: 2px;
+}
+.coupon-value {
+  font-size: 15px; font-weight: 700;
+}
+.coupon-btn {
+  background: var(--accent);
+  border: none; color: white;
+  font-size: 12px; font-weight: 600;
+  padding: 8px 16px; border-radius: 100px;
+  cursor: pointer; font-family: inherit;
+  letter-spacing: -0.2px;
+}
+
+/* ── 카테고리 아이콘 ── */
+.cat-row {
+  margin: 24px 20px 0;
+  display: flex; justify-content: space-between;
+}
+.cat-item {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 6px; cursor: pointer;
+}
+.cat-icon {
+  width: 52px; height: 52px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.cat-icon.active { background: var(--bg-dark); }
+.cat-icon svg { width: 24px; height: 24px; stroke: var(--fg); fill: none; stroke-width: 1.4; }
+.cat-icon.active svg { stroke: var(--fg-inverse); }
+.cat-label {
+  font-size: 11px; font-weight: 500;
+  color: var(--fg-sub);
+}
+
+/* ── 섹션 헤더 ── */
+.sec-header {
+  padding: 32px 20px 14px;
+  display: flex; align-items: baseline;
+  justify-content: space-between;
+}
+.sec-title {
+  font-size: 18px; font-weight: 700; color: var(--fg);
+}
+.sec-more {
+  font-size: 12px; font-weight: 500; color: var(--fg-light);
+  display: flex; align-items: center; gap: 2px;
+}
+.sec-more svg { width: 14px; height: 14px; stroke: var(--fg-light); fill: none; stroke-width: 2; }
+
+/* ── 상품 그리드 ── */
+.grid {
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.card:active { transform: scale(0.97); }
+.card-img {
+  width: 100%; aspect-ratio: 1/1;
+  position: relative;
+}
+.card-img-fill {
+  width: 100%; height: 100%;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+.card-tag {
+  position: absolute; top: 8px; left: 8px;
+  font-size: 10px; font-weight: 700;
+  color: var(--accent-deep);
+  background: rgba(255,255,255,0.8);
+  padding: 3px 8px; border-radius: 6px;
+  backdrop-filter: blur(4px);
+}
+.card-scrap {
+  position: absolute; bottom: 8px; right: 8px;
+  width: 30px; height: 30px;
+  background: rgba(255,255,255,0.75);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.card-scrap svg { width: 15px; height: 15px; stroke: var(--fg); fill: none; stroke-width: 1.6; }
+.card-body { padding: 10px 12px 14px; }
+.card-brand {
+  font-size: 11px; font-weight: 600; color: var(--fg-sub);
+  margin-bottom: 2px;
+}
+.card-name {
+  font-size: 13px; font-weight: 400; color: var(--fg);
+  line-height: 17px;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+  margin-bottom: 8px;
+}
+.card-price-row { display: flex; align-items: baseline; gap: 4px; }
+.card-disc { font-size: 15px; font-weight: 800; color: var(--accent-deep); }
+.card-price { font-size: 15px; font-weight: 700; color: var(--fg); }
+.card-orig {
+  font-size: 11px; color: var(--fg-light);
+  text-decoration: line-through; margin-top: 1px;
+}
+.card-social {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 6px; font-size: 11px; color: var(--fg-light);
+}
+.card-social span { display: flex; align-items: center; gap: 2px; }
+.card-social svg { width: 11px; height: 11px; stroke: var(--fg-light); fill: none; stroke-width: 1.8; }
+
+/* ── 스타일링 배너 ── */
+.styling-banner {
+  margin: 28px 20px 0;
+  height: 100px;
+  background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-dark-soft) 100%);
+  border-radius: var(--radius-md);
+  display: flex; align-items: center;
+  padding: 0 20px;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.styling-left {}
+.styling-count {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; font-weight: 600;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.styling-desc {
+  font-size: 13px; font-weight: 400;
+  color: var(--fg-inverse); opacity: 0.7;
+  line-height: 18px;
+}
+.styling-arrow {
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.styling-arrow svg { width: 16px; height: 16px; stroke: var(--fg-inverse); fill: none; stroke-width: 2; }
+
+/* ── 하단 여백 ── */
+.bottom-space { height: 32px; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="status-bar"></div>
+
+  <!-- Top Nav -->
+  <div class="top-nav">
+    <div class="nav-icon">
+      <svg viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+    </div>
+    <div class="nav-icon">
+      <svg viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+    </div>
+  </div>
+
+  <!-- Hero Text -->
+  <div class="hero">
+    <div class="hero-eyebrow">BRAND NAME</div>
+    <div class="hero-title">Designed to fit<br>your home.</div>
+    <div class="hero-sub">우리 집에 맞는 봄맞이 리빙 페어</div>
+  </div>
+
+  <!-- 메인 상품 카드 -->
+  <div class="main-card">
+    <div class="main-card-img" style="background:linear-gradient(160deg, #DDD0C0 0%, #CBBDA8 50%, #B8A68C 100%);">
+      <div class="main-card-brand">Steelcase</div>
+      <div class="main-card-badge">단독 특가</div>
+      <div class="main-card-cart">
+        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      </div>
+    </div>
+    <div class="main-card-info">
+      <div class="main-card-name">카를한센 CH24 위시본 체어 (내추럴)</div>
+      <div class="main-card-price-row">
+        <span class="main-card-discount">35%</span>
+        <span class="main-card-price">389,000</span>
+        <span class="main-card-original">599,000</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 쿠폰 바 -->
+  <div class="coupon-bar">
+    <div class="coupon-text">
+      <div class="coupon-label">기획전 전용 쿠폰</div>
+      <div class="coupon-value">최대 15,000원 할인</div>
+    </div>
+    <button class="coupon-btn">쿠폰 받기</button>
+  </div>
+
+  <!-- 카테고리 아이콘 -->
+  <div class="cat-row">
+    <div class="cat-item">
+      <div class="cat-icon active">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <span class="cat-label">전체</span>
+    </div>
+    <div class="cat-item">
+      <div class="cat-icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="14" width="20" height="4" rx="1"/><path d="M4 14V8a2 2 0 012-2h12a2 2 0 012 2v6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="6" y1="22" x2="18" y2="22"/></svg>
+      </div>
+      <span class="cat-label">가구</span>
+    </div>
+    <div class="cat-item">
+      <div class="cat-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      </div>
+      <span class="cat-label">조명</span>
+    </div>
+    <div class="cat-item">
+      <div class="cat-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      </div>
+      <span class="cat-label">패브릭</span>
+    </div>
+    <div class="cat-item">
+      <div class="cat-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </div>
+      <span class="cat-label">데코</span>
+    </div>
+  </div>
+
+  <!-- 섹션: 인기 상품 -->
+  <div class="sec-header">
+    <span class="sec-title">인기 상품</span>
+    <span class="sec-more">더보기 <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
+  </div>
+
+  <!-- 상품 그리드 -->
+  <div class="grid">
+    <div class="card">
+      <div class="card-img">
+        <div class="card-img-fill" style="background:linear-gradient(150deg,#D8CCBC,#C4B4A0);"></div>
+        <span class="card-tag">BEST</span>
+        <div class="card-scrap">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-brand">일룸</div>
+        <div class="card-name">쿠시노 패브릭 3인 소파</div>
+        <div class="card-price-row">
+          <span class="card-disc">28%</span>
+          <span class="card-price">527,000</span>
+        </div>
+        <div class="card-orig">732,000</div>
+        <div class="card-social">
+          <span><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>5,123</span>
+          <span><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>891</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-img">
+        <div class="card-img-fill" style="background:linear-gradient(150deg,#C8D0C8,#B0BCA8);"></div>
+        <div class="card-scrap">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-brand">무아스</div>
+        <div class="card-name">LED 무드등 스탠드 조명</div>
+        <div class="card-price-row">
+          <span class="card-disc">42%</span>
+          <span class="card-price">34,900</span>
+        </div>
+        <div class="card-orig">59,900</div>
+        <div class="card-social">
+          <span><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>1,204</span>
+          <span><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>256</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-img">
+        <div class="card-img-fill" style="background:linear-gradient(150deg,#E0D4C4,#CCB8A0);"></div>
+        <span class="card-tag">단독</span>
+        <div class="card-scrap">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-brand">한샘</div>
+        <div class="card-name">포레 원목 4인 식탁세트</div>
+        <div class="card-price-row">
+          <span class="card-disc">20%</span>
+          <span class="card-price">448,000</span>
+        </div>
+        <div class="card-orig">560,000</div>
+        <div class="card-social">
+          <span><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>3,456</span>
+          <span><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>672</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-img">
+        <div class="card-img-fill" style="background:linear-gradient(150deg,#D0D8E0,#B8C4D0);"></div>
+        <span class="card-tag">최저가</span>
+        <div class="card-scrap">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-brand">시디즈</div>
+        <div class="card-name">T50 에어 메쉬 의자</div>
+        <div class="card-price-row">
+          <span class="card-disc">45%</span>
+          <span class="card-price">269,000</span>
+        </div>
+        <div class="card-orig">489,000</div>
+        <div class="card-social">
+          <span><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>7,891</span>
+          <span><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>1,234</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스타일링 배너 -->
+  <div class="styling-banner">
+    <div class="styling-left">
+      <div class="styling-count">4,231</div>
+      <div class="styling-desc">유저들이 이 상품으로<br>꾸민 집 구경하기</div>
+    </div>
+    <div class="styling-arrow">
+      <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+  </div>
+
+  <div class="bottom-space"></div>
+
+</div>
+</body>
+</html>

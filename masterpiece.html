@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>하찮은 귀뚜라미</title>
+<style>
+body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: white; }
+canvas { border: 1px solid #ccc; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+<canvas id="c" width="400" height="400"></canvas>
+<script>
+const c = document.getElementById('c').getContext('2d');
+
+// 하찮은 픽셀 그리기 함수
+function px(x, y, color, size = 3) {
+  c.fillStyle = color;
+  c.fillRect(x, y, size, size);
+}
+
+function line(x1, y1, x2, y2, color, size = 3) {
+  c.strokeStyle = color;
+  c.lineWidth = size;
+  c.lineCap = 'round';
+  c.beginPath();
+  c.moveTo(x1, y1);
+  c.lineTo(x2, y2);
+  c.stroke();
+}
+
+function wobblyLine(x1, y1, x2, y2, color, size = 2) {
+  c.strokeStyle = color;
+  c.lineWidth = size;
+  c.beginPath();
+  c.moveTo(x1, y1);
+  const steps = 8;
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const x = x1 + (x2 - x1) * t + (Math.random() - 0.5) * 6;
+    const y = y1 + (y2 - y1) * t + (Math.random() - 0.5) * 6;
+    c.lineTo(x, y);
+  }
+  c.stroke();
+}
+
+// 배경
+c.fillStyle = 'white';
+c.fillRect(0, 0, 400, 400);
+
+const green = '#4a7a3a';
+const darkGreen = '#2d5a1e';
+const brown = '#8B6914';
+const darkBrown = '#5a3a0a';
+
+// === 몸통 (대충 타원) ===
+c.fillStyle = green;
+c.beginPath();
+c.ellipse(230, 220, 70, 35, 0.3, 0, Math.PI * 2);
+c.fill();
+c.strokeStyle = darkGreen;
+c.lineWidth = 2;
+c.stroke();
+
+// 몸통 날개 무늬 (대충 선 몇개)
+c.strokeStyle = '#6a9a5a';
+c.lineWidth = 1;
+wobblyLine(175, 210, 280, 200, '#6a9a5a', 1);
+wobblyLine(180, 220, 285, 215, '#6a9a5a', 1);
+wobblyLine(185, 230, 275, 230, '#6a9a5a', 1);
+
+// === 머리 (동그라미 대충) ===
+c.fillStyle = darkGreen;
+c.beginPath();
+c.arc(155, 185, 22, 0, Math.PI * 2);
+c.fill();
+c.strokeStyle = '#1a3a0a';
+c.lineWidth = 2;
+c.stroke();
+
+// 눈 (점 하나)
+c.fillStyle = 'white';
+c.beginPath();
+c.arc(148, 180, 5, 0, Math.PI * 2);
+c.fill();
+c.fillStyle = 'black';
+c.beginPath();
+c.arc(147, 179, 2, 0, Math.PI * 2);
+c.fill();
+
+// 입 (대충 선)
+wobblyLine(145, 195, 160, 198, '#1a3a0a', 1);
+
+// === 더듬이 ===
+wobblyLine(148, 168, 130, 130, darkGreen, 2);
+wobblyLine(130, 130, 120, 118, darkGreen, 2);
+wobblyLine(155, 165, 160, 125, darkGreen, 2);
+wobblyLine(160, 125, 155, 110, darkGreen, 2);
+
+// === 첼로/바이올린 (대충 갈색 덩어리) ===
+// 몸통
+c.fillStyle = brown;
+c.beginPath();
+c.ellipse(135, 250, 18, 28, 0.2, 0, Math.PI * 2);
+c.fill();
+c.strokeStyle = darkBrown;
+c.lineWidth = 2;
+c.stroke();
+
+// 윗부분 좁은 부분
+c.fillStyle = brown;
+c.beginPath();
+c.ellipse(132, 215, 10, 15, 0.1, 0, Math.PI * 2);
+c.fill();
+c.strokeStyle = darkBrown;
+c.lineWidth = 2;
+c.stroke();
+
+// 넥 (목)
+wobblyLine(128, 200, 122, 170, darkBrown, 3);
+
+// 줄 (대충)
+line(130, 218, 133, 268, darkBrown, 1);
+line(135, 217, 137, 265, darkBrown, 1);
+
+// f홀 대충
+c.fillStyle = darkBrown;
+c.font = '10px serif';
+c.fillText('f', 125, 248);
+c.fillText('f', 138, 252);
+
+// === 활 (대충 선) ===
+wobblyLine(110, 230, 90, 280, darkBrown, 2);
+// 활 털
+line(108, 235, 92, 275, '#ddd', 1);
+
+// === 앞다리 (악기 잡는 팔) ===
+wobblyLine(165, 200, 145, 220, green, 3);
+wobblyLine(145, 220, 130, 240, green, 3);
+
+// 활 잡는 팔
+wobblyLine(160, 205, 135, 235, green, 3);
+wobblyLine(135, 235, 105, 240, green, 3);
+
+// === 뒷다리 (큰거) ===
+// 허벅지
+c.fillStyle = green;
+c.beginPath();
+c.ellipse(270, 200, 35, 12, -0.8, 0, Math.PI * 2);
+c.fill();
+c.strokeStyle = darkGreen;
+c.lineWidth = 2;
+c.stroke();
+
+// 종아리
+wobblyLine(290, 185, 310, 280, green, 3);
+// 발
+wobblyLine(310, 280, 330, 290, green, 2);
+wobblyLine(330, 290, 345, 288, green, 2);
+
+// === 가운데 다리 ===
+wobblyLine(220, 250, 210, 290, green, 2);
+wobblyLine(210, 290, 200, 300, green, 2);
+
+// === 꼬리 쪽 줄무늬 ===
+c.fillStyle = darkGreen;
+c.beginPath();
+c.ellipse(305, 230, 15, 10, 0.3, 0, Math.PI * 2);
+c.fill();
+wobblyLine(310, 235, 320, 245, darkGreen, 2);
+wobblyLine(315, 240, 325, 255, darkGreen, 2);
+
+// === 음표 (하찮게) ===
+c.fillStyle = 'black';
+c.font = '18px serif';
+c.fillText('♪', 85, 200);
+c.font = '14px serif';
+c.fillText('♫', 70, 170);
+c.font = '12px serif';
+c.fillText('♪', 100, 160);
+c.font = '16px serif';
+c.fillText('♩', 60, 220);
+
+// === 바닥 선 (대충) ===
+c.strokeStyle = '#ccc';
+c.lineWidth = 1;
+wobblyLine(30, 310, 370, 310, '#ccc', 1);
+
+// 서명 (하찮게)
+c.fillStyle = '#aaa';
+c.font = '9px monospace';
+c.fillText('by 하찮은 마우스', 280, 390);
+</script>
+</body>
+</html>
