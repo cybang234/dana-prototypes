@@ -1,7 +1,18 @@
 {
-  "syncedAt": "2026-06-30T11:05:00+09:00",
+  "syncedAt": "2026-06-30T13:55:00+09:00",
   "note": "Slack todo-list 채널에서 danachecking 이모지 단 메시지를 모아 정리한 데이터입니다.",
   "todos": [
+    {
+      "id": "t-1782795074139059",
+      "title": "Jira 티켓 COMMWEB-7806 확인 필요",
+      "priority": "P2",
+      "category": "요청",
+      "team": "마케팅",
+      "requester": "Haneul",
+      "source": "https://ohou-se.slack.com/archives/C0A9QP6SYLS/p1782794886906119",
+      "channel": "proj-comm-promotion",
+      "createdAt": "6.30 13:51"
+    },
     {
       "id": "t-1782784916906379",
       "title": "머니 점검 case — 머니 자체 점검 디자인 요청",
