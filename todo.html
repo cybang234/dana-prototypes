@@ -303,6 +303,59 @@ img, video, iframe { max-width: 100%; }
   overflow: hidden;
 }
 
+/* ============ Add Modal ============ */
+.add-modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: flex-end; justify-content: center; }
+.add-modal[hidden] { display: none !important; }
+.add-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); }
+.add-modal-sheet {
+  position: relative;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 0));
+  width: 100%; max-width: 480px;
+  box-shadow: 0 -8px 24px rgba(0,0,0,0.08);
+  animation: sheetUp 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.add-modal-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 16px; color: #141414; }
+#add-input {
+  width: 100%; height: 44px;
+  padding: 0 14px;
+  border: 1.5px solid #E0E0E0; border-radius: 10px;
+  font-family: Pretendard, sans-serif; font-size: 14px; font-weight: 500;
+  background: #FAFAFA; color: #141414;
+  box-sizing: border-box;
+}
+#add-input:focus { outline: none; border-color: #141414; background: #fff; }
+.add-priority-row { display: flex; gap: 6px; margin-top: 12px; }
+.add-pri-btn {
+  flex: 1;
+  -webkit-appearance: none; appearance: none;
+  height: 36px;
+  border: 1.5px solid #E0E0E0; border-radius: 10px;
+  background: #fff; color: #999;
+  font-family: Pretendard, sans-serif; font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.add-pri-btn.on[data-pri="P1"] { background: #FF3B30; color: #fff; border-color: #FF3B30; }
+.add-pri-btn.on[data-pri="P2"] { background: #FF9500; color: #fff; border-color: #FF9500; }
+.add-pri-btn.on[data-pri="P3"] { background: #FFCC00; color: #4a3500; border-color: #FFCC00; }
+.add-pri-btn.on[data-pri="P4"] { background: #B0B0B0; color: #fff; border-color: #B0B0B0; }
+.add-actions { display: flex; gap: 8px; margin-top: 20px; }
+.add-btn {
+  flex: 1;
+  -webkit-appearance: none; appearance: none;
+  height: 44px;
+  border: 0; border-radius: 10px;
+  font-family: Pretendard, sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.add-btn.ghost { background: #F4F4F4; color: #141414; }
+.add-btn.primary { background: #141414; color: #fff; }
+.add-btn:active { opacity: 0.85; }
+
 /* ============ Calendar page ============ */
 .cal-page {
   position: fixed;
@@ -655,6 +708,9 @@ img, video, iframe { max-width: 100%; }
     <span class="logo">🔥</span>
   </div>
   <div class="right">
+    <button class="icon-btn" id="btn-add-todo" aria-label="할 일 추가">
+      <svg class="icon" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
     <button class="icon-btn" id="btn-calendar" aria-label="캘린더">
       <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.5" y="5" width="17" height="15" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
     </button>
@@ -663,6 +719,25 @@ img, video, iframe { max-width: 100%; }
     </button>
   </div>
 </header>
+
+<!-- 직접 할 일 추가 모달 -->
+<div class="add-modal" id="add-modal" hidden>
+  <div class="add-modal-backdrop" id="add-modal-backdrop"></div>
+  <div class="add-modal-sheet">
+    <h3 class="add-modal-title">할 일 추가</h3>
+    <input type="text" id="add-input" placeholder="무엇을 해야 하나요?" maxlength="80" autocomplete="off">
+    <div class="add-priority-row">
+      <button class="add-pri-btn" data-pri="P1">P1</button>
+      <button class="add-pri-btn on" data-pri="P2">P2</button>
+      <button class="add-pri-btn" data-pri="P3">P3</button>
+      <button class="add-pri-btn" data-pri="P4">P4</button>
+    </div>
+    <div class="add-actions">
+      <button class="add-btn ghost" id="add-cancel">취소</button>
+      <button class="add-btn primary" id="add-save">추가</button>
+    </div>
+  </div>
+</div>
 
 <!-- 오늘 일정 (schedule) -->
 <section class="schedule" id="schedule"></section>
@@ -802,6 +877,13 @@ function saveLocalDone(set) {
 }
 let LOCAL_DONE = loadLocalDone();
 
+// 사용자가 직접 등록한 할 일 (localStorage)
+function loadMyTodos() {
+  try { return JSON.parse(localStorage.getItem('myTodos') || '[]'); }
+  catch { return []; }
+}
+function saveMyTodos(arr) { localStorage.setItem('myTodos', JSON.stringify(arr)); }
+
 // 완료 시각 기록 (캘린더 history용) — {id: ISO date string}
 function loadDoneAt() {
   try { return JSON.parse(localStorage.getItem('danaDoneAt') || '{}'); }
@@ -861,6 +943,9 @@ async function fetchData() {
     const todoRes = await fetch('./data/todos.json?t=' + Date.now());
     const todoData = await todoRes.json();
     TODOS_RAW = todoData.todos || [];
+    // localStorage에 사용자가 직접 등록한 myTodos 합치기 (앞쪽 — 최신순)
+    const myTodos = loadMyTodos();
+    TODOS_RAW = [...myTodos, ...TODOS_RAW];
     TODOS = TODOS_RAW.map(t => ({ ...t, tab: 'open', done: LOCAL_DONE.has(t.id) }));
   } catch (e) {
     TODOS = [];
@@ -1270,6 +1355,51 @@ document.getElementById('cal-next')?.addEventListener('click', () => {
   calViewMonth++;
   if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
   renderCalendar();
+});
+
+// ============ 직접 할 일 추가 ============
+const addModalEl = document.getElementById('add-modal');
+let addPriority = 'P2';
+document.getElementById('btn-add-todo')?.addEventListener('click', () => {
+  addPriority = 'P2';
+  document.querySelectorAll('.add-pri-btn').forEach(b => b.classList.toggle('on', b.dataset.pri === 'P2'));
+  document.getElementById('add-input').value = '';
+  addModalEl.hidden = false;
+  setTimeout(() => document.getElementById('add-input').focus(), 100);
+});
+document.getElementById('add-modal-backdrop')?.addEventListener('click', () => { addModalEl.hidden = true; });
+document.getElementById('add-cancel')?.addEventListener('click', () => { addModalEl.hidden = true; });
+document.querySelectorAll('.add-pri-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    addPriority = b.dataset.pri;
+    document.querySelectorAll('.add-pri-btn').forEach(x => x.classList.toggle('on', x === b));
+  });
+});
+document.getElementById('add-save')?.addEventListener('click', () => {
+  const title = document.getElementById('add-input').value.trim();
+  if (!title) return;
+  const myTodos = loadMyTodos();
+  myTodos.unshift({
+    id: 'my-' + Date.now(),
+    title,
+    priority: addPriority,
+    category: '직접',
+    team: '내가 추가',
+    requester: 'Dana',
+    source: '',
+    channel: '',
+    createdAt: new Date().toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }).replace(/\./g, '').replace(/ /g, '.').replace('.', '.').slice(0, -1),
+  });
+  saveMyTodos(myTodos);
+  addModalEl.hidden = true;
+  // 즉시 UI 갱신
+  TODOS_RAW = [...myTodos, ...TODOS_RAW.filter(t => !String(t.id).startsWith('my-'))];
+  TODOS = TODOS_RAW.map(t => ({ ...t, tab: 'open', done: LOCAL_DONE.has(t.id) }));
+  renderTodos();
+});
+// Enter 키로 저장
+document.getElementById('add-input')?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('add-save').click();
 });
 
 // 새로고침 버튼
