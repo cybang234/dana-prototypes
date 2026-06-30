@@ -15,6 +15,10 @@ from pywebpush import webpush, WebPushException
 ROOT = Path(__file__).resolve().parent.parent
 TODOS_PATH = ROOT / "data" / "todos.json"
 NL_PATH = ROOT / "data" / "newsletters.json"
+CAL_PATH = ROOT / "data" / "calendar.json"
+
+from datetime import datetime, timezone, timedelta
+KST = timezone(timedelta(hours=9))
 
 # Secret 누락 시 명확한 에러
 required = ["VAPID_PRIVATE_KEY_PEM", "VAPID_SUBJECT", "PUSH_SUBSCRIPTIONS_JSON"]
@@ -63,32 +67,59 @@ def truncate(s, n):
 
 
 def build_body():
-    todos = load_json(TODOS_PATH, {"todos": []}).get("todos", [])
+    # done 처리 안 된 todo만
+    todos_all = load_json(TODOS_PATH, {"todos": []}).get("todos", [])
+    todos = [t for t in todos_all if not t.get("done")]
     newsletters = load_json(NL_PATH, {"newsletters": []}).get("newsletters", [])
     nl_count = len(newsletters)
 
+    # 오늘 미팅 (calendar.json events 중 today)
+    today_key = datetime.now(KST).strftime("%Y-%m-%d")
+    cal_events = load_json(CAL_PATH, {"events": []}).get("events", [])
+    today_events = [e for e in cal_events if (e.get("date") or "") == today_key]
+
     todos.sort(key=lambda t: PRIORITY_RANK.get(t.get("priority"), 9))
 
-    if not todos:
+    sections = []
+
+    # 1. 미팅
+    if today_events:
+        evt_lines = []
+        for e in today_events[:4]:
+            evt_lines.append(f"• {e.get('time','')} {truncate(e.get('title',''), 24)}")
+        if len(today_events) > 4:
+            evt_lines.append(f"외 {len(today_events)-4}건 더")
+        sections.append("📅 오늘 미팅 " + str(len(today_events)) + "건\n" + "\n".join(evt_lines))
+
+    # 2. 할일
+    if todos:
+        lines = []
+        shown = todos[:5]
+        for t in shown:
+            p = t.get("priority", "P3")
+            title = truncate(t.get("title", ""), 28)
+            lines.append(f"• {p} · {title}")
+        extra = len(todos) - len(shown)
+        if extra > 0:
+            lines.append(f"외 {extra}건 더")
+        sections.append(f"✅ 할 일 {len(todos)}건\n" + "\n".join(lines))
+
+    # 3. 뉴스레터
+    sections.append(f"📬 안 읽은 뉴스레터 {nl_count}개")
+
+    if not todos and not today_events:
         return {
-            "title": "🌿 오늘은 할 일이 없어요",
-            "body": f"여유로운 하루 보내세요\n\n📬 안 읽은 뉴스레터 {nl_count}개",
+            "title": "🌿 여유로운 하루 보내세요",
+            "body": f"오늘 할 일도, 미팅도 없어요\n\n📬 안 읽은 뉴스레터 {nl_count}개",
         }
 
-    lines = []
-    shown = todos[:5]
-    for t in shown:
-        p = t.get("priority", "P3")
-        title = truncate(t.get("title", ""), 30)
-        lines.append(f"• {p} · {title}")
-    extra = len(todos) - len(shown)
-    if extra > 0:
-        lines.append(f"외 {extra}건 더")
-    body = "\n".join(lines) + f"\n\n📬 안 읽은 뉴스레터 {nl_count}개"
-    return {
-        "title": f"🌞 오늘의 할 일 {len(todos)}건",
-        "body": body,
-    }
+    # title — 우선순위: 할일이 있으면 할일, 없으면 미팅
+    if todos:
+        title = f"🌞 오늘의 할 일 {len(todos)}건"
+    else:
+        title = f"📅 오늘 미팅 {len(today_events)}건"
+
+    return {"title": title, "body": "\n\n".join(sections)}
 
 
 def send_push(payload):
