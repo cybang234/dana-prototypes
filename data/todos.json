@@ -1,7 +1,18 @@
 {
-  "syncedAt": "2026-06-29T16:30:00+09:00",
+  "syncedAt": "2026-06-30T10:00:00+09:00",
   "note": "Slack todo-list 채널에서 danachecking 이모지 단 메시지를 모아 정리한 데이터입니다.",
   "todos": [
+    {
+      "id": "t-1782780713924519",
+      "title": "기획전 내 탭도 개인화 가능한지 확인 (키워드탭처럼)",
+      "priority": "P2",
+      "category": "질문",
+      "team": "마케팅",
+      "requester": "Dana",
+      "source": "https://ohou-se.slack.com/archives/C0A9QP6SYLS/p1782179016106379",
+      "channel": "proj-comm-promotion",
+      "createdAt": "6.30 09:51"
+    },
     {
       "id": "t-1782716957",
       "title": "고객확인정보 확인완료 모달 겹침 이슈 확인",
