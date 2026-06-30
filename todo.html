@@ -997,8 +997,11 @@ function renderTodos() {
   todoListEl.hidden = false;
   nlListEl.hidden = true;
 
-  // list
-  const list = TODOS.sort((a, b) => prRank(a.priority) - prRank(b.priority));
+  // 완료한 todo는 메인 리스트에서 숨김 (캘린더 페이지에서 history로 확인 가능)
+  const list = TODOS.filter(t => !t.done).sort((a, b) => prRank(a.priority) - prRank(b.priority));
+  // 열린 todo 카운트 갱신
+  const openCountEl = document.getElementById('open-count');
+  if (openCountEl) openCountEl.textContent = ' ' + list.length;
   const el = todoListEl;
   el.innerHTML = '';
   if (list.length === 0) {
