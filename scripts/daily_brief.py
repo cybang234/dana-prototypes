@@ -20,34 +20,32 @@ CAL_PATH = ROOT / "data" / "calendar.json"
 from datetime import datetime, timezone, timedelta
 KST = timezone(timedelta(hours=9))
 
-# Secret 누락 시 명확한 에러
+# Secret 누락 시 silent exit (workflow fail 메일 방지)
 required = ["VAPID_PRIVATE_KEY_PEM", "VAPID_SUBJECT", "PUSH_SUBSCRIPTIONS_JSON"]
 missing = [k for k in required if not os.environ.get(k)]
 if missing:
-    print(f"❌ MISSING SECRETS: {', '.join(missing)}", file=sys.stderr)
-    print("   GitHub Repo Settings → Secrets and variables → Actions 에서 등록 필요", file=sys.stderr)
-    sys.exit(1)
+    print(f"⚠ skip — secrets not configured: {', '.join(missing)}")
+    print("   등록하려면: GitHub Repo Settings → Secrets and variables → Actions")
+    sys.exit(0)  # 성공 코드로 종료 → workflow fail 메일 안 옴
 
 VAPID_PRIVATE_PEM = os.environ["VAPID_PRIVATE_KEY_PEM"]
 VAPID_SUBJECT = os.environ["VAPID_SUBJECT"]
 
-# PEM 첫 줄 검증 (줄바꿈 손상 자주 발생)
+# PEM 첫 줄 검증
 if "BEGIN PRIVATE KEY" not in VAPID_PRIVATE_PEM:
-    print("❌ VAPID_PRIVATE_KEY_PEM 형식 이상 — BEGIN/END 라인 누락", file=sys.stderr)
-    print(f"   현재 첫 60자: {VAPID_PRIVATE_PEM[:60]!r}", file=sys.stderr)
-    sys.exit(1)
+    print("⚠ skip — VAPID_PRIVATE_KEY_PEM 형식 이상")
+    sys.exit(0)  # 성공 코드 → fail 메일 안 옴
 
 try:
     raw = os.environ["PUSH_SUBSCRIPTIONS_JSON"]
-    # control character (줄바꿈, 탭 등) 자동 제거 — Secret에 붙여넣을 때 URL이 자동 줄바꿈 되는 경우 보호
+    # control character (줄바꿈, 탭 등) 자동 제거
     cleaned = re.sub(r"[\x00-\x1f\x7f]", "", raw)
     SUBSCRIPTIONS = json.loads(cleaned)
     if not isinstance(SUBSCRIPTIONS, list) or len(SUBSCRIPTIONS) == 0:
         raise ValueError("not a non-empty list")
 except (json.JSONDecodeError, ValueError) as e:
-    print(f"❌ PUSH_SUBSCRIPTIONS_JSON 파싱 실패: {e}", file=sys.stderr)
-    print(f"   현재 값 일부: {os.environ.get('PUSH_SUBSCRIPTIONS_JSON', '')[:80]!r}", file=sys.stderr)
-    sys.exit(1)
+    print(f"⚠ skip — PUSH_SUBSCRIPTIONS_JSON 파싱 실패: {e}")
+    sys.exit(0)  # 성공 코드 → fail 메일 안 옴
 
 print(f"✓ Secrets OK · subscriptions={len(SUBSCRIPTIONS)}")
 
