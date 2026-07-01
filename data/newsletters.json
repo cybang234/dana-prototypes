@@ -1,6 +1,24 @@
 {
-  "syncedAt": "2026-06-30T10:30:00+09:00",
+  "syncedAt": "2026-07-01T08:47:00+09:00",
   "newsletters": [
+    {
+      "id": "19f1a523bfe1fd44",
+      "subject": "🦔\"서남권 야호-!\" 역대급 반도체 투자 '메가 프로젝트' 정체는?",
+      "sender": "NEWNEEK",
+      "date": "7.1 05:57",
+      "snippet": "#메가프로젝트 #JTBC #트럼프 뉴닉 데일리 2026.07.01. 수요일",
+      "bodyPath": "./data/newsletters/19f1a523bfe1fd44.txt",
+      "url": "https://mail.google.com/mail/u/0/#inbox/19f1a523bfe1fd44"
+    },
+    {
+      "id": "19f168460df3f273",
+      "subject": "💜캘린더 박제! 하반기 도서전·영화제·전시 총정리 📚",
+      "sender": "NEWNEEK",
+      "date": "6.30 12:13",
+      "snippet": "#캔바무료체험권 #하반기도서전 #운세트렌드 고슴이의 비트 ㅣ 비트 큐레이션 2026.06.30",
+      "bodyPath": "./data/newsletters/19f168460df3f273.txt",
+      "url": "https://mail.google.com/mail/u/0/#inbox/19f168460df3f273"
+    },
     {
       "id": "19f15177f85aef17",
       "subject": "광주❤️전남 \"우리 통합했어요\" 앞으로 뭐가 바뀔까?",
