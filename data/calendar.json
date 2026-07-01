@@ -1,15 +1,15 @@
 {
-  "syncedAt": "2026-07-01T00:05:00+09:00",
+  "syncedAt": "2026-07-01T00:12:00+09:00",
   "events": [
     { "date": "2026-07-01", "time": "10:00 - 10:30", "title": "평가 제출", "loc": "" },
     { "date": "2026-07-01", "time": "11:45 - 13:00", "title": "다나리 점심", "loc": "" },
-    { "date": "2026-07-01", "time": "17:00 - 18:00", "title": "Weekly PD critique (1조)", "loc": "25F-25-502-드레스룸" },
+    { "date": "2026-07-01", "time": "17:00 - 18:00", "title": "Weekly PD critique (1조)", "loc": "25F-25-502-드레스룸 (6)" },
     { "date": "2026-07-02", "time": "11:50 - 13:15", "title": "Commerce UX Lunch", "loc": "" },
-    { "date": "2026-07-02", "time": "16:00 - 17:00", "title": "Ads PRD Time-out", "loc": "26F-26-2602-대회의실" },
-    { "date": "2026-07-06", "time": "10:45 - 11:30", "title": "[Home] Promotion Weekly Scrum", "loc": "25F-25-604-회의실" },
-    { "date": "2026-07-06", "time": "15:00 - 16:00", "title": "ads-po/pd/da weekly", "loc": "27F-3.회의존-308-TV" },
-    { "date": "2026-07-07", "time": "11:50 - 13:00", "title": "Lunch 🍀", "loc": "25F-25-405-영화&게임" },
-    { "date": "2026-07-07", "time": "14:00 - 15:00", "title": "PD weekly timeout", "loc": "26F-26-2602-대회의실" },
-    { "date": "2026-07-07", "time": "16:00 - 16:30", "title": "1on1 Dana / Yohan", "loc": "26F-26-2604" }
+    { "date": "2026-07-02", "time": "16:00 - 17:00", "title": "Ads PRD Time-out", "loc": "26F-26-2602-대회의실 (24)" },
+    { "date": "2026-07-06", "time": "10:45 - 11:30", "title": "[Home] Promotion Weekly Scrum", "loc": "25F-25-604-회의실 (10)" },
+    { "date": "2026-07-06", "time": "15:00 - 16:00", "title": "ads-po/pd/da weekly", "loc": "27F-3.회의존-308-TV(신규) (5)" },
+    { "date": "2026-07-07", "time": "11:50 - 13:00", "title": "Lunch 🍀", "loc": "25F-25-405-영화&게임 (6)" },
+    { "date": "2026-07-07", "time": "14:00 - 15:00", "title": "PD weekly timeout", "loc": "26F-26-2602-대회의실 (24)" },
+    { "date": "2026-07-07", "time": "16:00 - 16:30", "title": "1on1 Dana / Yohan", "loc": "26F-26-2604 (4)" }
   ]
 }
