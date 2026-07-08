@@ -516,6 +516,49 @@ body.view-custom .demo-theme-block { display: block; }
 .demo-preset-action:hover { background: #f5f5f5; border-style: solid; border-color: #141414; color: #141414; }
 .demo-preset-action:disabled { opacity: 0.5; cursor: wait; }
 
+.demo-preset-form {
+  display: flex; gap: 4px; align-items: center;
+  margin-top: 6px;
+}
+.demo-preset-form[hidden] { display: none; }
+.demo-preset-name {
+  flex: 1; min-width: 0;
+  height: 28px; padding: 0 8px;
+  border: 1px solid #ddd; border-radius: 6px;
+  font-family: inherit; font-size: 12px;
+  color: #141414;
+}
+.demo-preset-name:focus { border-color: #141414; outline: none; }
+.demo-preset-form-btn {
+  height: 28px; padding: 0 10px;
+  border: 0; border-radius: 6px;
+  background: #141414; color: #fff;
+  font-family: inherit; font-size: 11px; font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.demo-preset-form-btn.cancel { background: #f0f0f0; color: #666; }
+.demo-preset-status {
+  margin-top: 6px;
+  padding: 6px 8px;
+  background: #F5F9FF;
+  border: 1px solid #D6E7FA;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #333;
+}
+.demo-preset-status[hidden] { display: none; }
+.demo-preset-status b { display: inline-block; min-width: 60px; color: #555; }
+.demo-preset-status .swatch {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(0,0,0,.1);
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
 .demo-slot-list {
   display: flex; flex-direction: column;
   gap: 6px;
@@ -2057,6 +2100,12 @@ body.view-custom .demo-theme-block { display: block; }
       <button type="button" class="demo-preset-action" id="presetSaveBtn" title="현재 5개 슬롯을 프리셋으로 저장">+ 저장</button>
       <button type="button" class="demo-preset-action" id="presetKvBtn" title="KV 이미지의 대표 색상을 자동 추출">🖼️ KV 추출</button>
     </div>
+    <div class="demo-preset-form" id="presetForm" hidden>
+      <input type="text" class="demo-preset-name" id="presetName" placeholder="프리셋 이름" maxlength="24" autocomplete="off">
+      <button type="button" class="demo-preset-form-btn" id="presetFormOk">저장</button>
+      <button type="button" class="demo-preset-form-btn cancel" id="presetFormCancel">취소</button>
+    </div>
+    <div class="demo-preset-status" id="presetStatus" hidden></div>
 
     <div class="demo-subtitle">🎨 개별 슬롯 (고급)</div>
     <div class="demo-slot-list">
@@ -3575,12 +3624,11 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
       if (type === 'user') {
         btn.addEventListener('contextmenu', (e) => {
           e.preventDefault();
-          if (confirm(`'${label}' 프리셋을 삭제할까요?`)) {
-            delete userPresets[key];
-            saveUserPresets();
-            if (activeKey === key) activeKey = 'blue';
-            renderPresets();
-          }
+          delete userPresets[key];
+          saveUserPresets();
+          if (activeKey === key) { activeKey = 'blue'; applyPreset('blue'); }
+          renderPresets();
+          showStatus(`🗑️ '<b style="color:#141414">${label}</b>' 삭제됨`, 2400);
         });
       }
       grid.appendChild(btn);
@@ -3725,59 +3773,101 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
     });
   };
 
+  // ── 인라인 폼 상태 & 헬퍼 ─────────────────────
+  const form = document.getElementById('presetForm');
+  const nameInput = document.getElementById('presetName');
+  const formOk = document.getElementById('presetFormOk');
+  const formCancel = document.getElementById('presetFormCancel');
+  const statusBox = document.getElementById('presetStatus');
+  let pendingTokens = null;      // null이면 currentSlotValues() 사용
+
+  const closeForm = () => {
+    form.hidden = true;
+    pendingTokens = null;
+    nameInput.value = '';
+    nameInput.placeholder = '프리셋 이름';
+  };
+  const openForm = ({ tokens = null, defaultName = '' } = {}) => {
+    pendingTokens = tokens;
+    nameInput.value = defaultName;
+    nameInput.placeholder = '프리셋 이름';
+    form.hidden = false;
+    nameInput.focus();
+    nameInput.select();
+  };
+  const showStatus = (html, autoHideMs = 0) => {
+    statusBox.innerHTML = html;
+    statusBox.hidden = false;
+    if (autoHideMs > 0) {
+      clearTimeout(showStatus._t);
+      showStatus._t = setTimeout(() => { statusBox.hidden = true; }, autoHideMs);
+    }
+  };
+
   // ── + 저장 ────────────────────────────────────
   document.getElementById('presetSaveBtn').addEventListener('click', () => {
-    const name = prompt('프리셋 이름 (예: 여름세일):');
-    if (!name || !name.trim()) return;
-    const key = name.trim();
-    if (DEFAULT_ORDER.includes(key.toLowerCase())) {
-      alert('기본 프리셋 이름은 사용할 수 없어요.');
+    openForm({ defaultName: '' });
+  });
+
+  // ── 폼 저장 확정 ──────────────────────────────
+  const submitForm = () => {
+    const raw = nameInput.value.trim();
+    if (!raw) {
+      nameInput.placeholder = '이름을 입력해줘';
+      nameInput.focus();
       return;
     }
-    userPresets[key] = currentSlotValues();
+    if (DEFAULT_ORDER.includes(raw.toLowerCase())) {
+      nameInput.value = '';
+      nameInput.placeholder = '기본 이름 불가 (blue/red 등)';
+      nameInput.focus();
+      return;
+    }
+    const tokens = pendingTokens || currentSlotValues();
+    userPresets[raw] = tokens;
     saveUserPresets();
-    activeKey = key;
+    activeKey = raw;
+    closeForm();
     renderPresets();
+    showStatus(`✅ '<b style="color:#141414">${raw}</b>' 저장 완료`, 2400);
+  };
+  formOk.addEventListener('click', submitForm);
+  formCancel.addEventListener('click', closeForm);
+  nameInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); submitForm(); }
+    if (e.key === 'Escape') { e.preventDefault(); closeForm(); }
   });
 
   // ── 🖼️ KV 추출 ────────────────────────────────
   const kvBtn = document.getElementById('presetKvBtn');
   kvBtn.addEventListener('click', async () => {
-    const original = kvBtn.textContent;
+    const originalLabel = kvBtn.textContent;
     kvBtn.textContent = '⏳ 추출 중';
     kvBtn.disabled = true;
+    statusBox.hidden = true;
     try {
       const colors = await extractDominantColors('./assets/kv-event.png');
-      if (!colors.length) throw new Error('색상 없음');
+      if (!colors.length) throw new Error('색상을 찾지 못했어요');
       const tokens = mapColorsToTokens(colors);
       pushTokensToSlots(tokens);
-      // 커스텀 뷰로 자동 전환
       if (!body.classList.contains('view-custom')) {
         viewBtns.forEach(b => b.classList.toggle('on', b.dataset.view === 'custom'));
         body.classList.remove('view-original');
         body.classList.add('view-custom');
       }
-      const save = confirm(
-        'KV에서 추출한 색:\n' +
-        `• Primary: ${tokens.primary}\n` +
-        `• Emphasis: ${tokens.emphasis}\n` +
-        `• Accent: ${tokens.accent_bg}\n\n` +
-        '프리셋으로 저장할까요?'
+      showStatus(
+        '🖼️ KV에서 추출한 컬러:<br>' +
+        `<span class="swatch" style="background:${tokens.primary}"></span><b>Primary</b> ${tokens.primary}<br>` +
+        `<span class="swatch" style="background:${tokens.emphasis}"></span><b>Emphasis</b> ${tokens.emphasis}<br>` +
+        `<span class="swatch" style="background:${tokens.accent_bg}"></span><b>Accent</b> ${tokens.accent_bg}<br>` +
+        '<span style="color:#666">아래에서 이름을 지정하면 프리셋으로 저장됩니다.</span>'
       );
-      if (save) {
-        const name = prompt('프리셋 이름:', 'KV-' + new Date().toISOString().slice(5, 10).replace('-', ''));
-        if (name && name.trim()) {
-          const key = name.trim();
-          userPresets[key] = tokens;
-          saveUserPresets();
-          activeKey = key;
-        }
-      }
-      renderPresets();
+      const suggested = 'KV-' + new Date().toISOString().slice(5, 10).replace('-', '');
+      openForm({ tokens, defaultName: suggested });
     } catch (e) {
-      alert('KV 색 추출 실패: ' + e.message);
+      showStatus(`⚠️ KV 색 추출 실패: ${e.message}`, 4000);
     } finally {
-      kvBtn.textContent = original;
+      kvBtn.textContent = originalLabel;
       kvBtn.disabled = false;
     }
   });
