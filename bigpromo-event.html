@@ -483,6 +483,22 @@ body.view-custom .demo-theme-block { display: block; }
   transition: background .1s;
 }
 .demo-slot-auto:hover { background: #EAF3FE; }
+
+.demo-slot-refresh {
+  border: 1px solid #EAF3FE;
+  background: #F5F9FF;
+  color: #0079FA;
+  font-size: 12px;
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background .12s, transform .12s;
+  line-height: 1;
+}
+.demo-slot-refresh:hover { background: #0079FA; color: #FFF; transform: scale(1.05); }
+.demo-slot-refresh:active { transform: scale(0.95); }
 .demo-preset-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -2110,7 +2126,6 @@ body.view-custom .demo-theme-block { display: block; }
     <div class="demo-preset-actions">
       <button type="button" class="demo-preset-action" id="presetSaveBtn" title="현재 5개 슬롯을 프리셋으로 저장">+ 저장</button>
       <button type="button" class="demo-preset-action" id="presetKvBtn" title="KV 이미지의 대표 색상을 자동 추출">🖼️ KV 추출</button>
-      <button type="button" class="demo-preset-action" id="presetReharmonyBtn" title="저장된 사용자 프리셋을 primary 기준 monochromatic으로 재파생">🔄 재조화</button>
     </div>
     <div class="demo-preset-form" id="presetForm" hidden>
       <input type="text" class="demo-preset-name" id="presetName" placeholder="프리셋 이름" maxlength="24" autocomplete="off">
@@ -2126,6 +2141,7 @@ body.view-custom .demo-theme-block { display: block; }
     <div class="demo-slot-list">
       <div class="demo-slot">
         <span class="demo-slot-label">탭 배경 (primary)</span>
+        <button type="button" class="demo-slot-refresh" id="slotAutoInline" title="이 primary 기준으로 나머지 4개 재파생">🔗</button>
         <input class="demo-slot-picker" type="color" data-token="--promo-primary" value="#0079FA">
       </div>
       <div class="demo-slot">
@@ -3908,31 +3924,17 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
     openForm({ defaultName: '' });
   });
 
-  // ── 🔗 primary 기준 자동 파생 ─────────────────
-  document.getElementById('slotAutoBtn').addEventListener('click', () => {
+  // ── 🔗 primary 기준 자동 파생 · 서브타이틀 & 인라인 두 버튼 ──
+  const runReharmonyFromPrimary = () => {
     const primaryPicker = document.querySelector('[data-token="--promo-primary"]');
     if (!primaryPicker) return;
     const tokens = deriveFromPrimary(primaryPicker.value);
     pushTokensToSlots(tokens);
-    showStatus('🔗 primary 기준으로 자동 파생 완료', 1800);
-  });
+    showStatus('🔗 primary 기준으로 나머지 4개 재파생 완료', 1800);
+  };
+  document.getElementById('slotAutoBtn').addEventListener('click', runReharmonyFromPrimary);
+  document.getElementById('slotAutoInline').addEventListener('click', runReharmonyFromPrimary);
 
-  // ── 🔄 저장된 프리셋 일괄 재조화 ─────────────
-  document.getElementById('presetReharmonyBtn').addEventListener('click', () => {
-    const keys = Object.keys(userPresets);
-    if (!keys.length) {
-      showStatus('저장된 사용자 프리셋이 없어요', 2000);
-      return;
-    }
-    keys.forEach(k => {
-      const cur = userPresets[k];
-      if (cur && cur.primary) userPresets[k] = deriveFromPrimary(cur.primary);
-    });
-    saveUserPresets();
-    if (userPresets[activeKey]) applyPreset(activeKey);
-    renderPresets();
-    showStatus(`🔄 ${keys.length}개 사용자 프리셋 재조화 완료`, 2400);
-  });
 
   // ── 폼 저장 확정 ──────────────────────────────
   const submitForm = () => {
