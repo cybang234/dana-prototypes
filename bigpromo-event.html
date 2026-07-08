@@ -339,6 +339,82 @@ body {
 }
 .more-products-btn:active { background: #ebebeb; }
 
+/* ====== 참여 브랜드 (figma 8665:13210) ====== */
+.brand-list {
+  width: 100%;
+  display: flex; flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 0;
+  background: var(--background);
+}
+.brand-list-header {
+  display: flex; flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 16px;
+  text-align: center;
+  width: 100%;
+}
+.brand-list-title {
+  font-family: Pretendard, sans-serif;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--foreground);
+  margin: 0;
+}
+.brand-list-desc {
+  font-family: Pretendard, sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+  color: #8c8c8c;
+  margin: 0;
+}
+.brand-list-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.brand-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px 0 8px;
+  border: 1px solid #e5e5e5;
+  border-radius: 999px;
+  background: #ffffff;
+  font-family: Pretendard, sans-serif;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 600;
+  color: #141414;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+.brand-chip:active { background: #f5f5f5; border-color: #d4d4d4; }
+.brand-chip-logo {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: #666;
+  letter-spacing: -0.2px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.brand-chip-name { letter-spacing: -0.2px; }
+
 /* ====== 카테고리 원데이 캘린더 (figma 8615:12712) ====== */
 .oneday-cal {
   width: 100%;
@@ -1641,6 +1717,16 @@ body {
     box-sizing: border-box !important;
   }
 
+  /* 참여 브랜드 (.brand-list) — 양쪽 padding 16 직접 적용 */
+  .brand-list {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 32px 16px !important;
+    align-items: stretch !important;
+  }
+  .brand-list-header { width: 100% !important; box-sizing: border-box !important; padding: 0 !important; }
+  .brand-list-grid { width: 100% !important; box-sizing: border-box !important; padding: 0 !important; }
+
   /* 가구데이 (oneday) — .oneday-cal에 양쪽 padding 16 직접 적용 */
   .oneday-cal {
     width: 100% !important;
@@ -1749,6 +1835,56 @@ body {
   <!-- 탭 1: 이벤트 (기존) -->
   <!-- ============================== -->
   <div class="tab-pane" id="tab-pane-event">
+
+  <!-- 참여 브랜드 (figma 8665:13210) -->
+  <section class="brand-list" aria-label="참여 브랜드">
+    <div class="brand-list-header">
+      <h2 class="brand-list-title">참여 브랜드</h2>
+      <p class="brand-list-desc">이번 집요한세일에 참여한 브랜드들이에요</p>
+    </div>
+    <div class="brand-list-grid">
+      <button class="brand-chip" type="button">
+        <span class="brand-chip-logo">F/ABA</span>
+        <span class="brand-chip-name">피아바</span>
+      </button>
+      <button class="brand-chip" type="button">
+        <span class="brand-chip-logo">F/ABA</span>
+        <span class="brand-chip-name">피아바</span>
+      </button>
+      <button class="brand-chip" type="button">
+        <span class="brand-chip-logo">F/ABA</span>
+        <span class="brand-chip-name">피아바</span>
+      </button>
+      <button class="brand-chip" type="button">
+        <span class="brand-chip-logo">F/ABA</span>
+        <span class="brand-chip-name">피아바</span>
+      </button>
+      <button class="brand-chip" type="button">
+        <span class="brand-chip-logo">F/ABA</span>
+        <span class="brand-chip-name">피아바</span>
+      </button>
+      <button class="brand-chip" type="button">
+        <span class="brand-chip-logo">F/ABA</span>
+        <span class="brand-chip-name">피아바</span>
+      </button>
+      <button class="brand-chip" type="button">
+        <span class="brand-chip-logo">F/ABA</span>
+        <span class="brand-chip-name">피아바</span>
+      </button>
+      <button class="brand-chip" type="button">
+        <span class="brand-chip-logo">F/ABA</span>
+        <span class="brand-chip-name">피아바</span>
+      </button>
+      <button class="brand-chip" type="button">
+        <span class="brand-chip-logo">F/ABA</span>
+        <span class="brand-chip-name">피아바</span>
+      </button>
+      <button class="brand-chip" type="button">
+        <span class="brand-chip-logo">F/ABA</span>
+        <span class="brand-chip-name">피아바</span>
+      </button>
+    </div>
+  </section>
 
   <!-- 카테고리 원데이 캘린더 (figma 8615:12712) -->
   <section class="oneday-cal">
