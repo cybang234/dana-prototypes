@@ -347,7 +347,6 @@ body {
   gap: 20px;
   padding: 32px 0;
   background: var(--background);
-  border-bottom: 1px solid #f0f0f0;
 }
 .brand-list-header {
   display: flex; flex-direction: column;
@@ -377,15 +376,42 @@ body {
 }
 .brand-list-grid {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 10px 0;
   width: 100%;
   box-sizing: border-box;
-  max-height: 84px;
   overflow: hidden;
+}
+.brand-marquee {
+  width: 100%;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+}
+.brand-marquee-track {
+  display: inline-flex;
+  gap: 8px;
+  padding-right: 8px; /* seamless gap */
+  width: max-content;
+  animation-duration: 32s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+.brand-marquee--right .brand-marquee-track {
+  animation-name: brand-marquee-right;
+}
+.brand-marquee--left .brand-marquee-track {
+  animation-name: brand-marquee-left;
+}
+@keyframes brand-marquee-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes brand-marquee-right {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
 }
 .brand-chip {
   display: inline-flex;
@@ -402,6 +428,7 @@ body {
   cursor: pointer;
   transition: background .12s, border-color .12s;
   overflow: hidden;
+  flex-shrink: 0;
 }
 .brand-chip:active { background: #f5f5f5; border-color: #d4d4d4; }
 .brand-chip-logo {
@@ -421,7 +448,7 @@ body {
   padding: 0 6px;
   font-size: 14px;
   line-height: 18px;
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: -0.3px;
 }
 
@@ -1727,15 +1754,15 @@ body {
     box-sizing: border-box !important;
   }
 
-  /* 참여 브랜드 (.brand-list) — 양쪽 padding 16 직접 적용 */
+  /* 참여 브랜드 (.brand-list) — marquee가 화면 끝까지 흐르도록 좌우 padding X */
   .brand-list {
     width: 100% !important;
     box-sizing: border-box !important;
-    padding: 32px 16px !important;
-    align-items: stretch !important;
+    padding: 32px 0 !important;
+    align-items: center !important;
   }
-  .brand-list-header { width: 100% !important; box-sizing: border-box !important; padding: 0 !important; }
-  .brand-list-grid { width: 100% !important; box-sizing: border-box !important; padding: 0 !important; }
+  .brand-list-header { width: 100% !important; box-sizing: border-box !important; padding: 0 16px !important; }
+  .brand-list-grid { width: 100% !important; box-sizing: border-box !important; padding: 10px 0 !important; }
 
   /* 가구데이 (oneday) — .oneday-cal에 양쪽 padding 16 직접 적용 */
   .oneday-cal {
@@ -1853,48 +1880,117 @@ body {
       <p class="brand-list-desc">이번 집요한세일에 참여한 브랜드들이에요</p>
     </div>
     <div class="brand-list-grid">
-      <button class="brand-chip" type="button">
-        <span class="brand-chip-logo">F/ABA</span>
-        <span class="brand-chip-name">피아바</span>
-      </button>
-      <button class="brand-chip" type="button">
-        <span class="brand-chip-logo">F/ABA</span>
-        <span class="brand-chip-name">피아바</span>
-      </button>
-      <button class="brand-chip" type="button">
-        <span class="brand-chip-logo">F/ABA</span>
-        <span class="brand-chip-name">피아바</span>
-      </button>
-      <button class="brand-chip" type="button">
-        <span class="brand-chip-logo">F/ABA</span>
-        <span class="brand-chip-name">피아바</span>
-      </button>
-      <button class="brand-chip" type="button">
-        <span class="brand-chip-logo">F/ABA</span>
-        <span class="brand-chip-name">피아바</span>
-      </button>
-      <button class="brand-chip" type="button">
-        <span class="brand-chip-logo">F/ABA</span>
-        <span class="brand-chip-name">피아바</span>
-      </button>
-      <button class="brand-chip" type="button">
-        <span class="brand-chip-logo">F/ABA</span>
-        <span class="brand-chip-name">피아바</span>
-      </button>
-      <button class="brand-chip" type="button">
-        <span class="brand-chip-logo">F/ABA</span>
-        <span class="brand-chip-name">피아바</span>
-      </button>
-      <button class="brand-chip" type="button">
-        <span class="brand-chip-logo">F/ABA</span>
-        <span class="brand-chip-name">피아바</span>
-      </button>
-      <button class="brand-chip" type="button">
-        <span class="brand-chip-logo">F/ABA</span>
-        <span class="brand-chip-name">피아바</span>
-      </button>
+      <!-- 1번째 줄: 오른쪽 방향 무한 스크롤 -->
+      <div class="brand-marquee brand-marquee--right" aria-hidden="false">
+        <div class="brand-marquee-track">
+          <button class="brand-chip" type="button">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <!-- seamless loop 복제본 -->
+          <button class="brand-chip" type="button" aria-hidden="true">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button" aria-hidden="true">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button" aria-hidden="true">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button" aria-hidden="true">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button" aria-hidden="true">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button" aria-hidden="true">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+        </div>
+      </div>
+      <!-- 2번째 줄: 왼쪽 방향 무한 스크롤 -->
+      <div class="brand-marquee brand-marquee--left" aria-hidden="false">
+        <div class="brand-marquee-track">
+          <button class="brand-chip" type="button">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <!-- seamless loop 복제본 -->
+          <button class="brand-chip" type="button" aria-hidden="true">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button" aria-hidden="true">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button" aria-hidden="true">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button" aria-hidden="true">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button" aria-hidden="true">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+          <button class="brand-chip" type="button" aria-hidden="true">
+            <span class="brand-chip-logo">F/ABA</span>
+            <span class="brand-chip-name">피아바</span>
+          </button>
+        </div>
+      </div>
     </div>
   </section>
+  <div class="module-divider"></div>
 
   <!-- 카테고리 원데이 캘린더 (figma 8615:12712) -->
   <section class="oneday-cal">
