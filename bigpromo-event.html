@@ -399,21 +399,15 @@ body.view-custom .tab-label { color: color-mix(in srgb, var(--promo-primary-fg) 
 /* 원데이 카테고리 = 커스텀 뷰에서는 JS가 primary hue 기반 파생색을
    각 카테고리에 인덱스별로 배정 (analogous shift). CSS override는 없음. */
 
-/* 베네핏 쿠폰 · 기본(primary 계열) */
-body.view-custom .coupon-text:not(.pink),
-body.view-custom .coupon-icon-wrap:not(.pink) { background: var(--promo-primary); }
-body.view-custom .coupon-text:not(.pink) .coupon-name,
-body.view-custom .coupon-text:not(.pink) .coupon-cond { color: var(--promo-primary-fg); }
-body.view-custom .coupon-icon-wrap:not(.pink) .download-icon { color: var(--promo-primary-fg); }
-body.view-custom .coupon-icon-wrap:not(.pink)::before { background: var(--promo-primary-fg); }
+/* 베네핏 쿠폰 · 커스텀 뷰: pink 여부 무관 모두 primary/primary_fg로 통일 */
+body.view-custom .coupon-text,
+body.view-custom .coupon-icon-wrap { background: var(--promo-primary) !important; }
+body.view-custom .coupon-text .coupon-name,
+body.view-custom .coupon-text .coupon-cond { color: var(--promo-primary-fg) !important; }
+body.view-custom .coupon-icon-wrap .download-icon { color: var(--promo-primary-fg) !important; }
+body.view-custom .coupon-icon-wrap::before { background: var(--promo-primary-fg) !important; }
 
-/* 베네핏 쿠폰 · pink variant(accent 계열, 원데이 쿠폰과 동일 톤) */
-body.view-custom .coupon-text.pink,
-body.view-custom .coupon-icon-wrap.pink { background: var(--promo-accent-bg); }
-body.view-custom .coupon-text.pink .coupon-name,
-body.view-custom .coupon-text.pink .coupon-cond { color: var(--promo-accent-fg); }
-body.view-custom .coupon-icon-wrap.pink .download-icon { color: var(--promo-accent-fg); }
-body.view-custom .coupon-icon-wrap.pink::before { background: var(--promo-accent-fg); }
+/* 베네핏 쿠폰 · 기본(primary 계열) */
 
 /* bundle-header 안 강조 텍스트 (예: "채영", "180,000", "침대") */
 .bundle-accent { color: var(--accentBlue); }
@@ -2145,16 +2139,8 @@ body.view-custom .demo-theme-block { display: block; }
         <input class="demo-slot-picker" type="color" data-token="--promo-primary" value="#0079FA">
       </div>
       <div class="demo-slot">
-        <span class="demo-slot-label">탭 텍스트 (on primary)</span>
+        <span class="demo-slot-label">탭 · 쿠폰 텍스트 (on primary)</span>
         <input class="demo-slot-picker" type="color" data-token="--promo-primary-fg" value="#FFF950">
-      </div>
-      <div class="demo-slot">
-        <span class="demo-slot-label">쿠폰 배경 (accent)</span>
-        <input class="demo-slot-picker" type="color" data-token="--promo-accent-bg" value="#FB93E3">
-      </div>
-      <div class="demo-slot">
-        <span class="demo-slot-label">쿠폰 텍스트 (on accent)</span>
-        <input class="demo-slot-picker" type="color" data-token="--promo-accent-fg" value="#141414">
       </div>
       <div class="demo-slot">
         <span class="demo-slot-label">강조 (emphasis)</span>
@@ -2163,10 +2149,10 @@ body.view-custom .demo-theme-block { display: block; }
     </div>
 
     <p class="demo-panel-hint">
-      프리셋 선택 = 5개 슬롯 한 번에 세팅.<br>
-      개별 슬롯 = 프리셋 위 오버라이드.<br>
+      쿠폰 배경·텍스트는 탭 색(primary)과 자동 sync.<br>
       <b>+ 저장</b> = 현재 색 조합을 프리셋으로.<br>
       <b>🖼️ KV 추출</b> = 상단 이미지 대표색 자동 매핑.<br>
+      <b>🔗</b> = primary 기준 emphasis 자동 파생.<br>
       사용자 프리셋은 우클릭으로 삭제.
     </p>
   </div>
@@ -3671,10 +3657,17 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
   };
 
   // ── 개별 슬롯 오버라이드 ─────────────────────
-  const ONEDAY_TOKENS = new Set(['--promo-emphasis', '--promo-accent-bg', '--promo-accent-fg']);
+  const ONEDAY_TOKENS = new Set(['--promo-emphasis', '--promo-primary', '--promo-primary-fg']);
   document.querySelectorAll('.demo-slot-picker').forEach(picker => {
     picker.addEventListener('input', () => {
       body.style.setProperty(picker.dataset.token, picker.value);
+      // primary가 바뀌면 accent도 sync (쿠폰 = 탭 색)
+      if (picker.dataset.token === '--promo-primary') {
+        body.style.setProperty('--promo-accent-bg', picker.value);
+      }
+      if (picker.dataset.token === '--promo-primary-fg') {
+        body.style.setProperty('--promo-accent-fg', picker.value);
+      }
       if (ONEDAY_TOKENS.has(picker.dataset.token)) applyUnifiedToActiveOneday();
     });
   });
@@ -3744,46 +3737,42 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
     return rgbToHex(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255));
   };
 
-  // ── primary 기준 조화 파생 · monochromatic (같은 hue 유지) ──
-  //   emphasis = primary와 같은 hue · 채도 max · 명도 항상 낮게(진하게)
-  //   accent_bg = primary와 같은 hue · 채도 낮게 · 명도 매우 높은 파스텔
-  //   → 강조는 시각적으로 진한 톤, 배경은 파스텔로 대비
+  // ── primary 기준 조화 파생 · monochromatic ──
+  //   accent = primary와 완전 동일 (쿠폰 배경 = 탭 배경)
+  //   emphasis = 같은 hue · 채도 max · 명도 낮게(진하게)
   const deriveFromPrimary = (primaryHex) => {
     const { r, g, b } = hexToRgb(primaryHex);
     const { h, s, l } = rgbToHsl(r, g, b);
-    // emphasis 명도: primary보다 -0.15 낮추되 0.28~0.42 사이 클램프 (항상 진한 톤)
     const emphasisL = Math.max(0.28, Math.min(0.42, l - 0.15));
     const emphasis = hslToHex(h, Math.max(0.85, s), emphasisL);
-    // accent_bg: 항상 연한 파스텔 (톤은 같음)
-    const accentS = Math.min(0.45, Math.max(0.20, s * 0.35));
-    const accent_bg = hslToHex(h, accentS, 0.92);
+    const primary_fg = pickFg(primaryHex);
     return {
       primary: primaryHex.toUpperCase(),
-      primary_fg: pickFg(primaryHex),
-      accent_bg,
-      accent_fg: pickFg(accent_bg),
+      primary_fg,
+      accent_bg: primaryHex.toUpperCase(),  // 쿠폰 = 탭과 동일
+      accent_fg: primary_fg,
       emphasis
     };
   };
-  // ── 원데이 카테고리 = 커스텀 뷰에서 emphasis/accent 토큰으로 통일 ──
+  // ── 원데이 카테고리 = 커스텀 뷰: emphasis(강조 텍스트) · primary(쿠폰) ──
   const applyUnifiedToActiveOneday = () => {
     if (!body.classList.contains('view-custom')) return;
     const cs = getComputedStyle(body);
     const emphasis = cs.getPropertyValue('--promo-emphasis').trim();
-    const accentBg = cs.getPropertyValue('--promo-accent-bg').trim();
-    const accentFg = cs.getPropertyValue('--promo-accent-fg').trim();
+    const primary = cs.getPropertyValue('--promo-primary').trim();
+    const primaryFg = cs.getPropertyValue('--promo-primary-fg').trim();
     const titleSpan = document.querySelector('.oneday-title .oneday-cat');
     if (titleSpan) titleSpan.style.color = emphasis;
     const couponText = document.querySelector('.oneday-coupon-text');
     const couponIcon = document.querySelector('.oneday-coupon-icon');
     if (couponText) {
-      couponText.style.background = accentBg;
-      couponText.style.color = accentFg;
+      couponText.style.background = primary;
+      couponText.style.color = primaryFg;
     }
     if (couponIcon) {
-      couponIcon.style.background = accentBg;
+      couponIcon.style.background = primary;
       const svg = couponIcon.querySelector('svg path');
-      if (svg) svg.setAttribute('stroke', accentFg);
+      if (svg) svg.setAttribute('stroke', primaryFg);
     }
   };
   const restoreOnedayFromDataset = () => {
@@ -3855,14 +3844,22 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
     return deriveFromPrimary(primary.hex);
   };
 
-  // ── 슬롯 → 현재 값 (프리셋 저장용) ──────────
+  // ── 슬롯 → 현재 값 (프리셋 저장용) · accent는 primary와 sync ──
   const currentSlotValues = () => {
-    const p = {};
-    Object.entries(TOKEN_MAP).forEach(([token, k]) => {
-      const picker = document.querySelector(`[data-token="${token}"]`);
-      if (picker) p[k] = picker.value.toUpperCase();
-    });
-    return p;
+    const q = (t) => {
+      const el = document.querySelector(`[data-token="${t}"]`);
+      return el ? el.value.toUpperCase() : null;
+    };
+    const primary = q('--promo-primary');
+    const primary_fg = q('--promo-primary-fg');
+    const emphasis = q('--promo-emphasis');
+    return {
+      primary,
+      primary_fg,
+      accent_bg: primary,      // 쿠폰 = 탭
+      accent_fg: primary_fg,
+      emphasis
+    };
   };
 
   // ── 프리셋으로 슬롯 값 반영 (렌더 없이) ──
