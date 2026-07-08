@@ -476,6 +476,7 @@ body.view-custom .demo-theme-block { display: block; }
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 6px;
+  min-height: 32px;
 }
 .demo-preset-btn {
   border: 2px solid transparent;
@@ -484,14 +485,36 @@ body.view-custom .demo-theme-block { display: block; }
   cursor: pointer;
   padding: 0;
   transition: transform .1s, border-color .15s;
+  position: relative;
 }
 .demo-preset-btn:hover { transform: scale(1.08); }
 .demo-preset-btn.on { border-color: #141414; }
-.demo-preset-btn[data-preset="red"]    { background: #FD3D4A; }
-.demo-preset-btn[data-preset="blue"]   { background: #0079FA; }
-.demo-preset-btn[data-preset="yellow"] { background: #FFC700; }
-.demo-preset-btn[data-preset="mint"]   { background: #00B98A; }
-.demo-preset-btn[data-preset="purple"] { background: #6C4BF2; }
+.demo-preset-btn.is-user::after {
+  content: '';
+  position: absolute; top: -3px; right: -3px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #141414;
+  border: 1.5px solid #fff;
+  pointer-events: none;
+}
+.demo-preset-actions {
+  display: flex; gap: 6px;
+  margin-top: 8px; margin-bottom: 6px;
+}
+.demo-preset-action {
+  flex: 1; height: 28px;
+  padding: 0 6px;
+  border: 1px dashed #c0c0c0;
+  background: transparent;
+  color: #444;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background .1s, border-style .1s;
+}
+.demo-preset-action:hover { background: #f5f5f5; border-style: solid; border-color: #141414; color: #141414; }
+.demo-preset-action:disabled { opacity: 0.5; cursor: wait; }
 
 .demo-slot-list {
   display: flex; flex-direction: column;
@@ -2029,12 +2052,10 @@ body.view-custom .demo-theme-block { display: block; }
   <!-- 커스텀 모드에서만 노출 -->
   <div class="demo-theme-block">
     <div class="demo-subtitle">🎯 프리셋</div>
-    <div class="demo-preset-grid">
-      <button class="demo-preset-btn on" data-preset="blue" title="블루"></button>
-      <button class="demo-preset-btn" data-preset="red" title="레드"></button>
-      <button class="demo-preset-btn" data-preset="yellow" title="옐로우"></button>
-      <button class="demo-preset-btn" data-preset="mint" title="민트"></button>
-      <button class="demo-preset-btn" data-preset="purple" title="퍼플"></button>
+    <div class="demo-preset-grid" id="presetGrid"></div>
+    <div class="demo-preset-actions">
+      <button type="button" class="demo-preset-action" id="presetSaveBtn" title="현재 5개 슬롯을 프리셋으로 저장">+ 저장</button>
+      <button type="button" class="demo-preset-action" id="presetKvBtn" title="KV 이미지의 대표 색상을 자동 추출">🖼️ KV 추출</button>
     </div>
 
     <div class="demo-subtitle">🎨 개별 슬롯 (고급)</div>
@@ -2063,7 +2084,10 @@ body.view-custom .demo-theme-block { display: block; }
 
     <p class="demo-panel-hint">
       프리셋 선택 = 5개 슬롯 한 번에 세팅.<br>
-      개별 슬롯 = 프리셋 위 오버라이드.
+      개별 슬롯 = 프리셋 위 오버라이드.<br>
+      <b>+ 저장</b> = 현재 색 조합을 프리셋으로.<br>
+      <b>🖼️ KV 추출</b> = 상단 이미지 대표색 자동 매핑.<br>
+      사용자 프리셋은 우클릭으로 삭제.
     </p>
   </div>
 </aside>
@@ -3476,16 +3500,34 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
 (function () {
   const body = document.body;
 
-  // 프리셋 팔레트 (--promo-* 시맨틱 토큰 5개씩)
-  const PRESETS = {
-    red:    { primary: '#FD3D4A', primary_fg: '#FFFFFF', accent_bg: '#FFE1E3', accent_fg: '#B01924', emphasis: '#FD3D4A' },
+  // ── 기본 프리셋 ────────────────────────────────
+  const DEFAULT_PRESETS = {
     blue:   { primary: '#0079FA', primary_fg: '#FFF950', accent_bg: '#FB93E3', accent_fg: '#141414', emphasis: '#FF50D7' },
+    red:    { primary: '#FD3D4A', primary_fg: '#FFFFFF', accent_bg: '#FFE1E3', accent_fg: '#B01924', emphasis: '#FD3D4A' },
     yellow: { primary: '#FFC700', primary_fg: '#141414', accent_bg: '#FFF5CC', accent_fg: '#7A5A00', emphasis: '#FF7A00' },
     mint:   { primary: '#00B98A', primary_fg: '#FFFFFF', accent_bg: '#D3F5E8', accent_fg: '#005E43', emphasis: '#00B98A' },
     purple: { primary: '#6C4BF2', primary_fg: '#FFFFFF', accent_bg: '#ECE3FF', accent_fg: '#3A1F9E', emphasis: '#6C4BF2' }
   };
+  const DEFAULT_ORDER = ['blue','red','yellow','mint','purple'];
+  const LABELS = { blue:'블루', red:'레드', yellow:'옐로우', mint:'민트', purple:'퍼플' };
+  const TOKEN_MAP = {
+    '--promo-primary':    'primary',
+    '--promo-primary-fg': 'primary_fg',
+    '--promo-accent-bg':  'accent_bg',
+    '--promo-accent-fg':  'accent_fg',
+    '--promo-emphasis':   'emphasis'
+  };
 
-  // 뷰 스위처 (기존/커스텀)
+  // ── 사용자 프리셋 (localStorage) ────────────────
+  const LS_KEY = 'bigpromo_user_presets';
+  let userPresets = {};
+  try { userPresets = JSON.parse(localStorage.getItem(LS_KEY) || '{}'); }
+  catch (e) { userPresets = {}; }
+  const saveUserPresets = () => {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(userPresets)); } catch(e) {}
+  };
+
+  // ── 뷰 스위처 ──────────────────────────────────
   const viewBtns = document.querySelectorAll('.demo-view-btn');
   viewBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -3496,41 +3538,252 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
     });
   });
 
-  // 프리셋 선택
-  const presetBtns = document.querySelectorAll('.demo-preset-btn');
-  const applyPreset = (name) => {
-    body.setAttribute('data-preset', name);
-    const p = PRESETS[name];
+  // ── 프리셋 적용 ────────────────────────────────
+  let activeKey = 'blue';
+  const applyPreset = (key) => {
+    const p = DEFAULT_PRESETS[key] || userPresets[key];
     if (!p) return;
-    // 개별 슬롯 picker 값도 프리셋 값으로 동기화
-    const map = {
-      '--promo-primary':    p.primary,
-      '--promo-primary-fg': p.primary_fg,
-      '--promo-accent-bg':  p.accent_bg,
-      '--promo-accent-fg':  p.accent_fg,
-      '--promo-emphasis':   p.emphasis
-    };
-    document.querySelectorAll('.demo-slot-picker').forEach(picker => {
-      const token = picker.dataset.token;
-      if (map[token]) picker.value = map[token];
+    activeKey = key;
+    body.setAttribute('data-preset', key);
+    Object.entries(TOKEN_MAP).forEach(([token, k]) => {
+      const val = p[k];
+      body.style.setProperty(token, val);
+      const picker = document.querySelector(`[data-token="${token}"]`);
+      if (picker) picker.value = val;
     });
   };
-  presetBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      presetBtns.forEach(b => b.classList.toggle('on', b === btn));
-      applyPreset(btn.dataset.preset);
+
+  // ── 프리셋 렌더 ────────────────────────────────
+  const grid = document.getElementById('presetGrid');
+  const renderPresets = () => {
+    grid.innerHTML = '';
+    const entries = [];
+    DEFAULT_ORDER.forEach(k => entries.push({ key: k, label: LABELS[k], preset: DEFAULT_PRESETS[k], type: 'default' }));
+    Object.entries(userPresets).forEach(([k, p]) => entries.push({ key: k, label: k, preset: p, type: 'user' }));
+
+    entries.forEach(({ key, label, preset, type }) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'demo-preset-btn' + (type === 'user' ? ' is-user' : '') + (key === activeKey ? ' on' : '');
+      btn.dataset.preset = key;
+      btn.title = label + (type === 'user' ? ' (우클릭 삭제)' : '');
+      btn.style.background = preset.primary;
+      btn.addEventListener('click', () => {
+        applyPreset(key);
+        renderPresets();
+      });
+      if (type === 'user') {
+        btn.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          if (confirm(`'${label}' 프리셋을 삭제할까요?`)) {
+            delete userPresets[key];
+            saveUserPresets();
+            if (activeKey === key) activeKey = 'blue';
+            renderPresets();
+          }
+        });
+      }
+      grid.appendChild(btn);
+    });
+  };
+
+  // ── 개별 슬롯 오버라이드 ─────────────────────
+  document.querySelectorAll('.demo-slot-picker').forEach(picker => {
+    picker.addEventListener('input', () => {
+      body.style.setProperty(picker.dataset.token, picker.value);
     });
   });
 
-  // 개별 슬롯 커스텀 (프리셋 위 오버라이드)
-  document.querySelectorAll('.demo-slot-picker').forEach(picker => {
-    picker.addEventListener('input', () => {
-      const token = picker.dataset.token;
-      body.style.setProperty(token, picker.value);
-      // 개별 수정 시 프리셋 강조 해제 (임의 상태 표시)
-      // presetBtns.forEach(b => b.classList.remove('on'));
+  // ── 유틸: 컬러 변환 ────────────────────────────
+  const rgbToHex = (r, g, b) =>
+    '#' + [r, g, b].map(x => Math.max(0, Math.min(255, x)).toString(16).padStart(2, '0')).join('').toUpperCase();
+  const hexToRgb = (hex) => {
+    const m = hex.replace('#', '').match(/../g) || [];
+    return { r: parseInt(m[0] || '0', 16), g: parseInt(m[1] || '0', 16), b: parseInt(m[2] || '0', 16) };
+  };
+  const rgbToHsl = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0; const l = (max + min) / 2;
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h /= 6;
+    }
+    return { h, s, l };
+  };
+  const relLuminance = (r, g, b) => {
+    const [R, G, B] = [r, g, b].map(v => {
+      const s = v / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
     });
+    return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+  };
+  const pickFg = (hex) => {
+    const { r, g, b } = hexToRgb(hex);
+    return relLuminance(r, g, b) > 0.5 ? '#141414' : '#FFFFFF';
+  };
+  const lighten = (hex, amount) => {
+    const { r, g, b } = hexToRgb(hex);
+    return rgbToHex(
+      Math.round(r + (255 - r) * amount),
+      Math.round(g + (255 - g) * amount),
+      Math.round(b + (255 - b) * amount)
+    );
+  };
+  const hueDist = (h1, h2) => {
+    const d = Math.abs(h1 - h2);
+    return Math.min(d, 1 - d);
+  };
+
+  // ── 이미지 dominant color 추출 ─────────────────
+  const extractDominantColors = (src) => new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const W = 100, H = 100;
+      const cvs = document.createElement('canvas');
+      cvs.width = W; cvs.height = H;
+      const ctx = cvs.getContext('2d');
+      ctx.drawImage(img, 0, 0, W, H);
+      let data;
+      try { data = ctx.getImageData(0, 0, W, H).data; }
+      catch (e) { reject(new Error('canvas tainted (CORS)')); return; }
+      // 5-bit quantize per channel → 32^3=32768 버킷
+      const buckets = new Map();
+      for (let i = 0; i < data.length; i += 4) {
+        if (data[i + 3] < 200) continue;
+        const r = data[i] & 0xF8, g = data[i + 1] & 0xF8, b = data[i + 2] & 0xF8;
+        const key = (r << 16) | (g << 8) | b;
+        buckets.set(key, (buckets.get(key) || 0) + 1);
+      }
+      const list = [...buckets.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 40)
+        .map(([key, count]) => {
+          const r = ((key >> 16) & 0xF8) | 0x04;
+          const g = ((key >> 8) & 0xF8) | 0x04;
+          const b = (key & 0xF8) | 0x04;
+          const hsl = rgbToHsl(r, g, b);
+          return { r, g, b, count, ...hsl, hex: rgbToHex(r, g, b) };
+        });
+      resolve(list);
+    };
+    img.onerror = () => reject(new Error('이미지 로드 실패'));
+    img.src = src;
   });
+
+  // ── dominant colors → 5개 슬롯 매핑 ────────────
+  const mapColorsToTokens = (list) => {
+    // 유의미(채도·명도 극단 제외)
+    const meaningful = list.filter(c => c.s > 0.2 && c.l > 0.15 && c.l < 0.85);
+    const pool = meaningful.length ? meaningful : list;
+
+    const primary = pool[0];
+    // primary와 hue 다른 것 중 count 큰 것 → emphasis
+    let emphasis = pool.find(c => c !== primary && hueDist(c.h, primary.h) > 0.08) || pool[1] || primary;
+    // primary·emphasis와 hue 다른 것 → accent
+    let accent = pool.find(c =>
+      c !== primary && c !== emphasis &&
+      hueDist(c.h, primary.h) > 0.08 &&
+      hueDist(c.h, emphasis.h) > 0.05
+    ) || pool[2] || emphasis;
+
+    // accent_bg 너무 어두우면 밝게
+    const accentBg = accent.l < 0.55 ? lighten(accent.hex, 0.5) : accent.hex;
+
+    return {
+      primary: primary.hex,
+      primary_fg: pickFg(primary.hex),
+      accent_bg: accentBg,
+      accent_fg: pickFg(accentBg),
+      emphasis: emphasis.hex
+    };
+  };
+
+  // ── 슬롯 → 현재 값 (프리셋 저장용) ──────────
+  const currentSlotValues = () => {
+    const p = {};
+    Object.entries(TOKEN_MAP).forEach(([token, k]) => {
+      const picker = document.querySelector(`[data-token="${token}"]`);
+      if (picker) p[k] = picker.value.toUpperCase();
+    });
+    return p;
+  };
+
+  // ── 프리셋으로 슬롯 값 반영 (렌더 없이) ──
+  const pushTokensToSlots = (tokens) => {
+    Object.entries(TOKEN_MAP).forEach(([token, k]) => {
+      const val = tokens[k];
+      if (!val) return;
+      body.style.setProperty(token, val);
+      const picker = document.querySelector(`[data-token="${token}"]`);
+      if (picker) picker.value = val;
+    });
+  };
+
+  // ── + 저장 ────────────────────────────────────
+  document.getElementById('presetSaveBtn').addEventListener('click', () => {
+    const name = prompt('프리셋 이름 (예: 여름세일):');
+    if (!name || !name.trim()) return;
+    const key = name.trim();
+    if (DEFAULT_ORDER.includes(key.toLowerCase())) {
+      alert('기본 프리셋 이름은 사용할 수 없어요.');
+      return;
+    }
+    userPresets[key] = currentSlotValues();
+    saveUserPresets();
+    activeKey = key;
+    renderPresets();
+  });
+
+  // ── 🖼️ KV 추출 ────────────────────────────────
+  const kvBtn = document.getElementById('presetKvBtn');
+  kvBtn.addEventListener('click', async () => {
+    const original = kvBtn.textContent;
+    kvBtn.textContent = '⏳ 추출 중';
+    kvBtn.disabled = true;
+    try {
+      const colors = await extractDominantColors('./assets/kv-event.png');
+      if (!colors.length) throw new Error('색상 없음');
+      const tokens = mapColorsToTokens(colors);
+      pushTokensToSlots(tokens);
+      // 커스텀 뷰로 자동 전환
+      if (!body.classList.contains('view-custom')) {
+        viewBtns.forEach(b => b.classList.toggle('on', b.dataset.view === 'custom'));
+        body.classList.remove('view-original');
+        body.classList.add('view-custom');
+      }
+      const save = confirm(
+        'KV에서 추출한 색:\n' +
+        `• Primary: ${tokens.primary}\n` +
+        `• Emphasis: ${tokens.emphasis}\n` +
+        `• Accent: ${tokens.accent_bg}\n\n` +
+        '프리셋으로 저장할까요?'
+      );
+      if (save) {
+        const name = prompt('프리셋 이름:', 'KV-' + new Date().toISOString().slice(5, 10).replace('-', ''));
+        if (name && name.trim()) {
+          const key = name.trim();
+          userPresets[key] = tokens;
+          saveUserPresets();
+          activeKey = key;
+        }
+      }
+      renderPresets();
+    } catch (e) {
+      alert('KV 색 추출 실패: ' + e.message);
+    } finally {
+      kvBtn.textContent = original;
+      kvBtn.disabled = false;
+    }
+  });
+
+  // ── 초기 렌더 ──────────────────────────────────
+  renderPresets();
 })();
 </script>
 
