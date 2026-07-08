@@ -401,6 +401,22 @@ body.view-custom .oneday-coupon-text,
 body.view-custom .oneday-coupon-icon { background: var(--promo-accent-bg); color: var(--promo-accent-fg); }
 body.view-custom .oneday-coupon-icon path { stroke: var(--promo-accent-fg); }
 
+/* 베네핏 쿠폰 · 기본(primary 계열) */
+body.view-custom .coupon-text:not(.pink),
+body.view-custom .coupon-icon-wrap:not(.pink) { background: var(--promo-primary); }
+body.view-custom .coupon-text:not(.pink) .coupon-name,
+body.view-custom .coupon-text:not(.pink) .coupon-cond { color: var(--promo-primary-fg); }
+body.view-custom .coupon-icon-wrap:not(.pink) .download-icon { color: var(--promo-primary-fg); }
+body.view-custom .coupon-icon-wrap:not(.pink)::before { background: var(--promo-primary-fg); }
+
+/* 베네핏 쿠폰 · pink variant(accent 계열, 원데이 쿠폰과 동일 톤) */
+body.view-custom .coupon-text.pink,
+body.view-custom .coupon-icon-wrap.pink { background: var(--promo-accent-bg); }
+body.view-custom .coupon-text.pink .coupon-name,
+body.view-custom .coupon-text.pink .coupon-cond { color: var(--promo-accent-fg); }
+body.view-custom .coupon-icon-wrap.pink .download-icon { color: var(--promo-accent-fg); }
+body.view-custom .coupon-icon-wrap.pink::before { background: var(--promo-accent-fg); }
+
 /* 데모 컨트롤 · phone 우측 float */
 .demo-panel {
   position: fixed;
