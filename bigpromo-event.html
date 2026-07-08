@@ -417,6 +417,10 @@ body.view-custom .coupon-text.pink .coupon-cond { color: var(--promo-accent-fg);
 body.view-custom .coupon-icon-wrap.pink .download-icon { color: var(--promo-accent-fg); }
 body.view-custom .coupon-icon-wrap.pink::before { background: var(--promo-accent-fg); }
 
+/* bundle-header 안 강조 텍스트 (예: "채영", "180,000", "침대") */
+.bundle-accent { color: var(--accentBlue); }
+body.view-custom .bundle-accent { color: var(--promo-emphasis); }
+
 /* 데모 컨트롤 · phone 우측 float */
 .demo-panel {
   position: fixed;
@@ -2392,7 +2396,7 @@ body.view-custom .demo-theme-block { display: block; }
     <!-- Bundle 1: 채영님이 좋아할만한 -->
     <section class="recommend-bundle">
       <div class="header-container">
-        <h2 class="bundle-header"><span style="color: var(--accentBlue);">채영</span>님이 좋아할만한 상품</h2>
+        <h2 class="bundle-header"><span class="bundle-accent">채영</span>님이 좋아할만한 상품</h2>
         <p class="bundle-description">최근 둘러본 상품과 연관된 상품이에요</p>
       </div>
       <div class="recommend-item">
@@ -2472,7 +2476,7 @@ body.view-custom .demo-theme-block { display: block; }
     <!-- Bundle 2: 헤더만 + 1 section -->
     <section class="recommend-bundle">
       <div class="header-container">
-        <h2 class="bundle-header">스크랩한 상품이<br/><span style="color: var(--accentBlue);">180,000</span>원 더 저렴해요</h2>
+        <h2 class="bundle-header">스크랩한 상품이<br/><span class="bundle-accent">180,000</span>원 더 저렴해요</h2>
       </div>
       <div class="recommend-item">
         <div class="product-section">
@@ -2517,7 +2521,7 @@ body.view-custom .demo-theme-block { display: block; }
     <!-- Bundle 3: 헤더만 + 1 section -->
     <section class="recommend-bundle">
       <div class="header-container">
-        <h2 class="bundle-header">담아둔 상품이<br/><span style="color: var(--accentBlue);">180,000</span>원 더 저렴해요</h2>
+        <h2 class="bundle-header">담아둔 상품이<br/><span class="bundle-accent">180,000</span>원 더 저렴해요</h2>
       </div>
       <div class="recommend-item">
         <div class="product-section">
@@ -2567,7 +2571,7 @@ body.view-custom .demo-theme-block { display: block; }
   <div class="tab-pane" id="tab-pane-hansam">
     <section class="recommend-bundle">
       <div class="header-container">
-        <h2 class="bundle-header"><span style="color: var(--accentBlue);">채영</span>님이 스크랩한 브랜드 상품</h2>
+        <h2 class="bundle-header"><span class="bundle-accent">채영</span>님이 스크랩한 브랜드 상품</h2>
       </div>
       <div class="hansam-section-header">
         <div class="hansam-left">
@@ -2665,7 +2669,7 @@ body.view-custom .demo-theme-block { display: block; }
   <div class="tab-pane" id="tab-pane-bed">
     <section class="recommend-bundle" style="gap: 12px;">
       <div class="header-container">
-        <h2 class="bundle-header">최근 검색한 <span style="color: var(--accentBlue);">침대</span>와 연관된 상품</h2>
+        <h2 class="bundle-header">최근 검색한 <span class="bundle-accent">침대</span>와 연관된 상품</h2>
       </div>
       <div class="chip-strip">
         <button class="chip chip-solid">전체</button>
