@@ -339,6 +339,178 @@ body {
 }
 .more-products-btn:active { background: #ebebeb; }
 
+/* ==================================================== */
+/* ====== [DEMO CONTROL] 뷰 스위처 + 커스텀 테마 패널 ==== */
+/* ==================================================== */
+
+/* 커스텀 모드 토큰 (초기값 = 원본과 동일) */
+body {
+  --promo-primary: #0079FA;       /* 상단 탭 배경 */
+  --promo-primary-fg: #FFF950;    /* 탭 활성 텍스트·언더라인 */
+  --promo-accent-bg: #FB93E3;     /* 쿠폰 배경 */
+  --promo-accent-fg: #141414;     /* 쿠폰 텍스트 */
+  --promo-emphasis: #FF50D7;      /* 원데이 카테고리 강조 텍스트 */
+}
+
+/* 프리셋 팔레트 */
+body[data-preset="red"] {
+  --promo-primary: #FD3D4A;
+  --promo-primary-fg: #FFFFFF;
+  --promo-accent-bg: #FFE1E3;
+  --promo-accent-fg: #B01924;
+  --promo-emphasis: #FD3D4A;
+}
+body[data-preset="blue"] {
+  --promo-primary: #0079FA;
+  --promo-primary-fg: #FFF950;
+  --promo-accent-bg: #FB93E3;
+  --promo-accent-fg: #141414;
+  --promo-emphasis: #FF50D7;
+}
+body[data-preset="yellow"] {
+  --promo-primary: #FFC700;
+  --promo-primary-fg: #141414;
+  --promo-accent-bg: #FFF5CC;
+  --promo-accent-fg: #7A5A00;
+  --promo-emphasis: #FF7A00;
+}
+body[data-preset="mint"] {
+  --promo-primary: #00B98A;
+  --promo-primary-fg: #FFFFFF;
+  --promo-accent-bg: #D3F5E8;
+  --promo-accent-fg: #005E43;
+  --promo-emphasis: #00B98A;
+}
+body[data-preset="purple"] {
+  --promo-primary: #6C4BF2;
+  --promo-primary-fg: #FFFFFF;
+  --promo-accent-bg: #ECE3FF;
+  --promo-accent-fg: #3A1F9E;
+  --promo-emphasis: #6C4BF2;
+}
+
+/* 커스텀 뷰에서만 토큰 오버라이드 활성 */
+body.view-custom .tabs { background: var(--promo-primary); }
+body.view-custom .tab-item.on .tab-label { color: var(--promo-primary-fg); }
+body.view-custom .tab-item.on::after { background: var(--promo-primary-fg); }
+body.view-custom .tab-noti { background: var(--promo-primary-fg); }
+body.view-custom .tab-label { color: color-mix(in srgb, var(--promo-primary-fg) 65%, transparent); }
+
+body.view-custom .oneday-cat { color: var(--promo-emphasis); }
+body.view-custom .oneday-coupon-text,
+body.view-custom .oneday-coupon-icon { background: var(--promo-accent-bg); color: var(--promo-accent-fg); }
+body.view-custom .oneday-coupon-icon path { stroke: var(--promo-accent-fg); }
+
+/* 데모 컨트롤 · phone 우측 float */
+.demo-panel {
+  position: fixed;
+  top: 24px; right: 24px;
+  z-index: 1000;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+  padding: 14px;
+  width: 260px;
+  font-family: Pretendard, sans-serif;
+  color: #141414;
+}
+.demo-panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8c8c8c;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.demo-view-switch {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+.demo-view-btn {
+  flex: 1;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.demo-view-btn.on { background: #141414; color: #ffffff; }
+
+.demo-theme-block { display: none; }
+body.view-custom .demo-theme-block { display: block; }
+
+.demo-subtitle {
+  font-size: 11px; font-weight: 600; color: #8c8c8c;
+  margin-top: 10px; margin-bottom: 6px;
+}
+.demo-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.demo-preset-btn {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  width: 32px; height: 32px;
+  cursor: pointer;
+  padding: 0;
+  transition: transform .1s, border-color .15s;
+}
+.demo-preset-btn:hover { transform: scale(1.08); }
+.demo-preset-btn.on { border-color: #141414; }
+.demo-preset-btn[data-preset="red"]    { background: #FD3D4A; }
+.demo-preset-btn[data-preset="blue"]   { background: #0079FA; }
+.demo-preset-btn[data-preset="yellow"] { background: #FFC700; }
+.demo-preset-btn[data-preset="mint"]   { background: #00B98A; }
+.demo-preset-btn[data-preset="purple"] { background: #6C4BF2; }
+
+.demo-slot-list {
+  display: flex; flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.demo-slot {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+}
+.demo-slot-label {
+  color: #555;
+  font-weight: 500;
+  flex: 1;
+}
+.demo-slot-picker {
+  width: 26px; height: 26px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.demo-panel-hint {
+  font-size: 10px;
+  color: #b0b0b0;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .demo-panel {
+    top: auto; right: 12px;
+    bottom: 12px;
+    width: 240px;
+  }
+}
+
 /* ====== 참여 브랜드 (figma 8665:13210) ====== */
 .brand-list {
   width: 100%;
@@ -1820,7 +1992,61 @@ body {
 
 </style>
 </head>
-<body>
+<body class="view-original">
+
+<!-- ============================== -->
+<!-- DEMO CONTROL PANEL (실제 프로덕션 X · 프로토타입 데모용) -->
+<!-- ============================== -->
+<aside class="demo-panel" aria-label="데모 컨트롤">
+  <div class="demo-panel-title">🎨 뷰 · 컬러 테마</div>
+
+  <!-- 뷰 스위처 -->
+  <div class="demo-view-switch" role="tablist">
+    <button class="demo-view-btn on" data-view="original">기존</button>
+    <button class="demo-view-btn" data-view="custom">커스텀 적용</button>
+  </div>
+
+  <!-- 커스텀 모드에서만 노출 -->
+  <div class="demo-theme-block">
+    <div class="demo-subtitle">🎯 프리셋</div>
+    <div class="demo-preset-grid">
+      <button class="demo-preset-btn on" data-preset="blue" title="블루"></button>
+      <button class="demo-preset-btn" data-preset="red" title="레드"></button>
+      <button class="demo-preset-btn" data-preset="yellow" title="옐로우"></button>
+      <button class="demo-preset-btn" data-preset="mint" title="민트"></button>
+      <button class="demo-preset-btn" data-preset="purple" title="퍼플"></button>
+    </div>
+
+    <div class="demo-subtitle">🎨 개별 슬롯 (고급)</div>
+    <div class="demo-slot-list">
+      <div class="demo-slot">
+        <span class="demo-slot-label">탭 배경 (primary)</span>
+        <input class="demo-slot-picker" type="color" data-token="--promo-primary" value="#0079FA">
+      </div>
+      <div class="demo-slot">
+        <span class="demo-slot-label">탭 텍스트 (on primary)</span>
+        <input class="demo-slot-picker" type="color" data-token="--promo-primary-fg" value="#FFF950">
+      </div>
+      <div class="demo-slot">
+        <span class="demo-slot-label">쿠폰 배경 (accent)</span>
+        <input class="demo-slot-picker" type="color" data-token="--promo-accent-bg" value="#FB93E3">
+      </div>
+      <div class="demo-slot">
+        <span class="demo-slot-label">쿠폰 텍스트 (on accent)</span>
+        <input class="demo-slot-picker" type="color" data-token="--promo-accent-fg" value="#141414">
+      </div>
+      <div class="demo-slot">
+        <span class="demo-slot-label">강조 (emphasis)</span>
+        <input class="demo-slot-picker" type="color" data-token="--promo-emphasis" value="#FF50D7">
+      </div>
+    </div>
+
+    <p class="demo-panel-hint">
+      프리셋 선택 = 5개 슬롯 한 번에 세팅.<br>
+      개별 슬롯 = 프리셋 위 오버라이드.
+    </p>
+  </div>
+</aside>
 
 <div class="phone">
 
@@ -3223,6 +3449,69 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
     if (bundle) openSheet(bundle);
   });
 });
+
+/* ============================== */
+/* DEMO PANEL — 뷰 스위처 + 커스텀 테마 */
+/* ============================== */
+(function () {
+  const body = document.body;
+
+  // 프리셋 팔레트 (--promo-* 시맨틱 토큰 5개씩)
+  const PRESETS = {
+    red:    { primary: '#FD3D4A', primary_fg: '#FFFFFF', accent_bg: '#FFE1E3', accent_fg: '#B01924', emphasis: '#FD3D4A' },
+    blue:   { primary: '#0079FA', primary_fg: '#FFF950', accent_bg: '#FB93E3', accent_fg: '#141414', emphasis: '#FF50D7' },
+    yellow: { primary: '#FFC700', primary_fg: '#141414', accent_bg: '#FFF5CC', accent_fg: '#7A5A00', emphasis: '#FF7A00' },
+    mint:   { primary: '#00B98A', primary_fg: '#FFFFFF', accent_bg: '#D3F5E8', accent_fg: '#005E43', emphasis: '#00B98A' },
+    purple: { primary: '#6C4BF2', primary_fg: '#FFFFFF', accent_bg: '#ECE3FF', accent_fg: '#3A1F9E', emphasis: '#6C4BF2' }
+  };
+
+  // 뷰 스위처 (기존/커스텀)
+  const viewBtns = document.querySelectorAll('.demo-view-btn');
+  viewBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const view = btn.dataset.view;
+      viewBtns.forEach(b => b.classList.toggle('on', b === btn));
+      body.classList.remove('view-original', 'view-custom');
+      body.classList.add('view-' + view);
+    });
+  });
+
+  // 프리셋 선택
+  const presetBtns = document.querySelectorAll('.demo-preset-btn');
+  const applyPreset = (name) => {
+    body.setAttribute('data-preset', name);
+    const p = PRESETS[name];
+    if (!p) return;
+    // 개별 슬롯 picker 값도 프리셋 값으로 동기화
+    const map = {
+      '--promo-primary':    p.primary,
+      '--promo-primary-fg': p.primary_fg,
+      '--promo-accent-bg':  p.accent_bg,
+      '--promo-accent-fg':  p.accent_fg,
+      '--promo-emphasis':   p.emphasis
+    };
+    document.querySelectorAll('.demo-slot-picker').forEach(picker => {
+      const token = picker.dataset.token;
+      if (map[token]) picker.value = map[token];
+    });
+  };
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      presetBtns.forEach(b => b.classList.toggle('on', b === btn));
+      applyPreset(btn.dataset.preset);
+    });
+  });
+
+  // 개별 슬롯 커스텀 (프리셋 위 오버라이드)
+  document.querySelectorAll('.demo-slot-picker').forEach(picker => {
+    picker.addEventListener('input', () => {
+      const token = picker.dataset.token;
+      body.style.setProperty(token, picker.value);
+      // 개별 수정 시 프리셋 강조 해제 (임의 상태 표시)
+      // presetBtns.forEach(b => b.classList.remove('on'));
+    });
+  });
+})();
 </script>
 
 </body>
