@@ -2110,6 +2110,7 @@ body.view-custom .demo-theme-block { display: block; }
     <div class="demo-preset-actions">
       <button type="button" class="demo-preset-action" id="presetSaveBtn" title="현재 5개 슬롯을 프리셋으로 저장">+ 저장</button>
       <button type="button" class="demo-preset-action" id="presetKvBtn" title="KV 이미지의 대표 색상을 자동 추출">🖼️ KV 추출</button>
+      <button type="button" class="demo-preset-action" id="presetReharmonyBtn" title="저장된 사용자 프리셋을 primary 기준 monochromatic으로 재파생">🔄 재조화</button>
     </div>
     <div class="demo-preset-form" id="presetForm" hidden>
       <input type="text" class="demo-preset-name" id="presetName" placeholder="프리셋 이름" maxlength="24" autocomplete="off">
@@ -3914,6 +3915,23 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
     const tokens = deriveFromPrimary(primaryPicker.value);
     pushTokensToSlots(tokens);
     showStatus('🔗 primary 기준으로 자동 파생 완료', 1800);
+  });
+
+  // ── 🔄 저장된 프리셋 일괄 재조화 ─────────────
+  document.getElementById('presetReharmonyBtn').addEventListener('click', () => {
+    const keys = Object.keys(userPresets);
+    if (!keys.length) {
+      showStatus('저장된 사용자 프리셋이 없어요', 2000);
+      return;
+    }
+    keys.forEach(k => {
+      const cur = userPresets[k];
+      if (cur && cur.primary) userPresets[k] = deriveFromPrimary(cur.primary);
+    });
+    saveUserPresets();
+    if (userPresets[activeKey]) applyPreset(activeKey);
+    renderPresets();
+    showStatus(`🔄 ${keys.length}개 사용자 프리셋 재조화 완료`, 2400);
   });
 
   // ── 폼 저장 확정 ──────────────────────────────
