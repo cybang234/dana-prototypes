@@ -3583,7 +3583,7 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
       body.classList.remove('view-original', 'view-custom');
       body.classList.add('view-' + view);
       // 원데이 카테고리 색: 커스텀은 파생, 원본은 dataset 복원
-      if (view === 'custom') applyDerivedToActiveOneday();
+      if (view === 'custom') applyUnifiedToActiveOneday();
       else restoreOnedayFromDataset();
     });
   });
@@ -3601,7 +3601,7 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
       const picker = document.querySelector(`[data-token="${token}"]`);
       if (picker) picker.value = val;
     });
-    applyDerivedToActiveOneday();
+    applyUnifiedToActiveOneday();
   };
 
   // ── 프리셋 렌더 ────────────────────────────────
@@ -3638,11 +3638,11 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
   };
 
   // ── 개별 슬롯 오버라이드 ─────────────────────
+  const ONEDAY_TOKENS = new Set(['--promo-emphasis', '--promo-accent-bg', '--promo-accent-fg']);
   document.querySelectorAll('.demo-slot-picker').forEach(picker => {
     picker.addEventListener('input', () => {
       body.style.setProperty(picker.dataset.token, picker.value);
-      // primary가 바뀌면 원데이 파생색도 재계산
-      if (picker.dataset.token === '--promo-primary') applyDerivedToActiveOneday();
+      if (ONEDAY_TOKENS.has(picker.dataset.token)) applyUnifiedToActiveOneday();
     });
   });
 
@@ -3690,59 +3690,25 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
     const d = Math.abs(h1 - h2);
     return Math.min(d, 1 - d);
   };
-  const hue2rgb = (p, q, t) => {
-    if (t < 0) t += 1;
-    if (t > 1) t -= 1;
-    if (t < 1/6) return p + (q - p) * 6 * t;
-    if (t < 1/2) return q;
-    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-    return p;
-  };
-  const hslToHex = (h, s, l) => {
-    let r, g, b;
-    if (s === 0) { r = g = b = l; }
-    else {
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      r = hue2rgb(p, q, h + 1/3);
-      g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1/3);
-    }
-    return rgbToHex(Math.round(r * 255), Math.round(g * 255), Math.round(b * 255));
-  };
-
-  // ── 원데이 카테고리 파생 색상 (primary hue 기준 analogous shift) ──
-  const HUE_STEP = 0.15;   // 15% shift per index (analogous)
-  const derivedForIndex = (idx, total) => {
-    const primaryHex = getComputedStyle(body).getPropertyValue('--promo-primary').trim() || '#0079FA';
-    const { r, g, b } = hexToRgb(primaryHex);
-    const { h } = rgbToHsl(r, g, b);
-    const newH = ((h + HUE_STEP * idx) % 1 + 1) % 1;
-    const title = hslToHex(newH, 0.72, 0.46);   // 진한 카테고리명
-    const coupon = hslToHex(newH, 0.55, 0.82);  // 밝은 쿠폰 배경
-    return { title, coupon, couponText: pickFg(coupon) };
-  };
-  const applyDerivedToActiveOneday = () => {
+  // ── 원데이 카테고리 = 커스텀 뷰에서 emphasis/accent 토큰으로 통일 ──
+  const applyUnifiedToActiveOneday = () => {
     if (!body.classList.contains('view-custom')) return;
-    const container = document.querySelector('.oneday-cats');
-    if (!container) return;
-    const items = container.querySelectorAll('.oneday-cat-item');
-    const active = container.querySelector('.oneday-cat-item.active');
-    if (!active || !items.length) return;
-    const idx = Array.from(items).indexOf(active);
-    const d = derivedForIndex(idx, items.length);
+    const cs = getComputedStyle(body);
+    const emphasis = cs.getPropertyValue('--promo-emphasis').trim();
+    const accentBg = cs.getPropertyValue('--promo-accent-bg').trim();
+    const accentFg = cs.getPropertyValue('--promo-accent-fg').trim();
     const titleSpan = document.querySelector('.oneday-title .oneday-cat');
-    if (titleSpan) titleSpan.style.color = d.title;
+    if (titleSpan) titleSpan.style.color = emphasis;
     const couponText = document.querySelector('.oneday-coupon-text');
     const couponIcon = document.querySelector('.oneday-coupon-icon');
     if (couponText) {
-      couponText.style.background = d.coupon;
-      couponText.style.color = d.couponText;
+      couponText.style.background = accentBg;
+      couponText.style.color = accentFg;
     }
     if (couponIcon) {
-      couponIcon.style.background = d.coupon;
+      couponIcon.style.background = accentBg;
       const svg = couponIcon.querySelector('svg path');
-      if (svg) svg.setAttribute('stroke', d.couponText);
+      if (svg) svg.setAttribute('stroke', accentFg);
     }
   };
   const restoreOnedayFromDataset = () => {
@@ -3852,7 +3818,7 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
       const picker = document.querySelector(`[data-token="${token}"]`);
       if (picker) picker.value = val;
     });
-    applyDerivedToActiveOneday();
+    applyUnifiedToActiveOneday();
   };
 
   // ── 원데이 카테고리 클릭 → 커스텀 뷰라면 파생색으로 덮어씀 ──
@@ -3862,7 +3828,7 @@ document.querySelectorAll('.more-products-btn').forEach(btn => {
       if (!e.target.closest('.oneday-cat-item')) return;
       if (!body.classList.contains('view-custom')) return;
       // 원본 delegation이 인라인 style 세팅 후 microtask에서 덮어씀
-      Promise.resolve().then(applyDerivedToActiveOneday);
+      Promise.resolve().then(applyUnifiedToActiveOneday);
     });
   }
 
