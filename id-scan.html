@@ -269,13 +269,13 @@ body {
   padding: 2.5px;
   background: conic-gradient(from var(--gs-rot),
     #00A1FF 0deg,
-    #7DD3FC 45deg,
-    #E0F2FE 90deg,
-    #7DD3FC 135deg,
+    #BAE6FD 45deg,
+    #FFFFFF 90deg,
+    #BAE6FD 135deg,
     #00A1FF 180deg,
-    #0369A1 225deg,
-    #00A1FF 270deg,
-    #7DD3FC 315deg,
+    #BAE6FD 225deg,
+    #FFFFFF 270deg,
+    #BAE6FD 315deg,
     #00A1FF 360deg);
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -287,14 +287,12 @@ body {
 }
 /* Glow는 프레임 밖으로 · id-frame에 붙임 (overflow hidden 회피) */
 body[data-case="E"] .id-frame {
-  box-shadow:
-    0 0 0 0.5px rgba(0,161,255,0.3),
-    0 0 20px rgba(0,161,255,0.35);
+  box-shadow: 0 0 8px rgba(0,161,255,0.18);
   animation: gs-glow 3.6s ease-in-out infinite;
 }
 @keyframes gs-glow {
-  0%, 100% { box-shadow: 0 0 0 0.5px rgba(0,161,255,0.2), 0 0 12px rgba(0,161,255,0.3); }
-  50%      { box-shadow: 0 0 0 0.5px rgba(0,161,255,0.4), 0 0 28px rgba(0,161,255,0.7); }
+  0%, 100% { box-shadow: 0 0 6px rgba(0,161,255,0.15); }
+  50%      { box-shadow: 0 0 14px rgba(0,161,255,0.32); }
 }
 
 /* Scan Line (A) */
