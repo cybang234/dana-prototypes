@@ -243,9 +243,236 @@ body {
   width: max-content;
 }
 .info ul li { margin: 0; }
+
+/* ────────────────────────────────────────
+   인식중 인터랙션 요소 · 케이스별 활성화
+   ──────────────────────────────────────── */
+
+/* 프레임 안 스캔 요소 컨테이너 */
+.scan-line, .scan-flash, .corner-brackets, .scan-dots { display: none; }
+
+/* Scan Line (A) */
+.scan-line {
+  position: absolute;
+  left: 0; right: 0;
+  top: 0;
+  height: 56px;
+  background: linear-gradient(180deg,
+    rgba(37,99,235,0) 0%,
+    rgba(37,99,235,0.45) 45%,
+    rgba(96,165,250,0.75) 50%,
+    rgba(37,99,235,0.45) 55%,
+    rgba(37,99,235,0) 100%);
+  pointer-events: none;
+  z-index: 3;
+  will-change: transform;
+}
+.scan-line::after {
+  content: '';
+  position: absolute;
+  left: 12px; right: 12px;
+  top: 50%; height: 2px;
+  background: linear-gradient(90deg, transparent, #60A5FA 50%, transparent);
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px rgba(96,165,250,0.9);
+}
+
+/* Corner brackets (C) */
+.corner-brackets {
+  position: absolute;
+  inset: -4px;
+  pointer-events: none;
+  z-index: 3;
+}
+.corner-brackets .c {
+  position: absolute;
+  width: 32px; height: 32px;
+  border: 4px solid #FFC700;
+  box-shadow: 0 0 12px rgba(255,199,0,0.5);
+}
+.corner-brackets .c-tl { top: 0; left: 0; border-right: 0; border-bottom: 0; border-top-left-radius: 10px; }
+.corner-brackets .c-tr { top: 0; right: 0; border-left: 0; border-bottom: 0; border-top-right-radius: 10px; }
+.corner-brackets .c-bl { bottom: 0; left: 0; border-right: 0; border-top: 0; border-bottom-left-radius: 10px; }
+.corner-brackets .c-br { bottom: 0; right: 0; border-left: 0; border-top: 0; border-bottom-right-radius: 10px; }
+
+/* Flash overlay (D) */
+.scan-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.55), transparent 65%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Loading dots (B) */
+.scan-dots {
+  position: absolute;
+  left: 50%; bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 3;
+  gap: 6px;
+}
+.scan-dots i {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #FFF;
+  display: inline-block;
+}
+
+/* 가이드 텍스트: 상태별 표시 전환 */
+.guide-idle, .guide-scanning { display: none; }
+body[data-case="idle"] .guide-idle { display: block; }
+body:not([data-case="idle"]) .guide-scanning { display: block; }
+
+/* ─── 케이스 A · 블루 스캔라인 ─── */
+body[data-case="A"] .id-frame {
+  border-color: #2563EB;
+  box-shadow: 0 0 24px rgba(37,99,235,0.35);
+}
+body[data-case="A"] .scan-line {
+  display: block;
+  animation: scan-move 1.8s ease-in-out infinite;
+}
+@keyframes scan-move {
+  0%   { transform: translateY(-56px); }
+  50%  { transform: translateY(208px); }
+  100% { transform: translateY(-56px); }
+}
+
+/* ─── 케이스 B · 그린 프레임 펄스 ─── */
+body[data-case="B"] .id-frame {
+  border-width: 3px;
+  border-color: #00B98A;
+  animation: green-pulse 1.6s ease-in-out infinite;
+}
+body[data-case="B"] .scan-dots { display: flex; }
+body[data-case="B"] .scan-dots i {
+  background: #00B98A;
+  animation: dot-bounce 1.2s ease-in-out infinite;
+}
+body[data-case="B"] .scan-dots i:nth-child(2) { animation-delay: 0.15s; }
+body[data-case="B"] .scan-dots i:nth-child(3) { animation-delay: 0.30s; }
+@keyframes green-pulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(0,185,138,0.35); }
+  50%      { box-shadow: 0 0 32px rgba(0,185,138,0.7); }
+}
+@keyframes dot-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30%           { transform: translateY(-6px); opacity: 1; }
+}
+
+/* ─── 케이스 C · 노랑 코너 브래킷 ─── */
+body[data-case="C"] .id-frame { border-color: transparent; }
+body[data-case="C"] .corner-brackets {
+  display: block;
+  animation: bracket-pulse 1.2s ease-in-out infinite;
+}
+@keyframes bracket-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+/* ─── 케이스 D · 화이트 플래시 ─── */
+body[data-case="D"] .id-frame {
+  border-color: rgba(255,255,255,0.85);
+  animation: white-pulse 1.4s ease-in-out infinite;
+}
+body[data-case="D"] .scan-flash {
+  display: block;
+  animation: flash-fade 1.4s ease-in-out infinite;
+}
+@keyframes flash-fade {
+  0%, 100% { opacity: 0.15; }
+  50%      { opacity: 0.85; }
+}
+@keyframes white-pulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(255,255,255,0.3); }
+  50%      { box-shadow: 0 0 28px rgba(255,255,255,0.7); }
+}
+
+/* ────────────────────────────────────────
+   Demo Panel · 케이스 탭
+   ──────────────────────────────────────── */
+.demo-panel {
+  position: fixed;
+  top: 24px; right: 24px;
+  z-index: 1000;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 14px;
+  width: 240px;
+  font-family: 'Pretendard', sans-serif;
+  color: #141414;
+}
+.demo-panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8c8c8c;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.demo-cases {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.demo-case-btn {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #E5E7EB;
+  background: transparent;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: #4B5563;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  transition: background .12s, border-color .12s, color .12s;
+}
+.demo-case-btn:hover { background: #F3F4F6; }
+.demo-case-btn.on {
+  border-color: #141414;
+  background: #141414;
+  color: #FFF;
+}
+.demo-case-btn .swatch {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.demo-case-btn[data-case="idle"] .swatch { background: #FFF; }
+.demo-case-btn[data-case="A"]    .swatch { background: #2563EB; }
+.demo-case-btn[data-case="B"]    .swatch { background: #00B98A; }
+.demo-case-btn[data-case="C"]    .swatch { background: #FFC700; }
+.demo-case-btn[data-case="D"]    .swatch { background: linear-gradient(135deg,#FFF,#DDD); }
+.demo-panel-hint {
+  margin: 10px 0 0;
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: #8c8c8c;
+}
 </style>
 </head>
-<body>
+<body data-case="idle">
+
+<aside class="demo-panel" aria-label="인식 케이스 선택">
+  <div class="demo-panel-title">🔎 인식 인터랙션 케이스</div>
+  <div class="demo-cases" role="tablist">
+    <button class="demo-case-btn on" data-case="idle" type="button"><span class="swatch"></span>대기 (Idle)</button>
+    <button class="demo-case-btn" data-case="A" type="button"><span class="swatch"></span>A · 블루 스캔라인</button>
+    <button class="demo-case-btn" data-case="B" type="button"><span class="swatch"></span>B · 그린 프레임 펄스</button>
+    <button class="demo-case-btn" data-case="C" type="button"><span class="swatch"></span>C · 노랑 코너 브래킷</button>
+    <button class="demo-case-btn" data-case="D" type="button"><span class="swatch"></span>D · 화이트 플래시</button>
+  </div>
+  <p class="demo-panel-hint">탭을 눌러 인식중 상태별 컬러·모션 비교. 프레임 안 배경은 카메라 뷰 시뮬.</p>
+</aside>
 
 <div class="phone">
   <!-- 카메라 배경 이미지 -->
@@ -282,14 +509,29 @@ body {
   <!-- Instructions Section -->
   <div class="instructions">
     <div class="guide-text">
-      <p>신분증을 자동으로 촬영할게요.</p>
-      <p>표시된 영역에 신분증을 놓아주세요.</p>
+      <div class="guide-idle">
+        <p>신분증을 자동으로 촬영할게요.</p>
+        <p>표시된 영역에 신분증을 놓아주세요.</p>
+      </div>
+      <div class="guide-scanning">
+        <p>신분증을 인식하고 있어요</p>
+        <p>잠시만 기다려주세요</p>
+      </div>
     </div>
 
     <div class="id-frame" id="idFrame">
       <div class="frame-bg" aria-hidden="true">
         <img src="./assets/id-scan-bg.png" alt="">
       </div>
+      <div class="scan-line" aria-hidden="true"></div>
+      <div class="scan-flash" aria-hidden="true"></div>
+      <div class="corner-brackets" aria-hidden="true">
+        <span class="c c-tl"></span>
+        <span class="c c-tr"></span>
+        <span class="c c-bl"></span>
+        <span class="c c-br"></span>
+      </div>
+      <div class="scan-dots" aria-hidden="true"><i></i><i></i><i></i></div>
     </div>
 
     <div class="info">
@@ -310,5 +552,18 @@ body {
   </div>
 </div>
 
+<script>
+(function () {
+  const body = document.body;
+  const btns = document.querySelectorAll('.demo-case-btn');
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const c = btn.dataset.case;
+      btns.forEach(b => b.classList.toggle('on', b === btn));
+      body.setAttribute('data-case', c);
+    });
+  });
+})();
+</script>
 </body>
 </html>
