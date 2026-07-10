@@ -258,12 +258,13 @@ body {
   initial-value: 0deg;
 }
 
-/* Gradient stroke ring (E) · border만 표시하기 위한 mask trick */
+/* Gradient stroke ring (E) · 프레임 안쪽 border를 conic gradient로 표시
+   id-frame이 overflow: hidden이므로 inset 0으로 프레임 내부에 그린다. */
 .gradient-stroke {
   position: absolute;
-  inset: -2px;
-  border-radius: 10px;
-  padding: 2px;
+  inset: 0;
+  border-radius: 8px;
+  padding: 2.5px;
   background: conic-gradient(from var(--gs-rot),
     #00A1FF 0deg,
     #7DD3FC 45deg,
@@ -281,7 +282,17 @@ body {
           mask-composite: exclude;
   pointer-events: none;
   z-index: 4;
-  filter: drop-shadow(0 0 8px rgba(0,161,255,0.5));
+}
+/* Glow는 프레임 밖으로 · id-frame에 붙임 (overflow hidden 회피) */
+body[data-case="E"] .id-frame {
+  box-shadow:
+    0 0 0 0.5px rgba(0,161,255,0.3),
+    0 0 20px rgba(0,161,255,0.35);
+  animation: gs-glow 2.4s ease-in-out infinite;
+}
+@keyframes gs-glow {
+  0%, 100% { box-shadow: 0 0 0 0.5px rgba(0,161,255,0.2), 0 0 12px rgba(0,161,255,0.3); }
+  50%      { box-shadow: 0 0 0 0.5px rgba(0,161,255,0.4), 0 0 28px rgba(0,161,255,0.7); }
 }
 
 /* Scan Line (A) */
@@ -406,20 +417,13 @@ body[data-case="C"] .corner-brackets {
 }
 
 /* ─── 케이스 E · 그라디언트 stroke 일렁임 ─── */
-body[data-case="E"] .id-frame {
-  border-color: transparent;
-}
+body[data-case="E"] .id-frame { border-color: transparent; }
 body[data-case="E"] .gradient-stroke {
   display: block;
-  animation: gradient-rotate 3s linear infinite,
-             gradient-breathe 2.4s ease-in-out infinite;
+  animation: gradient-rotate 3s linear infinite;
 }
 @keyframes gradient-rotate {
   to { --gs-rot: 360deg; }
-}
-@keyframes gradient-breathe {
-  0%, 100% { filter: drop-shadow(0 0 6px rgba(0,161,255,0.35)); }
-  50%      { filter: drop-shadow(0 0 14px rgba(0,161,255,0.75)); }
 }
 
 /* ─── 케이스 D · 화이트 플래시 ─── */
