@@ -249,7 +249,40 @@ body {
    ──────────────────────────────────────── */
 
 /* 프레임 안 스캔 요소 컨테이너 */
-.scan-line, .scan-flash, .corner-brackets, .scan-dots { display: none; }
+.scan-line, .scan-flash, .corner-brackets, .scan-dots, .gradient-stroke { display: none; }
+
+/* ─── @property로 conic 회전 애니메이션 가능하게 (Safari 16.4+ / Chrome 85+) ─── */
+@property --gs-rot {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* Gradient stroke ring (E) · border만 표시하기 위한 mask trick */
+.gradient-stroke {
+  position: absolute;
+  inset: -2px;
+  border-radius: 10px;
+  padding: 2px;
+  background: conic-gradient(from var(--gs-rot),
+    #00A1FF 0deg,
+    #7DD3FC 45deg,
+    #E0F2FE 90deg,
+    #7DD3FC 135deg,
+    #00A1FF 180deg,
+    #0369A1 225deg,
+    #00A1FF 270deg,
+    #7DD3FC 315deg,
+    #00A1FF 360deg);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  z-index: 4;
+  filter: drop-shadow(0 0 8px rgba(0,161,255,0.5));
+}
 
 /* Scan Line (A) */
 .scan-line {
@@ -372,6 +405,23 @@ body[data-case="C"] .corner-brackets {
   50%      { opacity: 0.55; }
 }
 
+/* ─── 케이스 E · 그라디언트 stroke 일렁임 ─── */
+body[data-case="E"] .id-frame {
+  border-color: transparent;
+}
+body[data-case="E"] .gradient-stroke {
+  display: block;
+  animation: gradient-rotate 3s linear infinite,
+             gradient-breathe 2.4s ease-in-out infinite;
+}
+@keyframes gradient-rotate {
+  to { --gs-rot: 360deg; }
+}
+@keyframes gradient-breathe {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(0,161,255,0.35)); }
+  50%      { filter: drop-shadow(0 0 14px rgba(0,161,255,0.75)); }
+}
+
 /* ─── 케이스 D · 화이트 플래시 ─── */
 body[data-case="D"] .id-frame {
   border-color: rgba(255,255,255,0.85);
@@ -452,6 +502,7 @@ body[data-case="D"] .scan-flash {
 .demo-case-btn[data-case="B"]    .swatch { background: #00B98A; }
 .demo-case-btn[data-case="C"]    .swatch { background: #FFC700; }
 .demo-case-btn[data-case="D"]    .swatch { background: linear-gradient(135deg,#FFF,#DDD); }
+.demo-case-btn[data-case="E"]    .swatch { background: conic-gradient(from 0deg, #00A1FF, #7DD3FC, #E0F2FE, #00A1FF, #0369A1, #00A1FF); }
 .demo-panel-hint {
   margin: 10px 0 0;
   font-size: 10.5px;
@@ -470,6 +521,7 @@ body[data-case="D"] .scan-flash {
     <button class="demo-case-btn" data-case="B" type="button"><span class="swatch"></span>B · 그린 프레임 펄스</button>
     <button class="demo-case-btn" data-case="C" type="button"><span class="swatch"></span>C · 노랑 코너 브래킷</button>
     <button class="demo-case-btn" data-case="D" type="button"><span class="swatch"></span>D · 화이트 플래시</button>
+    <button class="demo-case-btn" data-case="E" type="button"><span class="swatch"></span>E · 그라디언트 stroke 일렁임</button>
   </div>
   <p class="demo-panel-hint">탭을 눌러 인식중 상태별 컬러·모션 비교. 프레임 안 배경은 카메라 뷰 시뮬.</p>
 </aside>
@@ -532,6 +584,7 @@ body[data-case="D"] .scan-flash {
         <span class="c c-br"></span>
       </div>
       <div class="scan-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="gradient-stroke" aria-hidden="true"></div>
     </div>
 
     <div class="info">
