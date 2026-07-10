@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>신분증 촬영 - 오늘의집머니</title>
+<meta name="viewport" content="width=375, initial-scale=1, maximum-scale=1">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root {
+  --dim: rgba(0,0,0,0.4);
+  --border-inverse: #ffffff;
+  --fg-inverse: #ffffff;
+  --fg-disabled: #C1C1C1;
+  --fg-strong: #2F3438;
+  --bg: #ffffff;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  background: #141414;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.3px;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: only light;
+}
+body {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+/* ── Phone frame (375 × 812) ────────── */
+.phone {
+  position: relative;
+  width: 375px;
+  height: 812px;
+  overflow: hidden;
+  background: #000;
+}
+
+/* ── 카메라 뷰 배경 이미지 (전체) ────── */
+.camera-bg {
+  position: absolute;
+  left: -45px;
+  top: 0;
+  width: 464.177px;
+  height: 812px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.camera-bg img {
+  position: absolute;
+  left: 0;
+  top: -8.71%;
+  width: 100%;
+  height: 124.29%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── 딤 오버레이 (전체 덮음) ─────────── */
+.dim-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--dim);
+  z-index: 1;
+}
+
+/* ── Top: Status Bar + White Nav ──────── */
+.top-nav {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.status-bar {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px 0 21px;
+  color: #000;
+  font-family: 'SF Pro Text', -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.28px;
+  background: transparent;
+}
+.status-time {
+  width: 54px;
+  text-align: center;
+}
+.status-levels {
+  width: 68px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+}
+.status-levels svg { display: block; }
+
+.nav-white {
+  height: 44px;
+  background: var(--bg);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+.nav-title {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+  color: var(--fg-strong);
+  margin: 0;
+  white-space: nowrap;
+}
+.nav-back {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  color: var(--fg-strong);
+}
+.nav-back svg { display: block; }
+.nav-right { width: 62px; height: 24px; }
+
+/* ── Instructions Section (top: 198) ───── */
+.instructions {
+  position: absolute;
+  left: 20px;
+  top: 198px;
+  width: 335px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  z-index: 3;
+}
+
+.guide-text {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: -0.3px;
+  color: var(--fg-inverse);
+  text-align: center;
+  margin: 0;
+  width: 100%;
+}
+.guide-text p { margin: 0; }
+
+/* ── ID Frame (208h, 2px white border, radius 8) ── */
+.id-frame {
+  width: 100%;
+  height: 208px;
+  border: 2px solid var(--border-inverse);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+  background: transparent;
+}
+.frame-bg {
+  position: absolute;
+  left: 50%;
+  top: -266px;
+  transform: translateX(-50%);
+  width: 464.177px;
+  height: 812px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.frame-bg img {
+  position: absolute;
+  left: 0;
+  top: -8.71%;
+  width: 100%;
+  height: 124.29%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Info Container ─────────────────── */
+.info {
+  width: 100%;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.warning-icon {
+  width: 16px; height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg-inverse);
+}
+.warning-icon svg { display: block; }
+.warning-text {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: -0.3px;
+  color: var(--fg-inverse);
+  white-space: nowrap;
+}
+.info ul {
+  margin: 0;
+  padding-left: 18px;
+  list-style: disc;
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: -0.3px;
+  color: var(--fg-disabled);
+  text-align: left;
+  width: max-content;
+}
+.info ul li { margin: 0; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <!-- 카메라 배경 이미지 -->
+  <div class="camera-bg" aria-hidden="true">
+    <img src="./assets/id-scan-bg.png" alt="">
+  </div>
+
+  <!-- 딤 오버레이 -->
+  <div class="dim-overlay" aria-hidden="true"></div>
+
+  <!-- Top Nav (Status + 흰 헤더) -->
+  <div class="top-nav">
+    <div class="status-bar">
+      <div class="status-time">9:41</div>
+      <div class="status-levels" aria-hidden="true">
+        <!-- signal / wifi / battery -->
+        <svg width="17" height="11" viewBox="0 0 17 11" fill="none"><rect x="0" y="7" width="3" height="4" rx="0.5" fill="black"/><rect x="4.5" y="4.5" width="3" height="6.5" rx="0.5" fill="black"/><rect x="9" y="2" width="3" height="9" rx="0.5" fill="black"/><rect x="13.5" y="0" width="3" height="11" rx="0.5" fill="black"/></svg>
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 2.5c2.1 0 4.1.8 5.6 2.2l1.2-1.2a10 10 0 0 0-13.6 0l1.2 1.2C3.9 3.3 5.9 2.5 8 2.5zm0 2.5c1.4 0 2.7.5 3.7 1.4l1.2-1.2A7.5 7.5 0 0 0 3.1 5.2l1.2 1.2A5.3 5.3 0 0 1 8 5zm0 2.5c.7 0 1.4.3 1.9.7L8 10.5 6.1 8.7A2.8 2.8 0 0 1 8 8z" fill="black"/></svg>
+        <svg width="27" height="12" viewBox="0 0 27 12" fill="none"><rect x="0.5" y="0.5" width="22" height="11" rx="2.5" stroke="black" stroke-opacity="0.35" fill="none"/><rect x="2" y="2" width="19" height="8" rx="1.5" fill="black"/><rect x="24" y="4" width="1.5" height="4" rx="0.75" fill="black" fill-opacity="0.4"/></svg>
+      </div>
+    </div>
+
+    <div class="nav-white">
+      <button class="nav-back" type="button" aria-label="뒤로가기">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M10.1328 4.49853C10.4443 4.18529 10.9509 4.18391 11.2642 4.49546C11.5774 4.80702 11.5788 5.31359 11.2672 5.62686L5.72397 11.2002H20.2C20.6418 11.2002 21 11.5584 21 12.0002C21 12.442 20.6418 12.8002 20.2 12.8002H5.72397L11.2672 18.3735C11.5788 18.6868 11.5774 19.1934 11.2642 19.5049C10.9509 19.8165 10.4443 19.8151 10.1328 19.5019L3.23276 12.5644C2.92725 12.2572 2.92249 11.7638 3.21804 11.4515L10.1328 4.49853Z" fill="currentColor"/>
+        </svg>
+      </button>
+      <h1 class="nav-title">신분증 선택</h1>
+      <div class="nav-right" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <!-- Instructions Section -->
+  <div class="instructions">
+    <div class="guide-text">
+      <p>신분증을 자동으로 촬영할게요.</p>
+      <p>표시된 영역에 신분증을 놓아주세요.</p>
+    </div>
+
+    <div class="id-frame" id="idFrame">
+      <div class="frame-bg" aria-hidden="true">
+        <img src="./assets/id-scan-bg.png" alt="">
+      </div>
+    </div>
+
+    <div class="info">
+      <div class="warning">
+        <span class="warning-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.95824 3.85019C10.8435 2.31686 13.0567 2.31686 13.9419 3.85019L21.6929 17.2752C22.5781 18.8085 21.4715 20.7252 19.701 20.7252H4.19916C2.42863 20.7252 1.32207 18.8085 2.20732 17.2752L9.95824 3.85019ZM12.0001 15.4002C11.503 15.4002 11.1001 15.8031 11.1001 16.3002C11.1001 16.7972 11.503 17.2002 12.0001 17.2002C12.4971 17.2002 12.9001 16.7972 12.9001 16.3002C12.9001 15.8031 12.4971 15.4002 12.0001 15.4002ZM12.0001 8.20015C11.503 8.20015 11.1001 8.60309 11.1001 9.10015V13.6002C11.1001 14.0973 11.503 14.5002 12.0001 14.5002C12.4971 14.5002 12.9001 14.0973 12.9001 13.6002V9.10015C12.9001 8.60309 12.4971 8.20015 12.0001 8.20015Z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="warning-text">다음과 같은 신분증은 사용할 수 없어요</span>
+      </div>
+      <ul>
+        <li>신분증 사본 (예: 출력물, 휴대폰 확인 촬영 등)</li>
+        <li>정보 확인이 어렵거나 훼손된 신분증</li>
+        <li>유효기간이 지난 신분증</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
