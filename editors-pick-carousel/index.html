@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0, user-scalable=no">
+<title>Recommend Item/Default</title>
+<!--
+  Figma frame : Recommend Item/Default (연합 브랜드 에디터스픽)
+  Node ID     : 6593:39280
+  File        : 3lq4pq6NVDuJzjKcL4Zbfv (branch of 52fnq0jqVg3HaxLUlkYMSP)
+  Figma URL   : https://www.figma.com/design/52fnq0jqVg3HaxLUlkYMSP/branch/3lq4pq6NVDuJzjKcL4Zbfv/?node-id=6593-39280
+  Built       : 2026-08-11
+
+  인터랙션 스펙 (Slack C0A9QP6SYLS / 1786412914.393289 질문 대응):
+  1. 인디케이터 넘버·닷은 이미지 위 고정 오버레이 — 스와이프 시 함께 이동하지 않음
+  2. 큰 이미지만 좌우 캐러셀 (드래그/스와이프, 엣지 러버밴드, 루프 없음)
+  3. 하단 상품정보는 캐러셀되지 않고 스냅 확정 시점에 fade-through로 교체
+  4. 인디케이터 닷 탭 동작 없음 권장(터치 타겟 미달) — 데스크톱 리뷰 편의용
+     클릭 이동만 프로토타입에 포함 (data-proto-only)
+-->
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<script src="assets/design-tokens.js"></script>
+<script src="assets/icons.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { background:var(--bg-weak, #F5F5F5); }
+  body {
+    font-family:'Pretendard',-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    /* 모듈 식별용 라이트 그레이 + 중앙 배치.
+       pixel-diff 뷰포트(375×575)에서는 모듈이 꽉 차 오프셋 0 유지 */
+    min-height:100vh; display:grid; place-items:center;
+  }
+
+  .screen {
+    position:relative; width:375px; background:var(--bg);
+    padding:32px 16px; display:flex; flex-direction:column;
+  }
+
+  /* ── Section Title / Body ─────────────────────────── */
+  .sec-title { color:var(--fg); }
+  .sec-desc  { margin-top:14px; color:var(--fg-weak); }
+
+  /* ── Image Carousel ───────────────────────────────── */
+  .carousel {
+    position:relative; margin-top:14px;
+    width:343px; height:343px; border-radius:12px; overflow:hidden;
+    background:var(--bg); touch-action:pan-y; cursor:grab;
+  }
+  .carousel.dragging { cursor:grabbing; }
+  .car-track {
+    display:flex; height:100%; will-change:transform;
+    transition:transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .car-track.no-anim { transition:none; }
+  .car-slide { position:relative; flex:0 0 343px; height:343px; }
+  .car-slide img {
+    width:100%; height:100%; object-fit:cover; display:block;
+    -webkit-user-drag:none; user-select:none; pointer-events:none;
+  }
+  .img-olive { filter:hue-rotate(55deg) saturate(0.75) brightness(0.97); }
+
+  /* 상품 태그 — 이미지 콘텐츠에 앵커되므로 슬라이드와 함께 이동 */
+  .product-tag {
+    position:absolute; width:20px; height:20px; left:211px; top:143px;
+    border-radius:50%; animation:tag-pulse 2.4s ease-out infinite;
+  }
+  .product-tag svg { display:block; }
+  @keyframes tag-pulse {
+    0%   { box-shadow:0 0 0 0 rgba(10,165,255,0.45); }
+    55%  { box-shadow:0 0 0 10px rgba(10,165,255,0); }
+    100% { box-shadow:0 0 0 0 rgba(10,165,255,0); }
+  }
+
+  /* ── 고정 오버레이: Indicator Number (우상단) ────── */
+  .ind-num {
+    position:absolute; top:12px; right:12px; height:24px;
+    display:flex; align-items:center; gap:1px; padding:0 8px;
+    border-radius:30px; background:rgba(0,0,0,0.4);
+    color:var(--fg-inverse); z-index:2; pointer-events:none;
+  }
+  .ind-num .cur { display:inline-block; min-width:6px; text-align:center; transition:opacity 120ms; }
+  .ind-num .cur.swap { opacity:0; }
+
+  /* ── 고정 오버레이: Indicator Dots (하단 중앙) ───── */
+  .ind-dots {
+    position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
+    display:flex; gap:6px; z-index:2;
+  }
+  .ind-dots .cell {
+    width:8px; height:8px; display:flex; align-items:center; justify-content:center;
+    /* 프로토타입 전용 클릭 이동 (스펙 권장: 탭 동작 없음) */
+    cursor:pointer; position:relative;
+  }
+  .ind-dots .cell::before { /* proto용 확장 히트영역 */
+    content:''; position:absolute; inset:-8px;
+  }
+  .ind-dots .dot {
+    width:8px; height:8px; border-radius:50%;
+    background:#fff; opacity:0.7;
+    box-shadow:0 2px 5px rgba(63,71,77,0.15);
+    transition:width 200ms cubic-bezier(0.22,1,0.36,1),
+               height 200ms cubic-bezier(0.22,1,0.36,1),
+               opacity 200ms;
+  }
+  .ind-dots .cell[data-d="0"] .dot { opacity:1; }
+  .ind-dots .cell[data-d="2"] .dot { width:6px; height:6px; }
+  .ind-dots .cell[data-d="3"] .dot { width:4px; height:4px; }
+
+  /* ── Product Info (캐러셀 아님 — fade-through 교체) ─ */
+  .prod-info {
+    margin-top:8px; height:60px; display:flex; align-items:center; gap:16px;
+  }
+  .prod-info .body {
+    flex:1; min-width:0; display:flex; align-items:center; gap:10px;
+    transition:opacity 140ms ease, transform 140ms ease;
+  }
+  .prod-info .body.leaving { opacity:0; transform:translateY(5px); }
+  .prod-info .body.entering { opacity:0; transform:translateY(-5px); transition:none; }
+
+  .thumb {
+    position:relative; width:60px; height:60px; flex:0 0 60px;
+    border-radius:8px; overflow:hidden;
+  }
+  .thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+  .thumb::after { /* ODS Thumbnail dim(border) 오버레이 */
+    content:''; position:absolute; inset:0; background:rgba(0,0,0,0.03);
+    border-radius:8px;
+  }
+
+  .prod-text { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .prod-name {
+    color:#2f3438; height:18px; overflow:hidden;
+    white-space:nowrap; text-overflow:ellipsis;
+  }
+  .prod-price { margin-top:2px; display:flex; align-items:center; gap:4px; height:20px; }
+  .prod-price .rate  { color:var(--accent-red); }
+  .prod-price .price { color:var(--fg); }
+  .prod-review { margin-top:2px; display:flex; align-items:center; gap:4px; height:16px; color:var(--fg-weak); }
+  .rating { display:flex; align-items:center; gap:1px; }
+  .star { width:12px; height:12px; display:flex; }
+  .star svg { width:12px; height:12px; }
+  .review-count { display:flex; }
+
+  /* ── ODS Scrap Button (normal) ────────────────────── */
+  .ods-scrap {
+    width:24px; height:24px; flex:0 0 24px; border:0; background:none;
+    padding:0; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .ods-scrap .ic, .ods-scrap svg { width:24px; height:24px; display:block; }
+  .ods-scrap.pop { animation:scrap-pop 260ms cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes scrap-pop { 0%{transform:scale(0.7);} 100%{transform:scale(1);} }
+</style>
+</head>
+<body>
+<div class="screen" data-id="editors-pick">
+
+  <h2 class="sec-title text-Heading24_Bold">Editor’s Pick</h2>
+  <p class="sec-desc text-Body14L20_Regular">상품 셀링포인트에 대한 설명 문구가 들어갑니다. 상품 셀링포인트에 대한 설명 문구가 들어갑니다.</p>
+
+  <div class="carousel" id="carousel" aria-roledescription="carousel">
+    <div class="car-track" id="track">
+      <!-- 슬라이드는 JS에서 PRODUCTS 기반 생성 -->
+    </div>
+
+    <!-- 고정 오버레이 — 스와이프와 무관하게 위치 고정 -->
+    <div class="ind-num text-Detail12L16_Medium" id="indNum" aria-live="polite">
+      <span class="cur" id="indCur">1</span><span>/</span><span id="indTotal">4</span>
+    </div>
+    <div class="ind-dots" id="indDots" role="tablist" aria-label="상품 이미지 페이지"></div>
+  </div>
+
+  <div class="prod-info">
+    <div class="body" id="infoBody">
+      <div class="thumb"><img id="infoThumb" src="" alt=""></div>
+      <div class="prod-text">
+        <p class="prod-name text-Detail13L18_Regular" id="infoName"></p>
+        <div class="prod-price">
+          <span class="rate text-Body16L20_Bold" id="infoRate"></span>
+          <span class="price text-Body14L20_Bold" id="infoPrice"></span>
+        </div>
+        <div class="prod-review text-Detail12L16_Regular">
+          <span class="rating">
+            <span class="star" id="starIcon"></span>
+            <span id="infoScore"></span>
+          </span>
+          <span class="review-count"><span>리뷰&nbsp;</span><span id="infoReviews"></span></span>
+        </div>
+      </div>
+    </div>
+    <button class="ods-scrap" id="scrapBtn" aria-pressed="false" aria-label="스크랩"></button>
+  </div>
+
+</div>
+
+<script>
+/* ── 토큰 주입 (window.TOKENS 실사용) ─────────────────── */
+(function applyTokens(){
+  const c = window.TOKENS.color.light;
+  const V = k => c[k] ? c[k].value : '';
+  const map = {
+    '--bg':         V('BG/Neutral/background'),
+    '--fg':         V('FG/Neutral/foreground'),
+    '--fg-weak':    V('FG/Neutral/foreground-weak'),
+    '--fg-inverse': V('FG/Neutral/foreground-inverse'),
+    '--accent-red':    V('Accent/accent-red'),
+    '--accent-yellow': V('Accent/accent-yellow'),
+  };
+  const r = document.documentElement;
+  Object.entries(map).forEach(([k,v]) => v && r.style.setProperty(k,v));
+})();
+
+/* ── 타이포 클래스 자동 생성 ──────────────────────────── */
+(function applyTypography(){
+  const typo = window.TOKENS.typography;
+  const css = Object.entries(typo).map(([name, v]) =>
+    `.text-${name}{font-family:'Pretendard',-apple-system,sans-serif;` +
+    `font-weight:${v.fontWeight};font-size:${v.fontSize}px;` +
+    `line-height:${v.lineHeight}px;letter-spacing:${(v.letterSpacing||0).toFixed(2)}px}`
+  ).join('\n');
+  const s = document.createElement('style');
+  s.textContent = css; document.head.appendChild(s);
+})();
+
+/* ── 에셋 (Figma export SVG 인라인 — fetch 금지 gotcha#2) ─ */
+const ASSETS = {
+  /* Product Tag 6593:39199 — Figma SVG export 원본 */
+  product_tag: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M10 20C12.6522 20 15.1957 18.9464 17.0711 17.0711C18.9464 15.1957 20 12.6522 20 10C20 7.34784 18.9464 4.8043 17.0711 2.92893C15.1957 1.05357 12.6522 0 10 0C7.34784 0 4.8043 1.05357 2.92893 2.92893C1.05357 4.8043 0 7.34784 0 10C0 12.6522 1.05357 15.1957 2.92893 17.0711C4.8043 18.9464 7.34784 20 10 20Z" fill="#0AA5FF"/><path fill-rule="evenodd" clip-rule="evenodd" d="M10.8666 5.73324V9.13324H14.2666V10.8666H10.8666V14.2666H9.13324V10.8666H5.73324V9.13324H9.13324V5.73324H10.8666Z" fill="#fff"/></svg>`,
+  /* Bookmark outline — icons.js에 outline 버전 부재, ODS [Icon] Bookmark 원본 path */
+  bookmark_outline: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M15.5 3C16.8058 3 17.9293 3.29786 18.7157 4.08428C19.5021 4.8707 19.8 5.99416 19.8 7.3V19.6944C19.8 20.2423 19.5446 20.743 19.1101 21.0391C18.666 21.3417 18.0876 21.3919 17.5632 21.1327C17.5514 21.1269 17.5398 21.1207 17.5283 21.1144L12 18.0343L6.47169 21.1144C6.46023 21.1207 6.44859 21.1269 6.43683 21.1327C5.91238 21.3919 5.33399 21.3417 4.8899 21.0391C4.45544 20.743 4.20003 20.2423 4.20001 19.6944V7.3C4.20001 5.99416 4.4979 4.8707 5.28434 4.08428C6.07077 3.29786 7.19423 3 8.50001 3H15.5ZM8.50001 4.6C7.40579 4.6 6.77925 4.85211 6.41569 5.21567C6.05213 5.57923 5.80001 6.20575 5.80001 7.3V19.657L11.6107 16.4197L11.6335 16.4075C11.8711 16.285 12.1549 16.2891 12.3894 16.4197L18.2 19.657V7.3C18.2 6.20575 17.9479 5.57923 17.5843 5.21567C17.2208 4.85211 16.5942 4.6 15.5 4.6H8.50001Z" fill="#141414"/></svg>`,
+};
+
+/* ── 상품 데이터 (이미지 ↔ 하단 상품정보 1:1 매핑) ────── */
+const PRODUCTS = [
+  { img:'assets/img/product-1.png', thumb:'assets/img/thumb-1.png', cls:'', tag:true,
+    name:'BELLY30 Pendant 3Colors BELLY30 Pendant 3Colors',
+    rate:'42%', price:'33,200', score:'4.6', reviews:'999,999' },
+  { img:'assets/img/product-2.png', cls:'', tag:false,
+    name:'스피겔라우 윈터드림 와인글라스 홈파티 4P 세트',
+    rate:'18%', price:'49,800', score:'4.8', reviews:'1,204' },
+  { img:'assets/img/product-3.png', cls:'', tag:false,
+    name:'마운틴 포레스트 방수 패브릭 샤워커튼 180×200',
+    rate:'25%', price:'17,900', score:'4.7', reviews:'3,482' },
+  { img:'assets/img/product-1.png', cls:'img-olive', tag:false,
+    name:'BELLY30 Pendant Olive Edition 단독 컬러',
+    rate:'38%', price:'35,900', score:'4.6', reviews:'999,999' },
+];
+
+const W = 343;
+const track    = document.getElementById('track');
+const dotsWrap = document.getElementById('indDots');
+const indCur   = document.getElementById('indCur');
+document.getElementById('indTotal').textContent = PRODUCTS.length;
+
+/* 슬라이드 생성 — Product Tag는 이미지 콘텐츠 앵커라 슬라이드 내부(함께 이동) */
+PRODUCTS.forEach((p, i) => {
+  const s = document.createElement('div');
+  s.className = 'car-slide';
+  s.innerHTML = `<img src="${p.img}" class="${p.cls}" alt="${p.name}">` +
+    (p.tag ? `<span class="product-tag">${ASSETS.product_tag}</span>` : '');
+  track.appendChild(s);
+});
+
+/* 닷 생성 — 위치 고정 오버레이. 크기 그라데이션은 활성 인덱스와의 거리 기준
+   (Figma variant 실측: d0=8px@100%, d1=8px@70%, d2=6px, d3+=4px) */
+PRODUCTS.forEach((_, i) => {
+  const c = document.createElement('span');
+  c.className = 'cell'; c.setAttribute('role','tab'); c.dataset.i = i;
+  c.dataset.protoOnly = 'true'; /* 스펙 권장: 탭 동작 없음 (프로토 리뷰 편의용 클릭) */
+  c.innerHTML = '<span class="dot"></span>';
+  c.addEventListener('click', () => setIndex(i));
+  dotsWrap.appendChild(c);
+});
+
+function renderDots(idx){
+  [...dotsWrap.children].forEach((c, i) => {
+    const d = Math.min(Math.abs(i - idx), 3);
+    c.dataset.d = d;
+    c.setAttribute('aria-selected', i === idx);
+  });
+}
+
+/* ── 상품정보 fade-through 교체 (캐러셀 아님) ─────────── */
+const infoBody = document.getElementById('infoBody');
+const scrapBtn = document.getElementById('scrapBtn');
+const scrapState = PRODUCTS.map(() => false);
+let infoTimer = null;
+
+function fillInfo(p){
+  document.getElementById('infoThumb').src = p.thumb || p.img;
+  document.getElementById('infoThumb').className = p.cls;
+  document.getElementById('infoName').textContent = p.name;
+  document.getElementById('infoRate').textContent = p.rate;
+  document.getElementById('infoPrice').textContent = p.price;
+  document.getElementById('infoScore').textContent = p.score;
+  document.getElementById('infoReviews').textContent = p.reviews;
+}
+function renderScrap(idx){
+  const on = scrapState[idx];
+  scrapBtn.innerHTML = on ? window.ICONS['bookmark_filled'] : ASSETS.bookmark_outline;
+  scrapBtn.setAttribute('aria-pressed', on);
+}
+function swapInfo(idx, immediate){
+  const p = PRODUCTS[idx];
+  if (immediate){ fillInfo(p); renderScrap(idx); return; }
+  clearTimeout(infoTimer);
+  infoBody.classList.add('leaving');
+  infoTimer = setTimeout(() => {
+    fillInfo(p); renderScrap(idx);
+    infoBody.classList.remove('leaving');
+    infoBody.classList.add('entering');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      infoBody.style.transition = '';
+      infoBody.classList.remove('entering');
+    }));
+  }, 140);
+}
+
+scrapBtn.addEventListener('click', () => {
+  scrapState[index] = !scrapState[index];
+  renderScrap(index);
+  scrapBtn.classList.remove('pop'); void scrapBtn.offsetWidth;
+  scrapBtn.classList.add('pop');
+});
+
+/* ── 캐러셀 코어: 드래그 스와이프 + 스냅 (루프 없음) ──── */
+let index = 0;
+
+function setIndex(i, opts){
+  const next = Math.max(0, Math.min(PRODUCTS.length - 1, i));
+  const changed = next !== index;
+  index = next;
+  track.classList.remove('no-anim');
+  track.style.transform = `translateX(${-index * W}px)`;
+  renderDots(index);
+  if (changed || (opts && opts.force)){
+    /* 넘버는 고정 위치에서 숫자만 교체 (짧은 페이드) */
+    indCur.classList.add('swap');
+    setTimeout(() => { indCur.textContent = index + 1; indCur.classList.remove('swap'); }, 120);
+    swapInfo(index, opts && opts.immediate);
+  }
+}
+
+const carousel = document.getElementById('carousel');
+let startX = 0, delta = 0, dragging = false, startT = 0;
+
+carousel.addEventListener('pointerdown', e => {
+  dragging = true; startX = e.clientX; delta = 0; startT = Date.now();
+  carousel.classList.add('dragging');
+  track.classList.add('no-anim');
+  carousel.setPointerCapture(e.pointerId);
+});
+carousel.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  delta = e.clientX - startX;
+  let x = -index * W + delta;
+  /* 엣지 러버밴드 */
+  const min = -(PRODUCTS.length - 1) * W, max = 0;
+  if (x > max) x = max + (x - max) * 0.35;
+  if (x < min) x = min + (x - min) * 0.35;
+  track.style.transform = `translateX(${x}px)`;
+});
+function endDrag(){
+  if (!dragging) return;
+  dragging = false;
+  carousel.classList.remove('dragging');
+  const dt = Date.now() - startT;
+  const flick = Math.abs(delta) > 40 && dt < 250;      /* 빠른 플릭 */
+  const far   = Math.abs(delta) > W * 0.25;            /* 25% 이상 이동 */
+  if (flick || far) setIndex(index + (delta < 0 ? 1 : -1));
+  else setIndex(index, { keep:true });                  /* 원위치 스냅백 */
+}
+carousel.addEventListener('pointerup', endDrag);
+carousel.addEventListener('pointercancel', endDrag);
+
+/* 데스크톱 리뷰 편의: 키보드 ←/→ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') setIndex(index + 1);
+  if (e.key === 'ArrowLeft')  setIndex(index - 1);
+});
+
+/* ── 초기 렌더 (Figma 기본 상태와 동일: index 0) ──────── */
+document.getElementById('starIcon').innerHTML =
+  window.ICONS['star_filled'].replace('fill="#141414"', 'fill="#FFC300"');
+renderDots(0);
+swapInfo(0, true);
+</script>
+</body>
+</html>
