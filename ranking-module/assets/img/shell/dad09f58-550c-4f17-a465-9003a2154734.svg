@@ -1,0 +1,21 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Mask">
+<g id="[Icon] Bookmark">
+<g id="Color">
+<mask id="mask0_0_6008" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="4" y="2" width="16" height="20">
+<g id="Vector">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M17 3.99995H7C6.33725 3.99995 5.8 4.53721 5.8 5.19995V19.1526L9.9875 16.5359C11.2198 15.7658 12.7833 15.766 14.0155 16.5362L18.2 19.152V5.19995C18.2 4.53721 17.6627 3.99995 17 3.99995ZM7 2.19995C5.34315 2.19995 4 3.54309 4 5.19995V20.5959C4 21.3813 4.86388 21.8601 5.52995 21.4439L10.9414 18.0624C11.5899 17.6571 12.4129 17.6571 13.0614 18.0625L18.4699 21.4435C19.136 21.8598 20 21.381 20 20.5955V5.19995C20 3.5431 18.6569 2.19995 17 2.19995H7Z" fill="black"/>
+<path d="M17 3.99995H7C6.33725 3.99995 5.8 4.53721 5.8 5.19995V19.1526L9.9875 16.5359C11.2198 15.7658 12.7833 15.766 14.0155 16.5362L18.2 19.152V5.19995C18.2 4.53721 17.6627 3.99995 17 3.99995Z" fill="black" fill-opacity="0.65"/>
+</g>
+</mask>
+<g mask="url(#mask0_0_6008)">
+<g id="Color Set">
+<g id="Color_2">
+<rect id="Color_3" width="24" height="24" fill="#2F3438"/>
+</g>
+</g>
+</g>
+</g>
+</g>
+</g>
+</svg>
