@@ -236,6 +236,8 @@
   .chip2 .c2-label { font-size:13px; line-height:18px; font-weight:500; color:var(--fg-weak); transition:color .18s; }
   .chip2.is-selected { border-color:var(--border-strong); box-shadow:inset 0 0 0 .5px var(--border-strong); }
   .chip2.is-selected .c2-label { font-weight:600; color:var(--fg); }
+  /* '전체' chip — 이미지 없는 텍스트 전용 (Figma 실측 47×48) */
+  .chip2.c2-textonly { padding:0; justify-content:center; }
 
   .rk-body { position:relative; overflow:hidden; transition:height .3s cubic-bezier(.4,0,.2,1); }
   .rk-pager {
@@ -633,7 +635,7 @@ const currentCount = () => state.override ?? (cat2() ? cat2().count : cat1().cou
 /* ── 랭킹 모듈 렌더 ── */
 /* Figma 실측 칩 폭 (텍스트 렌더 오차 누적 방지) */
 const CHIP1_W = { '전체':46, '가구':46, '가전·디지털':85, '패브릭':58, '주방용품':70, '드레스룸':70 };
-const CHIP2_W = { '침대':87, '매트리스·토퍼':134, '테이블·식탁·책상':148, 'Text':89 };
+const CHIP2_W = { '전체':47, '침대':87, '매트리스·토퍼':134, '테이블·식탁·책상':148, 'Text':89 };
 
 function renderChips1(){
   chips1El.innerHTML = CATS.map(c =>
@@ -646,14 +648,20 @@ function renderChips1(){
 function renderChips2(){
   const subs = cat1().sub;
   if (!subs) { chips2Wrap.classList.remove('is-open'); return; }
-  chips2El.innerHTML = subs.map(s =>
+  /* '전체' chip: 이미지 없이 텍스트만, 미선택 시 전체가 기본 선택 (확정안) */
+  chips2El.innerHTML =
+    `<button class="chip2 c2-textonly ${state.cat2===null?'is-selected':''}" data-sub=""
+       style="width:${CHIP2_W['전체']}px">
+       <span class="c2-label">전체</span>
+     </button>` +
+    subs.map(s =>
     `<button class="chip2 ${s.id===state.cat2?'is-selected':''}" data-sub="${s.id}"
        style="${CHIP2_W[s.label]?`width:${CHIP2_W[s.label]}px`:''}">
        <span class="c2-img"><img src="${s.img}" alt=""></span>
        <span class="c2-label">${s.label}</span>
      </button>`
   ).join('');
-  chips2El.querySelectorAll('button').forEach(b => b.onclick = () => selectCat2(b.dataset.sub));
+  chips2El.querySelectorAll('button').forEach(b => b.onclick = () => selectCat2(b.dataset.sub || null));
   chips2Wrap.classList.add('is-open');
 }
 
@@ -735,7 +743,8 @@ function selectCat1(id){
   renderChips1(); renderChips2(); transitionList();
 }
 function selectCat2(id){
-  if (state.cat2 === id) return;
+  /* 선택된 chip 재탭 = 해제 → '전체'로 복귀 */
+  if (state.cat2 === id) { if (id === null) return; id = null; }
   state.cat2 = id; state.override = null;
   renderChips2(); transitionList();
 }
@@ -755,7 +764,7 @@ function updatePanel(){
   el.querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.n === n));
   $('ppState').textContent =
     `1Depth: ${cat1().label}` +
-    (cat1().sub ? `\n2Depth: ${cat2() ? cat2().label : '(미선택)'} — 노출됨` : '\n2Depth: 숨김 (전체 또는 하위 없음)') +
+    (cat1().sub ? `\n2Depth: ${cat2() ? cat2().label : '전체 (기본)'} — 노출됨` : '\n2Depth: 숨김 (전체 또는 하위 없음)') +
     `\n상품: ${n}개 → ${n===0?'빈 상태':`컬럼 ${pages}개${pages>1?' (가로 스와이프)':''}`}` +
     `\n모듈 리스트 높이: ${listHeight(n)}px`;
 }
@@ -883,8 +892,8 @@ if (diffState){
   const apply = {
     'default':  () => { state.cat1='all'; },
     '2depth':   () => { state.cat1='furniture'; state.cat2=null; },
-    'empty':    () => { state.cat1='furniture'; state.cat2='bed'; state.override=0; },
-    'one':      () => { state.cat1='furniture'; state.cat2='bed'; state.override=1; },
+    'empty':    () => { state.cat1='furniture'; state.cat2=null; state.override=0; },
+    'one':      () => { state.cat1='furniture'; state.cat2=null; state.override=1; },
     'skeleton': () => { state.cat1='all'; },
   }[diffState];
   if (apply) apply();
