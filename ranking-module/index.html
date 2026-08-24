@@ -737,16 +737,28 @@ function transitionList(){
   }
 }
 
+/* 선택 chip을 스트립 좌측(패딩 16px 안쪽)으로 자동 스크롤 — 끝 chip은 최대 스크롤로 클램프 */
+function scrollChipToLeft(container){
+  const chip = container.querySelector('.is-selected');
+  if (!chip) return;
+  const left = chip.getBoundingClientRect().left - container.getBoundingClientRect().left
+             + container.scrollLeft - 16;
+  container.scrollTo({ left: Math.max(0, left), behavior:'smooth' }); /* max 초과분은 브라우저가 클램프 */
+}
+
 function selectCat1(id){
   if (state.cat1 === id) return;
   state.cat1 = id; state.cat2 = null; state.override = null;
   renderChips1(); renderChips2(); transitionList();
+  scrollChipToLeft(chips1El);
+  scrollChipToLeft(chips2El);
 }
 function selectCat2(id){
   /* 선택된 chip 재탭 = 해제 → '전체'로 복귀 */
   if (state.cat2 === id) { if (id === null) return; id = null; }
   state.cat2 = id; state.override = null;
   renderChips2(); transitionList();
+  scrollChipToLeft(chips2El);
 }
 
 /* ── 프로토 컨트롤 패널 ── */
