@@ -210,7 +210,7 @@
   }
   .rk-arrow svg { width:18px; height:18px; }
 
-  .rk-chips1 { height:44px; padding:0 16px 12px; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; }
+  .rk-chips1 { position:relative; height:44px; padding:0 16px 12px; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; }
   .rk-chips1::-webkit-scrollbar { display:none; }
   .chip1 {
     flex:none; height:32px; padding:0 9px; border:1px solid var(--border); border-radius:9999px;
@@ -221,7 +221,7 @@
 
   .rk-chips2-wrap { height:0; overflow:hidden; transition:height .28s cubic-bezier(.4,0,.2,1); }
   .rk-chips2-wrap.is-open { height:60px; }
-  .rk-chips2 { height:48px; padding:0 16px; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; }
+  .rk-chips2 { position:relative; height:48px; padding:0 16px; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; }
   .rk-chips2::-webkit-scrollbar { display:none; }
   .chip2 {
     flex:none; height:48px; padding:4px 8px 4px 4px; border:1px solid var(--border-thumb); border-radius:8px;
@@ -610,17 +610,46 @@ const THUMBS = ['9c8f13df-eb17-429f-9ff4-05c75e1c9893','40d96615-6ff0-4ddf-8678-
 const thumbAt = i => THUMBS[i % THUMBS.length];
 
 const PRODUCT = { brand:'한샘', name:'BELLY30 Pendant 3Colors BELLY30 Pendant 3Colors', rate:'51%', price:'225,000원' };
+/* 가구 2Depth: ohou.se 가구 카테고리(10000000) 실서비스 순서·아이콘 그대로 */
+const C2 = 'assets/img/cat2/';
+const FURNITURE_SUBS = [
+  { id:'bed',      label:'침대',            img:'assets/img/chip-bed.png',      count:7 },
+  { id:'mattress', label:'매트리스·토퍼',    img:'assets/img/chip-mattress.png', count:4 },
+  { id:'table',    label:'테이블·식탁·책상', img:'assets/img/chip-table.png',    count:1 },
+  { id:'sofa',     label:'소파',            img:C2+'sofa.png',      count:10 },
+  { id:'drawer',   label:'서랍·수납장',      img:C2+'drawer.png',    count:6 },
+  { id:'tvcab',    label:'거실장·TV장',      img:C2+'tvcabinet.png', count:5 },
+  { id:'shelf',    label:'선반',            img:C2+'shelf.png',     count:3 },
+  { id:'bookshelf',label:'진열장·책장',      img:C2+'bookshelf.png', count:8 },
+  { id:'chair',    label:'의자',            img:C2+'chair.png',     count:10 },
+  { id:'hanger',   label:'행거·옷장',        img:C2+'hanger.png',    count:2 },
+  { id:'mirror',   label:'거울',            img:C2+'mirror.png',    count:1 },
+  { id:'dresser',  label:'화장대·콘솔',      img:C2+'dresser.png',   count:4 },
+  { id:'kids',     label:'유아동가구',       img:C2+'kids.png',      count:0 },
+  { id:'outdoor',  label:'야외가구',         img:C2+'outdoor.png',   count:6 },
+  { id:'partition',label:'가벽·파티션',      img:C2+'partition.png', count:2 },
+  { id:'room',     label:'공간별가구',       img:C2+'room.png',      count:9 },
+];
+/* 1Depth: 실서비스 스토어 카테고리 택소노미 순서 */
 const CATS = [
-  { id:'all',      label:'전체',       count:10, sub:null },
-  { id:'furniture',label:'가구',       count:10, sub:[
-      { id:'bed',      label:'침대',            img:'assets/img/chip-bed.png',      count:7 },
-      { id:'mattress', label:'매트리스·토퍼',    img:'assets/img/chip-mattress.png', count:4 },
-      { id:'table',    label:'테이블·식탁·책상', img:'assets/img/chip-table.png',    count:1 },
-  ]},
-  { id:'digital',  label:'가전·디지털', count:6,  sub:null },
-  { id:'fabric',   label:'패브릭',      count:3,  sub:null },
-  { id:'kitchen',  label:'주방용품',    count:1,  sub:null },
-  { id:'dress',    label:'드레스룸',    count:0,  sub:null },
+  { id:'all',      label:'전체',        count:10, sub:null },
+  { id:'furniture',label:'가구',        count:10, sub:FURNITURE_SUBS },
+  { id:'digital',  label:'가전·디지털',  count:6,  sub:null },
+  { id:'fabric',   label:'패브릭',       count:3,  sub:null },
+  { id:'kitchen',  label:'주방용품',     count:1,  sub:null },
+  { id:'food',     label:'식품',         count:8,  sub:null },
+  { id:'deco',     label:'데코·식물',    count:5,  sub:null },
+  { id:'lighting', label:'조명',         count:10, sub:null },
+  { id:'storage',  label:'수납·정리',    count:4,  sub:null },
+  { id:'living',   label:'생활용품',     count:7,  sub:null },
+  { id:'daily',    label:'생필품',       count:2,  sub:null },
+  { id:'baby',     label:'유아·아동',    count:6,  sub:null },
+  { id:'pet',      label:'반려동물',     count:1,  sub:null },
+  { id:'camping',  label:'캠핑·레저',    count:9,  sub:null },
+  { id:'diy',      label:'공구·DIY',     count:3,  sub:null },
+  { id:'interior', label:'인테리어시공', count:0,  sub:null },
+  { id:'rental',   label:'렌탈·구독',    count:2,  sub:null },
+  { id:'grocery',  label:'장보기',       count:5,  sub:null },
 ];
 
 const state = { cat1:'all', cat2:null, override:null };
@@ -737,13 +766,28 @@ function transitionList(){
   }
 }
 
-/* 선택 chip을 스트립 좌측(패딩 16px 안쪽)으로 자동 스크롤 — 끝 chip은 최대 스크롤로 클램프 */
+/* 선택 chip을 스트립 좌측(패딩 16px 안쪽)으로 자동 스크롤 — 끝 chip은 최대 스크롤로 클램프.
+   네이티브 smooth scrollTo가 innerHTML 교체 직후/일부 환경에서 무시되는 이슈가 있어
+   rAF 기반 자체 애니메이션(easeOutCubic, 280ms)으로 구현 */
+const chipScrollAnim = new WeakMap();
 function scrollChipToLeft(container){
-  const chip = container.querySelector('.is-selected');
-  if (!chip) return;
-  const left = chip.getBoundingClientRect().left - container.getBoundingClientRect().left
-             + container.scrollLeft - 16;
-  container.scrollTo({ left: Math.max(0, left), behavior:'smooth' }); /* max 초과분은 브라우저가 클램프 */
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const chip = container.querySelector('.is-selected');
+    if (!chip) return;
+    const max = container.scrollWidth - container.clientWidth;
+    const target = Math.min(Math.max(0, chip.offsetLeft - 16), max);
+    const from = container.scrollLeft;
+    if (Math.abs(target - from) < 1) return;
+    cancelAnimationFrame(chipScrollAnim.get(container));
+    const t0 = performance.now(), DUR = 280;
+    const tick = now => {
+      const p = Math.min(1, (now - t0) / DUR);
+      const ease = 1 - Math.pow(1 - p, 3);
+      container.scrollLeft = from + (target - from) * ease;
+      if (p < 1) chipScrollAnim.set(container, requestAnimationFrame(tick));
+    };
+    chipScrollAnim.set(container, requestAnimationFrame(tick));
+  }));
 }
 
 function selectCat1(id){
@@ -901,6 +945,14 @@ if (diffState){
   document.body.classList.add('diff-mode');
   chips2Wrap.style.transition = 'none';
   bodyEl.style.transition = 'none';
+  /* pixel-diff는 Figma 변형 프레임과 동일한 택소노미로 고정 (실서비스 확장분 제외) */
+  const figmaCats = [
+    CATS[0],
+    { ...CATS[1], sub: FURNITURE_SUBS.slice(0,3) },
+    CATS[2], CATS[3], CATS[4],
+    { id:'dress', label:'드레스룸', count:0, sub:null },
+  ];
+  CATS.length = 0; CATS.push(...figmaCats);
   const apply = {
     'default':  () => { state.cat1='all'; },
     '2depth':   () => { state.cat1='furniture'; state.cat2=null; },
