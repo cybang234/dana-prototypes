@@ -219,25 +219,23 @@
   }
   .chip1.is-selected { background:var(--fg); color:var(--fg-inverse); border-color:transparent; padding:0 10px; }
 
+  /* 2Depth v2 — 텍스트 탭형 스트립 (ODS Box Button extra-small ghost/weak-ghost)
+     래퍼 52 = 스트립 40(상·하 1px 헤어라인, stroke inside) + pb 12 */
   .rk-chips2-wrap { height:0; overflow:hidden; transition:height .28s cubic-bezier(.4,0,.2,1); }
-  .rk-chips2-wrap.is-open { height:60px; }
-  .rk-chips2 { position:relative; height:48px; padding:0 16px; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; }
+  .rk-chips2-wrap.is-open { height:52px; }
+  .rk-chips2 {
+    position:relative; height:40px; padding:5px 16px; display:flex; gap:0;
+    border-top:1px solid var(--border-thumb); border-bottom:1px solid var(--border-thumb);
+    overflow-x:auto; scrollbar-width:none;
+  }
   .rk-chips2::-webkit-scrollbar { display:none; }
   .chip2 {
-    flex:none; height:48px; padding:4px 8px 4px 4px; border:1px solid var(--border-thumb); border-radius:8px;
-    background:var(--bg); display:flex; align-items:center; gap:8px;
-    transition:border-color .18s, box-shadow .18s;
+    flex:none; height:28px; padding:0 9px; background:transparent;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; line-height:18px; font-weight:500;
   }
-  .chip2 .c2-img {
-    width:40px; height:40px; border-radius:4px; background:var(--bg-weak); flex:none;
-    display:flex; align-items:center; justify-content:center; overflow:hidden;
-  }
-  .chip2 .c2-img img { width:32px; height:32px; object-fit:contain; }
-  .chip2 .c2-label { font-size:13px; line-height:18px; font-weight:500; color:var(--fg-weak); transition:color .18s; }
-  .chip2.is-selected { border-color:var(--border-strong); box-shadow:inset 0 0 0 .5px var(--border-strong); }
-  .chip2.is-selected .c2-label { font-weight:600; color:var(--fg); }
-  /* '전체' chip — 이미지 없는 텍스트 전용 (Figma 실측 47×48) */
-  .chip2.c2-textonly { padding:0; justify-content:center; }
+  .chip2 .c2-label { color:var(--fg-weak); transition:color .18s; }
+  .chip2.is-selected .c2-label { color:var(--fg); }
 
   .rk-body { position:relative; overflow:hidden; transition:height .3s cubic-bezier(.4,0,.2,1); }
   .rk-pager {
@@ -683,7 +681,7 @@ const currentCount = () => state.override ?? (cat2() ? cat2().count : cat1().cou
 /* ── 랭킹 모듈 렌더 ── */
 /* Figma 실측 칩 폭 (텍스트 렌더 오차 누적 방지) */
 const CHIP1_W = { '전체':46, '가구':46, '가전·디지털':85, '패브릭':58, '주방용품':70, '드레스룸':70 };
-const CHIP2_W = { '전체':47, '침대':87, '매트리스·토퍼':134, '테이블·식탁·책상':148, 'Text':89 };
+const CHIP2_W = { '전체':42, '침대':42, '매트리스·토퍼':93, '테이블·식탁·책상':108, '소파':42, '서랍·수납장':81, '선반':42 };
 
 function renderChips1(){
   chips1El.innerHTML = CATS.map(c =>
@@ -696,19 +694,15 @@ function renderChips1(){
 function renderChips2(){
   const subs = cat1().sub;
   if (!subs) { chips2Wrap.classList.remove('is-open'); return; }
-  /* '전체' chip: 이미지 없이 텍스트만, 미선택 시 전체가 기본 선택 (확정안) */
+  /* v2: 텍스트 탭형. '전체' chip 맨 앞 고정, 미선택 시 전체가 기본 선택 (확정안) */
+  const chipHTML = (label, id, selected) =>
+    `<button class="chip2 ${selected?'is-selected':''}" data-sub="${id}"
+       style="${CHIP2_W[label]?`width:${CHIP2_W[label]}px`:''}">
+       <span class="c2-label">${label}</span>
+     </button>`;
   chips2El.innerHTML =
-    `<button class="chip2 c2-textonly ${state.cat2===null?'is-selected':''}" data-sub=""
-       style="width:${CHIP2_W['전체']}px">
-       <span class="c2-label">전체</span>
-     </button>` +
-    subs.map(s =>
-    `<button class="chip2 ${s.id===state.cat2?'is-selected':''}" data-sub="${s.id}"
-       style="${CHIP2_W[s.label]?`width:${CHIP2_W[s.label]}px`:''}">
-       <span class="c2-img"><img src="${s.img}" alt=""></span>
-       <span class="c2-label">${s.label}</span>
-     </button>`
-  ).join('');
+    chipHTML('전체', '', state.cat2===null) +
+    subs.map(s => chipHTML(s.label, s.id, s.id===state.cat2)).join('');
   chips2El.querySelectorAll('button').forEach(b => b.onclick = () => selectCat2(b.dataset.sub || null));
   chips2Wrap.classList.add('is-open');
 }
@@ -967,7 +961,8 @@ if (diffState){
   /* pixel-diff는 Figma 변형 프레임과 동일한 택소노미로 고정 (실서비스 확장분 제외) */
   const figmaCats = [
     CATS[0],
-    { ...CATS[1], sub: FURNITURE_SUBS.slice(0,3) },
+    /* Figma 2Depth 변형(12852:60715) 노출 순서: 침대·매트리스·토퍼·테이블·소파·서랍·수납장·선반 */
+    { ...CATS[1], sub: [0,1,2,3,4,6].map(i => FURNITURE_SUBS[i]) },
     CATS[2], CATS[3], CATS[4],
     { id:'dress', label:'드레스룸', count:0, sub:null },
   ];
@@ -990,11 +985,6 @@ if (diffState){
     skelEl.style.display='block';
     renderSkeleton(5, false);
     bodyEl.style.height='332px';
-  } else if (diffState === '2depth'){
-    /* Figma 12852:60715: 2Depth 전부 Default 상태 + placeholder 칩 3개 */
-    chips2El.insertAdjacentHTML('beforeend', Array.from({length:3},()=>
-      `<button class="chip2" style="width:${CHIP2_W['Text']}px"><span class="c2-img"></span><span class="c2-label">Text</span></button>`).join(''));
-    renderList();
   } else {
     renderList();
   }

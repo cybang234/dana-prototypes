@@ -1,9 +1,9 @@
 {
   "width": 750,
-  "height": 952,
-  "totalPixels": 714000,
-  "diffPixels": 9264,
-  "diffRatio": 0.012974789915966387,
-  "diffPercent": "1.297%",
+  "height": 936,
+  "totalPixels": 702000,
+  "diffPixels": 6822,
+  "diffRatio": 0.009717948717948718,
+  "diffPercent": "0.972%",
   "note": "Computed after flattening both images over white bg (transparent → white)"
 }
