@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TimeDeal</title>
 <!--
-  Figma frame : TimeDeal (스페셜딜 14241:63344 · 타임특가 14241:65000)
+  Figma frame : TimeDeal (스페셜딜 14241:63344 · 타임특가 14241:65000 · 실지면 14295:76781)
   Node ID     : 14078:196440
   File        : BB8U7aI5Sm5mn39ZFCqqDr (기획전 개편 Master 26H2 브랜치)
   Figma URL   : https://www.figma.com/design/BB8U7aI5Sm5mn39ZFCqqDr?node-id=14078-196440
@@ -43,24 +43,21 @@
   .clock { font-variant-numeric:tabular-nums; font-size:13px; font-weight:700; color:var(--accent-red); min-width:150px; }
   body.diff .topbar { display:none; }
 
-  /* ══ 스테이지: 두 모듈 가로 나열 ══ */
+  /* ══ 스테이지: 가로 나열 ══ */
   .stage { display:flex; gap:24px; padding:28px 24px 48px; overflow-x:auto; align-items:flex-start; }
   .panel { flex:none; }
   .panel-label { font-size:13px; font-weight:700; color:var(--fg-weak); margin:0 0 10px 2px; }
   .device { width:375px; background:#fff; box-shadow:0 8px 32px rgba(0,0,0,.08); border-radius:8px; overflow:clip; }
   body.diff .stage { padding:0; gap:0; }
-  body.diff .panel-label { display:none; }
+  body.diff .panel-label, body.diff #panel-screen, body.diff .doc { display:none; }
   body.diff .device { box-shadow:none; border-radius:0; }
-  .module { padding:0 0 24px; }
+  .module { padding:24px 0; }
   body.diff .module { padding:0; }
 
   /* ══ 섹션 타이틀 (ODS Section md) ══ */
   .section-title { display:flex; justify-content:space-between; align-items:center; padding:3px 16px; height:28px; margin-bottom:12px; }
   .section-title h2 { font-size:17px; line-height:22px; font-weight:600; color:var(--fg); }
-  .arrow-btn { width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:var(--fg); }
-  .arrow-btn .ic { width:20px; height:20px; }
-  .module { padding-top:24px; }
-  body.diff .module { padding-top:0; }
+  .arrow-btn { width:28px; height:28px; display:flex; align-items:center; justify-content:center; }
 
   /* ══ ODS Chip sm ══ */
   .chip-strip { display:flex; gap:8px; padding:0 16px; margin-bottom:12px; overflow-x:auto; scrollbar-width:none; scroll-behavior:smooth; }
@@ -75,26 +72,19 @@
   .gauge { position:relative; height:2px; background:var(--fg-disabled); margin-bottom:8px; }
   .gauge .fill { position:absolute; left:0; top:0; height:2px; background:var(--accent-red); width:74.64%; }
   .gauge .fill.intro { transition:width 1.6s cubic-bezier(0.4, 0, 0.2, 1); }
-  .gauge .pin { position:absolute; top:1px; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%;
-    background:var(--accent-red); display:none; }
-  .gauge .pin.intro { transition:left 1.6s cubic-bezier(0.4, 0, 0.2, 1); }
-  .gauge .pin::before { content:''; position:absolute; inset:-4px; border-radius:50%;
-    background:var(--accent-red); opacity:.3; animation:halo 1.8s ease-in-out infinite; }
-  @keyframes halo { 0%,100%{ opacity:.3; transform:scale(1);} 50%{ opacity:.12; transform:scale(1.15);} }
-  body.pin-on .gauge .pin { display:block; }
   .timer { display:flex; gap:4px; align-items:center; font-size:14px; line-height:18px; font-weight:600;
     color:var(--accent-red); font-variant-numeric:tabular-nums; }
+  .timer .clock-ic { width:16px; height:16px; flex:none; }
+  .timer .t-parts { display:flex; gap:2px; align-items:center; }
   /* 숫자 슬롯머신 롤링 */
   .t-remain { display:inline-flex; }
   .dg { position:relative; width:8.6px; height:18px; overflow:hidden; }
   .dg .strip { position:absolute; left:0; top:0; display:flex; flex-direction:column; }
   .dg .strip.anim { transition:transform .28s cubic-bezier(0.4, 0, 0.2, 1); }
   .dg .strip span { height:18px; line-height:18px; display:block; text-align:center; }
-  .timer .clock-ic { width:16px; height:16px; flex:none; color:var(--badge-red); }
-  .timer .t-parts { display:flex; gap:2px; align-items:center; }
 
   /* 종료 상태 */
-  .ended .gauge .fill, .ended .gauge .pin { display:none !important; }
+  .ended .gauge .fill { display:none !important; }
   .ended .timer { color:var(--fg-weak); }
   .ended .timer .clock-ic img { filter:grayscale(1) opacity(.8); }
 
@@ -111,14 +101,12 @@
   .price { font-size:14px; line-height:18px; font-weight:600; color:var(--fg-product); display:flex; gap:4px; }
   .price .rate { color:var(--critical); }
   .review { display:flex; align-items:center; gap:2px; font-size:12px; line-height:16px; font-weight:400; color:var(--fg-weak); }
-  /* ODS Top Space: 가로형 카드만 리뷰/배송 위 4px */
-  .hcard .review, .hcard .delivery { margin-top:4px; }
   .star { width:12px; height:12px; background:var(--accent-yellow); flex:none;
     -webkit-mask:url(assets/img/star-mask.svg) center / 12px 12px no-repeat;
             mask:url(assets/img/star-mask.svg) center / 12px 12px no-repeat; }
 
   /* ══ 스페셜딜 가로형 카드 (328×100) ══ */
-  #sd-carousel { transition:opacity .12s; }
+  .sd-carousel { transition:opacity .12s; }
   .col { display:flex; flex-direction:column; gap:12px; width:328px; flex:none; scroll-snap-align:start; }
   .hcard { display:flex; gap:12px; align-items:center; height:100px; }
   .hcard .thumb { position:relative; width:100px; height:100px; flex:none; }
@@ -132,6 +120,8 @@
     display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
   .hcard .brand + .name { -webkit-line-clamp:1; }
   .delivery { font-size:12px; line-height:16px; font-weight:400; color:var(--fg-weak2); height:16px; }
+  /* ODS Top Space: 가로형 카드만 리뷰/배송 위 4px */
+  .hcard .review, .hcard .delivery { margin-top:4px; }
 
   /* 스켈레톤 (리스트 전환) */
   .skel { background:var(--bg-weak); border-radius:8px; animation:pulse 1.2s ease-in-out infinite; }
@@ -154,6 +144,31 @@
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
   .empty { width:343px; padding:40px 16px; text-align:center; font-size:13px; line-height:18px; color:var(--fg-weak); }
+
+  /* ══ 실지면 스크롤 테스트 ══ */
+  .screen-device { height:812px; display:flex; flex-direction:column; }
+  .screen-head { flex:none; }
+  .sh-status { height:54px; display:flex; align-items:flex-end; justify-content:space-between; padding:0 20px 6px; }
+  .sh-status .t { font-size:15px; font-weight:600; color:var(--fg); }
+  .sh-nav { height:44px; display:flex; align-items:center; gap:12px; padding:0 16px; border-bottom:1px solid var(--bg-weak); }
+  .sh-nav .back { font-size:20px; color:var(--fg); }
+  .sh-nav .ttl { font-size:17px; font-weight:600; color:var(--fg); }
+  .screen-scroll { flex:1; overflow-y:auto; scrollbar-width:none; }
+  .screen-scroll::-webkit-scrollbar { display:none; }
+  .shell-block { background:var(--bg-weak); display:flex; align-items:center; justify-content:center;
+    color:var(--fg-disabled); font-size:14px; font-weight:600; }
+  .divider12 { height:12px; background:var(--bg-weak); }
+  .screen-scroll .module { padding:32px 0; }
+
+  /* ══ 하단 인터랙션 스펙 문서 ══ */
+  .doc { max-width:920px; margin:8px 24px 80px; background:#fff; border-radius:12px; padding:32px;
+    display:flex; flex-direction:column; gap:24px; }
+  .doc .doc-head { display:flex; gap:12px; align-items:baseline; }
+  .doc h2 { font-size:20px; font-weight:600; color:var(--fg); }
+  .doc .doc-link { font-size:13px; font-weight:600; color:#0aa5ff; text-decoration:underline; }
+  .doc h3 { font-size:16px; font-weight:600; color:var(--fg); margin-bottom:8px; }
+  .doc p { font-size:13px; line-height:20px; color:#545c64; white-space:pre-line; }
+  .doc .foot { font-size:12px; line-height:18px; color:var(--fg-weak); white-space:pre-line; }
 </style>
 </head>
 <body>
@@ -175,61 +190,81 @@
     <button class="ctrl-btn speed" data-x="600">×600</button>
   </div>
   <div class="ctrl-group">
-    <span class="ctrl-label">게이지 핀 (협의중)</span>
-    <button class="ctrl-btn pin-toggle">OFF</button>
-  </div>
-  <div class="ctrl-group">
     <button class="ctrl-btn replay-btn">↻ 로딩 테스트</button>
   </div>
   <div class="clock" id="global-clock"></div>
 </div>
 
 <div class="stage">
-
-  <!-- ═══ 패널 1: 스페셜딜 ═══ -->
   <div class="panel" id="panel-sd">
     <p class="panel-label">스페셜딜 (14241:63344)</p>
-    <main class="device">
-      <section class="module countdown-scope" data-id="14241:63344">
-        <div class="section-title">
-          <h2>단 하루 특가, 스페셜딜</h2>
-          <button class="arrow-btn" aria-label="전체보기"><img src="assets/img/icon-arrow-press.svg" width="28" height="28" alt=""></button>
-        </div>
-        <div class="chip-strip" id="sd-chips"></div>
-        <div class="countdown">
-          <div class="gauge"><i class="fill"></i><i class="pin"></i></div>
-          <p class="timer">
-            <span class="clock-ic"><img src="assets/img/icon-clock.svg" width="16" height="16" alt=""></span>
-            <span class="t-parts"><span>종료시간까지</span><b class="t-remain">12:36:10</b><span>남음</span></span>
-          </p>
-        </div>
-        <div class="carousel" id="sd-carousel"></div>
-      </section>
-    </main>
+    <main class="device"><div class="module-slot" data-module="sd"></div></main>
   </div>
-
-  <!-- ═══ 패널 2: 타임특가 ═══ -->
   <div class="panel" id="panel-td">
     <p class="panel-label">타임특가 (14241:65000)</p>
-    <main class="device">
-      <section class="module countdown-scope" data-id="14241:65000">
-        <div class="section-title">
-          <h2>최저가 보장, 타임특가 세일</h2>
-          <button class="arrow-btn" aria-label="전체보기"><img src="assets/img/icon-arrow-press.svg" width="28" height="28" alt=""></button>
-        </div>
-        <div class="countdown">
-          <div class="gauge"><i class="fill"></i><i class="pin"></i></div>
-          <p class="timer">
-            <span class="clock-ic"><img src="assets/img/icon-clock.svg" width="16" height="16" alt=""></span>
-            <span class="t-parts"><span>종료시간까지</span><b class="t-remain">12:36:10</b><span>남음</span></span>
-          </p>
-        </div>
-        <div class="carousel" id="td-carousel"></div>
-      </section>
+    <main class="device"><div class="module-slot" data-module="td"></div></main>
+  </div>
+  <div class="panel" id="panel-screen">
+    <p class="panel-label">실지면 스크롤 테스트 — 아래로 스크롤해 모듈이 30% 보이면 게이지 인트로 재생</p>
+    <main class="device screen-device">
+      <div class="screen-head">
+        <div class="sh-status"><span class="t">9:41</span><span class="t">📶</span></div>
+        <div class="sh-nav"><span class="back">←</span><span class="ttl">집요한 세일</span></div>
+      </div>
+      <div class="screen-scroll">
+        <div class="shell-block" style="height:421px">히어로 배너</div>
+        <div class="shell-block" style="height:44px; font-size:13px;">탭 (혜택 · 특가 · 랭킹 · 라이브)</div>
+        <div class="shell-block" style="height:779px">혜택(Benefit) 모듈</div>
+        <div class="divider12"></div>
+        <div class="module-slot" data-module="sd"></div>
+        <div class="divider12"></div>
+        <div class="module-slot" data-module="td"></div>
+        <div class="divider12"></div>
+        <div class="shell-block" style="height:600px">랭킹 모듈</div>
+      </div>
     </main>
   </div>
-
 </div>
+
+<!-- ══ 인터랙션 스펙 (하단 문서) ══ -->
+<section class="doc">
+  <div class="doc-head">
+    <h2>스페셜딜·타임특가 · 인터랙션 스펙</h2>
+    <a class="doc-link" href="https://www.figma.com/design/BB8U7aI5Sm5mn39ZFCqqDr?node-id=14078-196440" target="_blank">Figma</a>
+  </div>
+  <div>
+    <h3>1. 카운트다운 게이지 · 진입 모션</h3>
+    <p>· 노출 조건 — 모듈이 뷰포트에 30% 이상 보일 때 1회 재생 (threshold 0.3), 노출 전에는 fill 100% 대기
+· 게이지 fill 100% 꽉 찬 상태 → 남은시간 비율 지점까지 감소
+· Duration 1.6s / cubic-bezier(0.4, 0, 0.2, 1) — 감소 후 실시간 카운트 시작
+· 두 모듈(스페셜딜·타임특가)이 같은 종료시각 공유 — 게이지·타이머 동기화
+· fill 폭 = 남은시간 ÷ 전체 딜 시간(24h), 이후 초 단위로 계속 감소
+· 실지면 패널에서 스크롤로 30% 노출 트리거 직접 테스트 가능 (↻ 로딩 테스트 버튼 = 강제 재생)</p>
+  </div>
+  <div>
+    <h3>2. 카운트다운 · 숫자 롤링 · 종료 상태</h3>
+    <p>· 타이머 "종료시간까지 HH:MM:SS 남음" — 1초 단위 갱신, 시계 아이콘은 정적
+· 숫자는 슬롯머신 롤링 — 변경된 자리만 세로 슬라이드 0.28s cubic-bezier(0.4, 0, 0.2, 1)
+· 종료 시 — fill 제거(트랙만 남음), 타이머 회색 + "오늘 딜 종료"(문구 확정 필요)
+· 타임특가 인상 예고 배지도 동시에 회색 전환 + "오늘 딜 종료"로 교체
+· 게이지 위 핀 — 제외 확정 (2026-09-01)</p>
+  </div>
+  <div>
+    <h3>3. 카테고리 chip (스페셜딜)</h3>
+    <p>· '전체' chip 필수, 기본 선택 (selected = solid 전환)
+· chip 선택 시 리스트 갱신 — 스켈레톤 320ms 노출 후 데이터 즉시 교체 (랭킹 모듈과 동일)
+· 선택 chip 자동 스크롤 — 스트립 좌측 패딩(16px) 안쪽 정렬, 끝쪽 chip은 클램프
+· 빈 카테고리(상품 0개)는 스켈레톤 없이 즉시 빈 상태 노출 — 실서비스는 해당 chip 미노출 정책</p>
+  </div>
+  <div>
+    <h3>4. 캐러셀</h3>
+    <p>· 스페셜딜 — 컬럼(카드 3개 = w328) 단위 scroll-snap, 1회 스와이프 = 1컬럼, 컬럼 간격 12
+· 타임특가 — 카드(w280) 단위 snap, 다음 카드 peek 67, 카드 간격 12
+· 공통 — scroll-padding-left 16, 스크랩 버튼 탭 시 토글(레드 전환)</p>
+  </div>
+  <p class="foot">라이브 프로토타입  https://cybang234.github.io/dana-prototypes/specialdeal-timedeal/
+검증 — Figma 확정안 대비 pixel-diff 스페셜딜 2.26% · 타임특가 1.23% (기준 3% 미만 합격) · 2026-09-01</p>
+</section>
 
 <script>
 /* ══ 토큰 주입 (ODS design-tokens.js → CSS 변수) ══ */
@@ -249,30 +284,37 @@
   Object.entries(map).forEach(([k,v]) => v && r.style.setProperty(k,v));
 })();
 
-/* ══ 아이콘 주입 (mask id 유니크화 포함) ══ */
-(function applyIcons(){
-  let seq = 0;
-  document.querySelectorAll('[data-icon]').forEach(el => {
-    const name = el.getAttribute('data-icon');
-    let svg = window.ICONS[name];
-    if (!svg) { console.warn('missing icon:', name); return; }
-    const suffix = '__ic' + (seq++);
-    svg = svg.replace(/id="([^"]+)"/g, (m, id) => `id="${id}${suffix}"`)
-             .replace(/url\(#([^)]+)\)/g, (m, id) => `url(#${id}${suffix})`);
-    el.innerHTML = svg;
-  });
-  document.querySelectorAll('[data-icon] svg').forEach(svg => {
-    svg.setAttribute('width','100%'); svg.setAttribute('height','100%');
-    svg.querySelectorAll('[fill]:not([fill="none"])').forEach(n => n.setAttribute('fill','currentColor'));
-  });
-})();
-
 const DIFF = new URLSearchParams(location.search).get('diff'); // 'sd' | 'td' | null
 if (DIFF) {
   document.body.classList.add('diff');
   if (DIFF === 'sd') document.getElementById('panel-td').style.display = 'none';
   if (DIFF === 'td') document.getElementById('panel-sd').style.display = 'none';
 }
+
+/* ══ 모듈 템플릿 (스테이지·실지면 공용) ══ */
+const ARROW = '<img src="assets/img/icon-arrow-press.svg" width="28" height="28" alt="">';
+const CLOCK = '<span class="clock-ic"><img src="assets/img/icon-clock.svg" width="16" height="16" alt=""></span>';
+const COUNTDOWN = `
+  <div class="countdown">
+    <div class="gauge"><i class="fill"></i></div>
+    <p class="timer">${CLOCK}<span class="t-parts"></span></p>
+  </div>`;
+const TEMPLATES = {
+  sd: `<section class="module countdown-scope" data-id="14241:63344">
+    <div class="section-title"><h2>단 하루 특가, 스페셜딜</h2><button class="arrow-btn" aria-label="전체보기">${ARROW}</button></div>
+    <div class="chip-strip sd-chips"></div>
+    ${COUNTDOWN}
+    <div class="carousel sd-carousel"></div>
+  </section>`,
+  td: `<section class="module countdown-scope" data-id="14241:65000">
+    <div class="section-title"><h2>최저가 보장, 타임특가 세일</h2><button class="arrow-btn" aria-label="전체보기">${ARROW}</button></div>
+    ${COUNTDOWN}
+    <div class="carousel td-carousel"></div>
+  </section>`,
+};
+document.querySelectorAll('.module-slot').forEach(slot => {
+  slot.innerHTML = TEMPLATES[slot.dataset.module];
+});
 
 /* ══ 더미데이터 ══ */
 const IMG = 'assets/img/';
@@ -326,7 +368,7 @@ const SD_CATS = [
   { id:'fabric', label:'패브릭' }, { id:'kitchen', label:'주방용품' }, { id:'dressroom', label:'드레스룸' },
 ];
 
-const TD_DATA = [
+let TD_DATA = [
   { ...p(T[9],null,'시몬스 뷰티레스트 윌리엄 매트리스 Q','51%','225,000원',4.6,'12,483'), rise:'34,000' },
   { ...p(T[2],null,'클라우드 모션 패브릭 3인 소파','46%','498,000원',4.7,'8,912'), rise:'50,000' },
   { ...p(T[1],null,'호텔식 워싱 차렵이불 풀세트 Q','52%','79,000원',4.8,'31,027'), rise:'12,000' },
@@ -341,17 +383,10 @@ if (DIFF) {
   const PH = IMG + 'thumb-placeholder.png';
   const fig = (brand) => p(PH, brand, 'BELLY30 Pendant 3Colors BELLY30 Pendant 3Colors', '51%', '225,000원', 4.6, '999,999');
   SD_DATA.all = [fig(null), fig(null), fig(null), fig('한샘'), fig('한샘'), fig('한샘')];
-  TD_DATA.length = 0;
-  for (let i = 0; i < 2; i++) TD_DATA.push({ ...fig(null), rise: '{34,000}' });
+  TD_DATA = [{ ...fig(null), rise: '{34,000}' }, { ...fig(null), rise: '{34,000}' }];
 }
 
-/* ══ 스페셜딜: chip 필터 + 컬럼 캐러셀 + 스켈레톤 ══ */
-const chipStrip = document.getElementById('sd-chips');
-const sdCarousel = document.getElementById('sd-carousel');
-
-chipStrip.innerHTML = SD_CATS.map((c,i) =>
-  `<button class="chip${i===0?' is-on':''}" data-cat="${c.id}">${c.label}</button>`).join('');
-
+/* ══ 스페셜딜: chip 필터 + 컬럼 캐러셀 + 스켈레톤 (인스턴스별) ══ */
 function cardHTML(pr) {
   return `<article class="hcard">
     <div class="thumb"><img src="${pr.img}" alt=""><button class="scrap" aria-label="스크랩"></button></div>
@@ -366,60 +401,61 @@ function cardHTML(pr) {
     </div>
   </article>`;
 }
-
-function renderSD(catId) {
+function renderSD(carousel, catId) {
   const items = SD_DATA[catId] || [];
   if (!items.length) {
-    sdCarousel.innerHTML = '<div class="empty">노출할 상품이 없어요<br>상품이 준비되면 보여드릴게요</div>';
+    carousel.innerHTML = '<div class="empty">노출할 상품이 없어요<br>상품이 준비되면 보여드릴게요</div>';
     return;
   }
   const cols = [];
   for (let i = 0; i < items.length; i += 3) cols.push(items.slice(i, i + 3));
-  sdCarousel.innerHTML = cols.map(col => `<div class="col">${col.map(cardHTML).join('')}</div>`).join('');
-  sdCarousel.scrollTo({ left: 0 });
+  carousel.innerHTML = cols.map(col => `<div class="col">${col.map(cardHTML).join('')}</div>`).join('');
+  carousel.scrollTo({ left: 0 });
 }
-renderSD('all');
-
-function renderSkeleton() {
+function renderSkeleton(carousel) {
   const skelCard = `<article class="hcard">
     <div class="skel skel-thumb"></div>
-    <div class="txt" style="gap:8px">
+    <div class="txt" style="gap:8px; top:0">
       <div class="skel skel-line" style="width:80%"></div>
       <div class="skel skel-line" style="width:55%"></div>
       <div class="skel skel-line" style="width:40%"></div>
     </div>
   </article>`;
-  sdCarousel.innerHTML = `<div class="col">${skelCard.repeat(3)}</div>`;
+  carousel.innerHTML = `<div class="col">${skelCard.repeat(3)}</div>`;
 }
-
-chipStrip.addEventListener('click', e => {
-  const chip = e.target.closest('.chip');
-  if (!chip || chip.classList.contains('is-on')) return;
-  chipStrip.querySelectorAll('.chip').forEach(c => c.classList.toggle('is-on', c === chip));
-  /* 선택 chip 좌측 자동 스크롤 — 좌측 패딩 16 안쪽 정렬, 끝쪽 chip은 클램프 (랭킹과 동일) */
-  chipStrip.scrollTo({ left: Math.max(0, chip.offsetLeft - 16), behavior: 'smooth' });
-  /* 스켈레톤 320ms → 데이터 교체 (랭킹과 동일) */
-  const cat = chip.dataset.cat;
-  if (!(SD_DATA[cat] || []).length) { renderSD(cat); return; } /* 빈 상태는 즉시 */
-  renderSkeleton();
-  setTimeout(() => renderSD(cat), 320);
+document.querySelectorAll('.sd-chips').forEach(strip => {
+  const carousel = strip.closest('.countdown-scope').querySelector('.sd-carousel');
+  strip.innerHTML = SD_CATS.map((c,i) =>
+    `<button class="chip${i===0?' is-on':''}" data-cat="${c.id}">${c.label}</button>`).join('');
+  renderSD(carousel, 'all');
+  strip.addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip || chip.classList.contains('is-on')) return;
+    strip.querySelectorAll('.chip').forEach(c => c.classList.toggle('is-on', c === chip));
+    strip.scrollTo({ left: Math.max(0, chip.offsetLeft - 16), behavior: 'smooth' });
+    const cat = chip.dataset.cat;
+    if (!(SD_DATA[cat] || []).length) { renderSD(carousel, cat); return; } /* 빈 상태는 즉시 */
+    renderSkeleton(carousel);
+    setTimeout(() => renderSD(carousel, cat), 320);
+  });
 });
 
 /* ══ 타임특가 ══ */
-const tdCarousel = document.getElementById('td-carousel');
-tdCarousel.innerHTML = TD_DATA.map(pr => `
-  <article class="vcard">
-    <div class="thumb">
-      <img src="${pr.img}" alt="">
-      <button class="scrap" aria-label="스크랩"></button>
-      <div class="rise-badge" data-rise="${pr.rise}">내일 ${pr.rise}원 더 비싸져요</div>
-    </div>
-    <div class="txt">
-      <p class="name">${esc(pr.name)}</p>
-      <p class="price"><b class="rate">${pr.rate}</b><b>${pr.price}</b></p>
-      <p class="review"><span class="star"></span><span>${pr.rating}</span><span>·</span><span>리뷰</span><span>${pr.review}</span></p>
-    </div>
-  </article>`).join('');
+document.querySelectorAll('.td-carousel').forEach(el => {
+  el.innerHTML = TD_DATA.map(pr => `
+    <article class="vcard">
+      <div class="thumb">
+        <img src="${pr.img}" alt="">
+        <button class="scrap" aria-label="스크랩"></button>
+        <div class="rise-badge" data-rise="${pr.rise}">내일 ${pr.rise}원 더 비싸져요</div>
+      </div>
+      <div class="txt">
+        <p class="name">${esc(pr.name)}</p>
+        <p class="price"><b class="rate">${pr.rate}</b><b>${pr.price}</b></p>
+        <p class="review"><span class="star"></span><span>${pr.rating}</span><span>·</span><span>리뷰</span><span>${pr.review}</span></p>
+      </div>
+    </article>`).join('');
+});
 
 /* 스크랩 토글 */
 document.querySelector('.stage').addEventListener('click', e => {
@@ -428,7 +464,7 @@ document.querySelector('.stage').addEventListener('click', e => {
 });
 
 /* ══ 카운트다운 ══
-   진입 모션: 모듈이 뷰포트에 30% 이상 보일 때, 게이지 100% → 남은시간 지점까지 1.6s 감소 후 실시간 카운트 */
+   진입 모션: 모듈이 뷰포트(또는 실지면 스크롤 영역)에 30% 이상 보일 때, 100% → 남은시간 지점까지 1.6s 감소 */
 const TOTAL = 24 * 3600;
 let remaining = 45370, speed = 1, ended = false;
 const pad = n => String(n).padStart(2, '0');
@@ -481,12 +517,11 @@ function paintTimer() {
 }
 function paintGaugeFor(m, widthPct) {
   m.querySelector('.gauge .fill').style.width = widthPct + '%';
-  m.querySelector('.gauge .pin').style.left = widthPct + '%';
 }
 
 /* 진입 모션 (rAF 미의존 — 백그라운드 로드에도 안전). 모듈별 독립 재생 */
 function runIntroFor(m) {
-  const els = m.querySelectorAll('.gauge .fill, .gauge .pin');
+  const els = m.querySelectorAll('.gauge .fill');
   m._introRunning = true;
   els.forEach(el => el.classList.remove('intro'));
   paintGaugeFor(m, 100);
@@ -523,17 +558,22 @@ if (DIFF) {
   });
 } else {
   paintTimer();
-  /* 노출 전에는 100% 대기 → 30% 이상 보이면 1회 재생 */
+  /* 노출 전에는 100% 대기 → 30% 이상 보이면 1회 재생. 실지면 모듈은 스크롤 영역 기준 */
   modules.forEach(m => paintGaugeFor(m, 100));
-  const io = new IntersectionObserver(entries => {
+  const onEntries = entries => {
     entries.forEach(e => {
       if (e.intersectionRatio >= 0.3 && !e.target._introPlayed) {
         e.target._introPlayed = true;
         runIntroFor(e.target);
       }
     });
-  }, { threshold: [0.3] });
-  modules.forEach(m => io.observe(m));
+  };
+  const ioViewport = new IntersectionObserver(onEntries, { threshold: [0.3] });
+  const scroller = document.querySelector('.screen-scroll');
+  const ioScreen = new IntersectionObserver(onEntries, { threshold: [0.3], root: scroller });
+  modules.forEach(m => {
+    (m.closest('.screen-scroll') ? ioScreen : ioViewport).observe(m);
+  });
   setInterval(tick, 100);
 }
 
@@ -549,22 +589,28 @@ bindGroup('.preset', b => {
   remaining = Number(b.dataset.sec); ended = false;
   modules.forEach(m => { m._digits = null; });
   paintTimer();
-  modules.forEach(m => { m._introPlayed = true; runIntroFor(m); });
+  modules.forEach(m => { if (m._introPlayed) runIntroFor(m); });
 });
 bindGroup('.speed', b => { speed = Number(b.dataset.x); });
 
-/* 로딩(진입 모션) 테스트: 30% 노출 조건을 다시 밟은 것처럼 재생 */
+/* 로딩(진입 모션) 테스트: 30% 노출 조건을 다시 밟은 것처럼 재생.
+   실지면 모듈은 상태를 초기화해 스크롤 트리거를 다시 테스트할 수 있게 함 */
 const replayBtn = document.querySelector('.replay-btn');
 if (replayBtn) replayBtn.addEventListener('click', () => {
-  modules.forEach(m => { m._introPlayed = true; runIntroFor(m); });
-});
-
-const pinBtn = document.querySelector('.pin-toggle');
-if (pinBtn) pinBtn.addEventListener('click', () => {
-  const on = !document.body.classList.contains('pin-on');
-  document.body.classList.toggle('pin-on', on);
-  pinBtn.textContent = on ? 'ON' : 'OFF';
-  pinBtn.classList.toggle('is-on', on);
+  modules.forEach(m => {
+    if (m.closest('.screen-scroll')) {
+      /* 실지면: 초기 상태로 리셋 → 다시 스크롤해서 30% 트리거 */
+      m._introPlayed = false;
+      m._introRunning = false;
+      m.querySelectorAll('.gauge .fill').forEach(el => el.classList.remove('intro'));
+      paintGaugeFor(m, 100);
+    } else {
+      m._introPlayed = true;
+      runIntroFor(m);
+    }
+  });
+  const scroller = document.querySelector('.screen-scroll');
+  if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
 });
 </script>
 </body>
