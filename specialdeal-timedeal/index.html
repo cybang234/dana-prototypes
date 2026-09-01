@@ -249,7 +249,7 @@
   <div>
     <h3>2. 카운트다운 · 숫자 롤링 · 종료 상태</h3>
     <p>· 타이머 — 1초 단위 갱신, 시계 아이콘은 정적. 문구: 스페셜딜 "종료시간까지" / 타임특가 "종료까지" (확정값 상이)
-· 숫자는 슬롯머신 롤링 — 변경된 자리만 세로 슬라이드 0.28s cubic-bezier(0.4, 0, 0.2, 1)
+· 숫자는 슬롯머신 롤링 — 변경된 자리만, 새 숫자가 위→아래로 떨어짐. 0.28s cubic-bezier(0.4, 0, 0.2, 1)
 · 종료 시 — fill 제거(트랙만 남음), 타이머 회색 + "오늘 딜 종료"(문구 확정 필요)
 · 타임특가 인상 예고 배지도 동시에 회색 전환 + "오늘 딜 종료"로 교체
 · 타임특가 쿠폰 다운로드 버튼(Box Button h32) — 탭 동작(발급/완료 상태) 정책 확인 필요
@@ -509,13 +509,14 @@ function buildSlots(m) {
   m._slots = [...m.querySelectorAll('.t-remain .dg')];
 }
 function rollDigit(dgEl, from, to) {
+  /* 새 숫자가 위에서 아래로 떨어지는 방향 (카운트다운 직관) */
   const strip = dgEl.firstChild;
   strip.classList.remove('anim');
-  strip.innerHTML = `<span>${from}</span><span>${to}</span>`;
-  strip.style.transform = 'translateY(0)';
+  strip.innerHTML = `<span>${to}</span><span>${from}</span>`;
+  strip.style.transform = 'translateY(-18px)';
   void strip.offsetHeight;
   strip.classList.add('anim');
-  strip.style.transform = 'translateY(-18px)';
+  strip.style.transform = 'translateY(0)';
 }
 function paintTimer() {
   const chars = fmt(remaining).split('');
