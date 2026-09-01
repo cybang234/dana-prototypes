@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TimeDeal</title>
+<!--
+  Figma frame : TimeDeal (스페셜딜 14241:63344 · 타임특가 14241:65000)
+  Node ID     : 14078:196440
+  File        : BB8U7aI5Sm5mn39ZFCqqDr (기획전 개편 Master 26H2 브랜치)
+  Figma URL   : https://www.figma.com/design/BB8U7aI5Sm5mn39ZFCqqDr?node-id=14078-196440
+  Built       : 2026-09-01 · new-ods-ui-builder (ODS tokens + icons, MCP 스크린샷 기준 pixel-diff)
+  Spec        : /specialdeal-timedeal-specs.md
+  URL params  : ?diff=sd|td (pixel-diff용 정지 렌더 — 타이머 12:36:10 고정, 모션·topbar 제거)
+-->
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script src="assets/design-tokens.js"></script>
+<script src="assets/icons.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif; letter-spacing:-0.3px; }
+  /* <b>는 UA bold(700)로 렌더되므로 명시적으로 SemiBold 고정 */
+  .device b { font-weight:600; }
+  /* 토큰은 applyTokens()가 CSS 변수로 주입. 아래 fallback은 Figma 변수 원값. */
+  :root {
+    --fg:#141414; --fg-product:#2f3438; --fg-weak:#8c8c8c; --fg-weak2:#828c94;
+    --critical:#f05656; --accent-red:#ff4650; --badge-red:#fd3d4a;
+    --accent-yellow:#ffc300; --bg-weak:#f5f5f5; --fg-disabled:#c1c1c1; --border:#e0e0e0;
+  }
+  body { background:#e9ecef; }
+  button { background:none; border:0; cursor:pointer; font-family:inherit; letter-spacing:-0.3px; }
+
+  /* ══ 상단 컨트롤 바 ══ */
+  .topbar {
+    position:sticky; top:0; z-index:10; background:#fff; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:20px; flex-wrap:wrap; padding:14px 24px;
+  }
+  .topbar h1 { font-size:15px; font-weight:700; color:var(--fg); margin-right:4px; }
+  .ctrl-group { display:flex; align-items:center; gap:6px; }
+  .ctrl-label { font-size:12px; font-weight:600; color:var(--fg-weak); margin-right:2px; }
+  .ctrl-btn { height:30px; padding:0 12px; border-radius:999px; background:var(--bg-weak); font-size:13px; font-weight:600; color:var(--fg); }
+  .ctrl-btn.is-on { background:var(--fg); color:#fff; }
+  .clock { font-variant-numeric:tabular-nums; font-size:13px; font-weight:700; color:var(--accent-red); min-width:150px; }
+  body.diff .topbar { display:none; }
+
+  /* ══ 스테이지: 두 모듈 가로 나열 ══ */
+  .stage { display:flex; gap:24px; padding:28px 24px 48px; overflow-x:auto; align-items:flex-start; }
+  .panel { flex:none; }
+  .panel-label { font-size:13px; font-weight:700; color:var(--fg-weak); margin:0 0 10px 2px; }
+  .device { width:375px; background:#fff; box-shadow:0 8px 32px rgba(0,0,0,.08); border-radius:8px; overflow:clip; }
+  body.diff .stage { padding:0; gap:0; }
+  body.diff .panel-label { display:none; }
+  body.diff .device { box-shadow:none; border-radius:0; }
+  .module { padding:0 0 24px; }
+  body.diff .module { padding:0; }
+
+  /* ══ 섹션 타이틀 (ODS Section md) ══ */
+  .section-title { display:flex; justify-content:space-between; align-items:center; padding:3px 16px; height:28px; margin-bottom:12px; }
+  .section-title h2 { font-size:17px; line-height:22px; font-weight:600; color:var(--fg); }
+  .arrow-btn { width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:var(--fg); }
+  .arrow-btn .ic { width:20px; height:20px; }
+  .module { padding-top:24px; }
+  body.diff .module { padding-top:0; }
+
+  /* ══ ODS Chip sm ══ */
+  .chip-strip { display:flex; gap:8px; padding:0 16px; margin-bottom:12px; overflow-x:auto; scrollbar-width:none; scroll-behavior:smooth; }
+  .chip-strip::-webkit-scrollbar { display:none; }
+  .chip { flex:none; height:32px; padding:0 10px; border-radius:16px; font-size:14px; line-height:18px; font-weight:400;
+    display:inline-flex; align-items:center; background:#fff; color:var(--fg); border:1px solid var(--border);
+    transition:background .15s, color .15s; }
+  .chip.is-on { background:var(--fg); color:#fff; border-color:transparent; }
+
+  /* ══ 카운트다운 게이지 ══ */
+  .countdown { padding:0 16px; margin-bottom:12px; }
+  .gauge { position:relative; height:2px; background:var(--fg-disabled); margin-bottom:8px; }
+  .gauge .fill { position:absolute; left:0; top:0; height:2px; background:var(--accent-red); width:74.64%; }
+  .gauge .fill.intro { transition:width 1.6s cubic-bezier(0.4, 0, 0.2, 1); }
+  .gauge .pin { position:absolute; top:1px; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%;
+    background:var(--accent-red); display:none; }
+  .gauge .pin.intro { transition:left 1.6s cubic-bezier(0.4, 0, 0.2, 1); }
+  .gauge .pin::before { content:''; position:absolute; inset:-4px; border-radius:50%;
+    background:var(--accent-red); opacity:.3; animation:halo 1.8s ease-in-out infinite; }
+  @keyframes halo { 0%,100%{ opacity:.3; transform:scale(1);} 50%{ opacity:.12; transform:scale(1.15);} }
+  body.pin-on .gauge .pin { display:block; }
+  .timer { display:flex; gap:4px; align-items:center; font-size:14px; line-height:18px; font-weight:600;
+    color:var(--accent-red); font-variant-numeric:tabular-nums; }
+  .timer .clock-ic { width:16px; height:16px; flex:none; color:var(--badge-red); }
+  .timer .t-parts { display:flex; gap:2px; align-items:center; }
+
+  /* 종료 상태 */
+  .ended .gauge .fill, .ended .gauge .pin { display:none !important; }
+  .ended .timer { color:var(--fg-weak); }
+  .ended .timer .clock-ic img { filter:grayscale(1) opacity(.8); }
+
+  /* ══ 캐러셀 공통 ══ */
+  .carousel { display:flex; gap:12px; padding:0 16px; overflow-x:auto; scrollbar-width:none;
+    scroll-snap-type:x mandatory; scroll-padding-left:16px; }
+  .carousel::-webkit-scrollbar { display:none; }
+  body.diff .carousel { overflow:hidden; }
+  .scrap { position:absolute; right:8px; bottom:8px; width:24px; height:24px;
+    background:#fff; filter:drop-shadow(0 4px 5px rgba(0,0,0,0.12)); transition:background .15s;
+    -webkit-mask:url(assets/img/scrap2.svg) center / 24px 24px no-repeat;
+            mask:url(assets/img/scrap2.svg) center / 24px 24px no-repeat; }
+  .scrap.is-on { background:var(--accent-red); }
+  .price { font-size:14px; line-height:18px; font-weight:600; color:var(--fg-product); display:flex; gap:4px; }
+  .price .rate { color:var(--critical); }
+  .review { display:flex; align-items:center; gap:2px; font-size:12px; line-height:16px; font-weight:400; color:var(--fg-weak); }
+  /* ODS Top Space: 가로형 카드만 리뷰/배송 위 4px */
+  .hcard .review, .hcard .delivery { margin-top:4px; }
+  .star { width:12px; height:12px; background:var(--accent-yellow); flex:none;
+    -webkit-mask:url(assets/img/star-mask.svg) center / 12px 12px no-repeat;
+            mask:url(assets/img/star-mask.svg) center / 12px 12px no-repeat; }
+
+  /* ══ 스페셜딜 가로형 카드 (328×100) ══ */
+  #sd-carousel { transition:opacity .12s; }
+  .col { display:flex; flex-direction:column; gap:12px; width:328px; flex:none; scroll-snap-align:start; }
+  .hcard { display:flex; gap:12px; align-items:center; height:100px; }
+  .hcard .thumb { position:relative; width:100px; height:100px; flex:none; }
+  .hcard .thumb img { width:100%; height:100%; object-fit:cover; border-radius:8px; display:block;
+    box-shadow:inset 0 0 0 0.5px rgba(0,0,0,0.05); }
+  .hcard .txt { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; position:relative; top:5px; }
+  .hcard .title-wrap { height:56px; display:flex; flex-direction:column; gap:2px; }
+  .hcard .brand { font-size:13px; line-height:18px; font-weight:600; color:var(--fg-product);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hcard .name { font-size:13px; line-height:18px; font-weight:400; color:var(--fg-product);
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .hcard .brand + .name { -webkit-line-clamp:1; }
+  .delivery { font-size:12px; line-height:16px; font-weight:400; color:var(--fg-weak2); height:16px; }
+
+  /* 스켈레톤 (리스트 전환) */
+  .skel { background:var(--bg-weak); border-radius:8px; animation:pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:.55; } }
+  .hcard .skel-thumb { width:100px; height:100px; flex:none; }
+  .skel-line { height:14px; border-radius:4px; }
+
+  /* ══ 타임특가 세로형 카드 (280×340) ══ */
+  .vcard { width:280px; flex:none; display:flex; flex-direction:column; gap:4px; scroll-snap-align:start; }
+  .vcard .thumb { position:relative; width:280px; height:280px; border-radius:8px; overflow:clip; }
+  .vcard .thumb img { width:100%; height:100%; object-fit:cover; display:block;
+    box-shadow:inset 0 0 0 0.5px rgba(0,0,0,0.05); }
+  .rise-badge { position:absolute; left:0; right:0; bottom:0; padding:4px;
+    background:var(--badge-red); color:#fff; text-align:center; font-size:12px; line-height:20px; font-weight:500;
+    transition:background .3s; }
+  .ended .rise-badge { background:var(--fg-weak); }
+  .vcard .scrap { bottom:36px; }
+  .vcard .txt { display:flex; flex-direction:column; gap:2px; }
+  .vcard .name { font-size:13px; line-height:18px; font-weight:400; color:var(--fg-product);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .empty { width:343px; padding:40px 16px; text-align:center; font-size:13px; line-height:18px; color:var(--fg-weak); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>스페셜딜 · 타임특가 확정안 인터랙션</h1>
+  <div class="ctrl-group">
+    <span class="ctrl-label">남은 시간</span>
+    <button class="ctrl-btn preset is-on" data-sec="45370">12:36:10</button>
+    <button class="ctrl-btn preset" data-sec="3600">1시간</button>
+    <button class="ctrl-btn preset" data-sec="600">10분</button>
+    <button class="ctrl-btn preset" data-sec="60">1분</button>
+    <button class="ctrl-btn preset" data-sec="10">10초</button>
+  </div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">배속</span>
+    <button class="ctrl-btn speed is-on" data-x="1">×1</button>
+    <button class="ctrl-btn speed" data-x="60">×60</button>
+    <button class="ctrl-btn speed" data-x="600">×600</button>
+  </div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">게이지 핀 (협의중)</span>
+    <button class="ctrl-btn pin-toggle">OFF</button>
+  </div>
+  <div class="clock" id="global-clock"></div>
+</div>
+
+<div class="stage">
+
+  <!-- ═══ 패널 1: 스페셜딜 ═══ -->
+  <div class="panel" id="panel-sd">
+    <p class="panel-label">스페셜딜 (14241:63344)</p>
+    <main class="device">
+      <section class="module countdown-scope" data-id="14241:63344">
+        <div class="section-title">
+          <h2>단 하루 특가, 스페셜딜</h2>
+          <button class="arrow-btn" aria-label="전체보기"><img src="assets/img/icon-arrow-press.svg" width="28" height="28" alt=""></button>
+        </div>
+        <div class="chip-strip" id="sd-chips"></div>
+        <div class="countdown">
+          <div class="gauge"><i class="fill"></i><i class="pin"></i></div>
+          <p class="timer">
+            <span class="clock-ic"><img src="assets/img/icon-clock.svg" width="16" height="16" alt=""></span>
+            <span class="t-parts"><span>종료시간까지</span><b class="t-remain">12:36:10</b><span>남음</span></span>
+          </p>
+        </div>
+        <div class="carousel" id="sd-carousel"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ═══ 패널 2: 타임특가 ═══ -->
+  <div class="panel" id="panel-td">
+    <p class="panel-label">타임특가 (14241:65000)</p>
+    <main class="device">
+      <section class="module countdown-scope" data-id="14241:65000">
+        <div class="section-title">
+          <h2>최저가 보장, 타임특가 세일</h2>
+          <button class="arrow-btn" aria-label="전체보기"><img src="assets/img/icon-arrow-press.svg" width="28" height="28" alt=""></button>
+        </div>
+        <div class="countdown">
+          <div class="gauge"><i class="fill"></i><i class="pin"></i></div>
+          <p class="timer">
+            <span class="clock-ic"><img src="assets/img/icon-clock.svg" width="16" height="16" alt=""></span>
+            <span class="t-parts"><span>종료시간까지</span><b class="t-remain">12:36:10</b><span>남음</span></span>
+          </p>
+        </div>
+        <div class="carousel" id="td-carousel"></div>
+      </section>
+    </main>
+  </div>
+
+</div>
+
+<script>
+/* ══ 토큰 주입 (ODS design-tokens.js → CSS 변수) ══ */
+(function applyTokens(){
+  const c = window.TOKENS.color.light;
+  const V = k => c[k] ? c[k].value : '';
+  const map = {
+    '--bg-weak':       V('BG/Neutral/background-weak'),
+    '--fg':            V('FG/Neutral/foreground'),
+    '--fg-weak':       V('FG/Neutral/foreground-weak'),
+    '--border':        V('Border/Neutral/border'),
+    '--critical':      V('Semantic/FG/foreground-critical'),
+    '--fg-disabled':   V('Disabled/FG/foreground-disabled'),
+    '--accent-yellow': V('Accent/accent-yellow'),
+  };
+  const r = document.documentElement;
+  Object.entries(map).forEach(([k,v]) => v && r.style.setProperty(k,v));
+})();
+
+/* ══ 아이콘 주입 (mask id 유니크화 포함) ══ */
+(function applyIcons(){
+  let seq = 0;
+  document.querySelectorAll('[data-icon]').forEach(el => {
+    const name = el.getAttribute('data-icon');
+    let svg = window.ICONS[name];
+    if (!svg) { console.warn('missing icon:', name); return; }
+    const suffix = '__ic' + (seq++);
+    svg = svg.replace(/id="([^"]+)"/g, (m, id) => `id="${id}${suffix}"`)
+             .replace(/url\(#([^)]+)\)/g, (m, id) => `url(#${id}${suffix})`);
+    el.innerHTML = svg;
+  });
+  document.querySelectorAll('[data-icon] svg').forEach(svg => {
+    svg.setAttribute('width','100%'); svg.setAttribute('height','100%');
+    svg.querySelectorAll('[fill]:not([fill="none"])').forEach(n => n.setAttribute('fill','currentColor'));
+  });
+})();
+
+const DIFF = new URLSearchParams(location.search).get('diff'); // 'sd' | 'td' | null
+if (DIFF) {
+  document.body.classList.add('diff');
+  if (DIFF === 'sd') document.getElementById('panel-td').style.display = 'none';
+  if (DIFF === 'td') document.getElementById('panel-sd').style.display = 'none';
+}
+
+/* ══ 더미데이터 ══ */
+const IMG = 'assets/img/';
+const T = ['9c8f13df-eb17-429f-9ff4-05c75e1c9893','40d96615-6ff0-4ddf-8678-79d470079b06',
+  'fa777be8-04b8-4dc7-8342-f994e331f292','92db22a9-e864-4a41-8e59-f3d2db76ecf5',
+  '5d3eaad2-f4f3-4980-b0d5-d3edc53b483e','37d17ee6-295b-4862-ac2f-b7ff7367f74a',
+  'bd6e8902-9236-4848-a44c-ec6341861a18','25da450a-ce06-4f00-9715-0aa2b0d5f3a8',
+  'cdac5cba-7c56-47d8-acea-b7c71a391ba0','4bb12bc8-a798-4763-b2c0-b371b05fae7e']
+  .map(id => IMG + id + '.png');
+
+const p = (img, brand, name, rate, price, rating, review) => ({ img, brand, name, rate, price, rating, review });
+const SD_DATA = {
+  all: [
+    p(T[0],'레마','BELLY30 팬던트 조명 3Colors','51%','225,000원',4.6,'12,483'),
+    p(T[1],'슬로우','호텔식 워싱 차렵이불 풀세트 Q','45%','89,000원',4.8,'31,027'),
+    p(T[2],null,'클라우드 모션 패브릭 3인 소파 쿠션 포함 국내제작','38%','549,000원',4.7,'8,912'),
+    p(T[3],'한샘','샘베딩 클로이 수납 침대 SS/Q','27%','389,000원',4.9,'5,204'),
+    p(T[4],null,'무선 물걸레 로봇청소기 스테이션형 2세대','33%','429,000원',4.5,'2,318'),
+    p(T[5],'일룸','데스커 모션데스크 1400 오크','21%','618,000원',4.8,'1,730'),
+    p(T[6],null,'세라믹 확장형 식탁 4인 6인 세트','44%','298,000원',4.6,'9,441'),
+    p(T[7],'에몬스','클로젯 슬라이딩 옷장 3자 화이트','30%','459,000원',4.7,'3,652'),
+    p(T[8],null,'스텐 인덕션 프라이팬 3종 세트','56%','49,800원',4.8,'44,209'),
+  ],
+  furniture: [
+    p(T[3],'한샘','샘베딩 클로이 수납 침대 SS/Q','27%','389,000원',4.9,'5,204'),
+    p(T[2],null,'클라우드 모션 패브릭 3인 소파 쿠션 포함 국내제작','38%','549,000원',4.7,'8,912'),
+    p(T[6],null,'세라믹 확장형 식탁 4인 6인 세트','44%','298,000원',4.6,'9,441'),
+    p(T[5],'일룸','데스커 모션데스크 1400 오크','21%','618,000원',4.8,'1,730'),
+    p(T[9],'시몬스','뷰티레스트 윌리엄 매트리스 Q','51%','225,000원',4.6,'12,483'),
+    p(T[7],'에몬스','클로젯 슬라이딩 옷장 3자 화이트','30%','459,000원',4.7,'3,652'),
+  ],
+  digital: [
+    p(T[4],null,'무선 물걸레 로봇청소기 스테이션형 2세대','33%','429,000원',4.5,'2,318'),
+    p(T[0],'레마','BELLY30 팬던트 조명 3Colors','51%','225,000원',4.6,'12,483'),
+    p(T[8],null,'미니 공기청정기 원룸용 화이트','40%','89,000원',4.4,'7,209'),
+  ],
+  fabric: [
+    p(T[1],'슬로우','호텔식 워싱 차렵이불 풀세트 Q','45%','89,000원',4.8,'31,027'),
+    p(T[2],null,'프리미엄 극세사 러그 카페트 200×250','52%','69,900원',4.7,'18,331'),
+    p(T[9],null,'구스다운 경추 베개 2입 세트','35%','54,900원',4.6,'22,104'),
+  ],
+  kitchen: [
+    p(T[8],null,'스텐 인덕션 프라이팬 3종 세트','56%','49,800원',4.8,'44,209'),
+    p(T[6],null,'세라믹 식기 홈세트 4인 20p','48%','79,000원',4.7,'12,050'),
+    p(T[4],null,'저소음 전기포트 1.7L 스텐','29%','32,900원',4.5,'8,442'),
+  ],
+  dressroom: [],
+};
+const SD_CATS = [
+  { id:'all', label:'전체' }, { id:'furniture', label:'가구' }, { id:'digital', label:'가전·디지털' },
+  { id:'fabric', label:'패브릭' }, { id:'kitchen', label:'주방용품' }, { id:'dressroom', label:'드레스룸' },
+];
+
+const TD_DATA = [
+  { ...p(T[9],null,'시몬스 뷰티레스트 윌리엄 매트리스 Q','51%','225,000원',4.6,'12,483'), rise:'34,000' },
+  { ...p(T[2],null,'클라우드 모션 패브릭 3인 소파','46%','498,000원',4.7,'8,912'), rise:'50,000' },
+  { ...p(T[1],null,'호텔식 워싱 차렵이불 풀세트 Q','52%','79,000원',4.8,'31,027'), rise:'12,000' },
+  { ...p(T[5],null,'데스커 모션데스크 1400 오크','35%','528,000원',4.8,'1,730'), rise:'21,000' },
+  { ...p(T[8],null,'스텐 인덕션 프라이팬 3종 세트','61%','42,900원',4.8,'44,209'), rise:'8,000' },
+];
+
+const esc = s => String(s).replace(/</g,'&lt;');
+
+/* ══ DIFF 모드: Figma 시안 더미 콘텐츠로 교체 (pixel-diff 정합용) ══ */
+if (DIFF) {
+  const PH = IMG + 'thumb-placeholder.png';
+  const fig = (brand) => p(PH, brand, 'BELLY30 Pendant 3Colors BELLY30 Pendant 3Colors', '51%', '225,000원', 4.6, '999,999');
+  SD_DATA.all = [fig(null), fig(null), fig(null), fig('한샘'), fig('한샘'), fig('한샘')];
+  TD_DATA.length = 0;
+  for (let i = 0; i < 2; i++) TD_DATA.push({ ...fig(null), rise: '{34,000}' });
+}
+
+/* ══ 스페셜딜: chip 필터 + 컬럼 캐러셀 + 스켈레톤 ══ */
+const chipStrip = document.getElementById('sd-chips');
+const sdCarousel = document.getElementById('sd-carousel');
+
+chipStrip.innerHTML = SD_CATS.map((c,i) =>
+  `<button class="chip${i===0?' is-on':''}" data-cat="${c.id}">${c.label}</button>`).join('');
+
+function cardHTML(pr) {
+  return `<article class="hcard">
+    <div class="thumb"><img src="${pr.img}" alt=""><button class="scrap" aria-label="스크랩"></button></div>
+    <div class="txt">
+      <div class="title-wrap">
+        ${pr.brand ? `<p class="brand">${esc(pr.brand)}</p>` : ''}
+        <p class="name">${esc(pr.name)}</p>
+        <p class="price"><b class="rate">${pr.rate}</b><b>${pr.price}</b></p>
+      </div>
+      <p class="review"><span class="star"></span><span>${pr.rating}</span><span>·</span><span>리뷰</span><span>${pr.review}</span></p>
+      <p class="delivery">무료배송</p>
+    </div>
+  </article>`;
+}
+
+function renderSD(catId) {
+  const items = SD_DATA[catId] || [];
+  if (!items.length) {
+    sdCarousel.innerHTML = '<div class="empty">노출할 상품이 없어요<br>상품이 준비되면 보여드릴게요</div>';
+    return;
+  }
+  const cols = [];
+  for (let i = 0; i < items.length; i += 3) cols.push(items.slice(i, i + 3));
+  sdCarousel.innerHTML = cols.map(col => `<div class="col">${col.map(cardHTML).join('')}</div>`).join('');
+  sdCarousel.scrollTo({ left: 0 });
+}
+renderSD('all');
+
+function renderSkeleton() {
+  const skelCard = `<article class="hcard">
+    <div class="skel skel-thumb"></div>
+    <div class="txt" style="gap:8px">
+      <div class="skel skel-line" style="width:80%"></div>
+      <div class="skel skel-line" style="width:55%"></div>
+      <div class="skel skel-line" style="width:40%"></div>
+    </div>
+  </article>`;
+  sdCarousel.innerHTML = `<div class="col">${skelCard.repeat(3)}</div>`;
+}
+
+chipStrip.addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip || chip.classList.contains('is-on')) return;
+  chipStrip.querySelectorAll('.chip').forEach(c => c.classList.toggle('is-on', c === chip));
+  /* 선택 chip 좌측 자동 스크롤 — 좌측 패딩 16 안쪽 정렬, 끝쪽 chip은 클램프 (랭킹과 동일) */
+  chipStrip.scrollTo({ left: Math.max(0, chip.offsetLeft - 16), behavior: 'smooth' });
+  /* 스켈레톤 320ms → 데이터 교체 (랭킹과 동일) */
+  const cat = chip.dataset.cat;
+  if (!(SD_DATA[cat] || []).length) { renderSD(cat); return; } /* 빈 상태는 즉시 */
+  renderSkeleton();
+  setTimeout(() => renderSD(cat), 320);
+});
+
+/* ══ 타임특가 ══ */
+const tdCarousel = document.getElementById('td-carousel');
+tdCarousel.innerHTML = TD_DATA.map(pr => `
+  <article class="vcard">
+    <div class="thumb">
+      <img src="${pr.img}" alt="">
+      <button class="scrap" aria-label="스크랩"></button>
+      <div class="rise-badge" data-rise="${pr.rise}">내일 ${pr.rise}원 더 비싸져요</div>
+    </div>
+    <div class="txt">
+      <p class="name">${esc(pr.name)}</p>
+      <p class="price"><b class="rate">${pr.rate}</b><b>${pr.price}</b></p>
+      <p class="review"><span class="star"></span><span>${pr.rating}</span><span>·</span><span>리뷰</span><span>${pr.review}</span></p>
+    </div>
+  </article>`).join('');
+
+/* 스크랩 토글 */
+document.querySelector('.stage').addEventListener('click', e => {
+  const s = e.target.closest('.scrap');
+  if (s) s.classList.toggle('is-on');
+});
+
+/* ══ 카운트다운 ══
+   진입 모션: 게이지 100% 꽉 찬 상태 → 남은시간 지점까지 1.6s로 감소 후 실시간 카운트 시작 */
+const TOTAL = 24 * 3600;
+let remaining = 45370, speed = 1, ended = false, introRunning = false;
+const pad = n => String(n).padStart(2, '0');
+const fmt = s => `${pad(Math.floor(s/3600))}:${pad(Math.floor(s%3600/60))}:${pad(Math.floor(s%60))}`;
+const pct = () => Math.max(0, remaining / TOTAL * 100);
+
+function paintTimer() {
+  document.querySelectorAll('.countdown-scope').forEach(m => {
+    m.classList.toggle('ended', ended);
+    m.querySelector('.t-parts').innerHTML = ended
+      ? '<span>오늘 딜 종료</span>'
+      : `<span>종료시간까지</span><b class="t-remain">${fmt(remaining)}</b><span>남음</span>`;
+  });
+  document.querySelectorAll('.rise-badge').forEach(b => {
+    b.textContent = ended ? '오늘 딜 종료' : `내일 ${b.dataset.rise}원 더 비싸져요`;
+  });
+  const gc = document.getElementById('global-clock');
+  if (gc) gc.textContent = ended ? '딜 종료' : `남은시간 ${fmt(remaining)}`;
+}
+function paintGauge(widthPct) {
+  document.querySelectorAll('.countdown-scope').forEach(m => {
+    m.querySelector('.gauge .fill').style.width = widthPct + '%';
+    m.querySelector('.gauge .pin').style.left = widthPct + '%';
+  });
+}
+
+/* 진입 모션: 100% → 현재 남은시간 비율 (rAF 미의존 — 백그라운드 로드에도 안전) */
+let introTimer = null;
+function runIntro() {
+  const els = document.querySelectorAll('.gauge .fill, .gauge .pin');
+  introRunning = true;
+  els.forEach(el => el.classList.remove('intro'));
+  paintGauge(100);
+  void document.body.offsetWidth; /* 강제 reflow — 100%가 먼저 커밋되도록 */
+  els.forEach(el => el.classList.add('intro'));
+  paintGauge(pct());
+  clearTimeout(introTimer);
+  introTimer = setTimeout(() => {
+    els.forEach(el => el.classList.remove('intro'));
+    introRunning = false;
+  }, 1650);
+}
+
+let last = Date.now();
+function tick() {
+  const now = Date.now();
+  const dt = (now - last) / 1000; last = now;
+  if (!ended) {
+    remaining -= dt * speed;
+    if (remaining <= 0) { remaining = 0; ended = true; }
+    paintTimer();
+    if (!introRunning) paintGauge(pct());
+  }
+}
+
+if (DIFF) {
+  /* 정지 렌더: Figma 시안값 고정 (12:36:10, fill 256/343) */
+  paintTimer();
+  paintGauge(256 / 343 * 100);
+} else {
+  paintTimer();
+  runIntro();
+  setInterval(tick, 100);
+}
+
+/* 컨트롤 */
+function bindGroup(sel, fn) {
+  document.querySelectorAll(sel).forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll(sel).forEach(x => x.classList.remove('is-on'));
+    b.classList.add('is-on');
+    fn(b);
+  }));
+}
+bindGroup('.preset', b => { remaining = Number(b.dataset.sec); ended = false; paintTimer(); runIntro(); });
+bindGroup('.speed', b => { speed = Number(b.dataset.x); });
+
+const pinBtn = document.querySelector('.pin-toggle');
+if (pinBtn) pinBtn.addEventListener('click', () => {
+  const on = !document.body.classList.contains('pin-on');
+  document.body.classList.toggle('pin-on', on);
+  pinBtn.textContent = on ? 'ON' : 'OFF';
+  pinBtn.classList.toggle('is-on', on);
+});
+</script>
+</body>
+</html>
