@@ -129,8 +129,13 @@
   .hcard .skel-thumb { width:100px; height:100px; flex:none; }
   .skel-line { height:14px; border-radius:4px; }
 
-  /* ══ 타임특가 세로형 카드 (280×340) ══ */
-  .vcard { width:280px; flex:none; display:flex; flex-direction:column; gap:4px; scroll-snap-align:start; }
+  /* ══ 타임특가 세로형 카드 (280×384) ══ */
+  .vcard { width:280px; flex:none; display:flex; flex-direction:column; gap:8px; scroll-snap-align:start; }
+  .coupon-btn { height:32px; border:1px solid var(--border); border-radius:6px; background:#fff;
+    display:flex; align-items:center; justify-content:center; gap:4px;
+    font-size:14px; line-height:18px; font-weight:500; color:var(--fg); }
+  .cpn-ic { width:14px; height:14px; flex:none; color:var(--fg); }
+  .cpn-ic svg { display:block; }
   .vcard .thumb { position:relative; width:280px; height:280px; border-radius:8px; overflow:clip; }
   .vcard .thumb img { width:100%; height:100%; object-fit:cover; display:block;
     box-shadow:inset 0 0 0 0.5px rgba(0,0,0,0.05); }
@@ -139,7 +144,7 @@
     transition:background .3s; }
   .ended .rise-badge { background:var(--fg-weak); }
   .vcard .scrap { bottom:36px; }
-  .vcard .txt { display:flex; flex-direction:column; gap:2px; }
+  .vcard .txt { display:flex; flex-direction:column; gap:2px; height:56px; }
   .vcard .name { font-size:13px; line-height:18px; font-weight:400; color:var(--fg-product);
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
@@ -243,10 +248,11 @@
   </div>
   <div>
     <h3>2. 카운트다운 · 숫자 롤링 · 종료 상태</h3>
-    <p>· 타이머 "종료시간까지 HH:MM:SS 남음" — 1초 단위 갱신, 시계 아이콘은 정적
+    <p>· 타이머 — 1초 단위 갱신, 시계 아이콘은 정적. 문구: 스페셜딜 "종료시간까지" / 타임특가 "종료까지" (확정값 상이)
 · 숫자는 슬롯머신 롤링 — 변경된 자리만 세로 슬라이드 0.28s cubic-bezier(0.4, 0, 0.2, 1)
 · 종료 시 — fill 제거(트랙만 남음), 타이머 회색 + "오늘 딜 종료"(문구 확정 필요)
 · 타임특가 인상 예고 배지도 동시에 회색 전환 + "오늘 딜 종료"로 교체
+· 타임특가 쿠폰 다운로드 버튼(Box Button h32) — 탭 동작(발급/완료 상태) 정책 확인 필요
 · 게이지 위 핀 — 제외 확정 (2026-09-01)</p>
   </div>
   <div>
@@ -300,13 +306,13 @@ const COUNTDOWN = `
     <p class="timer">${CLOCK}<span class="t-parts"></span></p>
   </div>`;
 const TEMPLATES = {
-  sd: `<section class="module countdown-scope" data-id="14241:63344">
+  sd: `<section class="module countdown-scope" data-id="14241:63344" data-tlabel="종료시간까지">
     <div class="section-title"><h2>단 하루 특가, 스페셜딜</h2><button class="arrow-btn" aria-label="전체보기">${ARROW}</button></div>
     <div class="chip-strip sd-chips"></div>
     ${COUNTDOWN}
     <div class="carousel sd-carousel"></div>
   </section>`,
-  td: `<section class="module countdown-scope" data-id="14241:65000">
+  td: `<section class="module countdown-scope" data-id="14241:65000" data-tlabel="종료까지">
     <div class="section-title"><h2>최저가 보장, 타임특가 세일</h2><button class="arrow-btn" aria-label="전체보기">${ARROW}</button></div>
     ${COUNTDOWN}
     <div class="carousel td-carousel"></div>
@@ -449,6 +455,7 @@ document.querySelectorAll('.td-carousel').forEach(el => {
         <button class="scrap" aria-label="스크랩"></button>
         <div class="rise-badge" data-rise="${pr.rise}">내일 ${pr.rise}원 더 비싸져요</div>
       </div>
+      <button class="coupon-btn"><span class="cpn-ic"></span>쿠폰 다운로드</button>
       <div class="txt">
         <p class="name">${esc(pr.name)}</p>
         <p class="price"><b class="rate">${pr.rate}</b><b>${pr.price}</b></p>
@@ -456,6 +463,24 @@ document.querySelectorAll('.td-carousel').forEach(el => {
       </div>
     </article>`).join('');
 });
+
+/* 쿠폰 다운로드 아이콘 주입 (ODS arrow_down_to_bracket, mask id 유니크화) */
+(function () {
+  let seq = 0;
+  document.querySelectorAll('.cpn-ic').forEach(el => {
+    let svg = window.ICONS['arrow_down_to_bracket'];
+    if (!svg) return;
+    const sfx = '__cpn' + (seq++);
+    svg = svg.replace(/id="([^"]+)"/g, (m, id) => `id="${id}${sfx}"`)
+             .replace(/url\(#([^)]+)\)/g, (m, id) => `url(#${id}${sfx})`);
+    el.innerHTML = svg;
+    const s = el.querySelector('svg');
+    if (s) {
+      s.setAttribute('width', '100%'); s.setAttribute('height', '100%');
+      s.querySelectorAll('[fill]:not([fill="none"])').forEach(n => n.setAttribute('fill', 'currentColor'));
+    }
+  });
+})();
 
 /* 스크랩 토글 */
 document.querySelector('.stage').addEventListener('click', e => {
@@ -476,7 +501,7 @@ const modules = [...document.querySelectorAll('.countdown-scope')];
 function buildSlots(m) {
   const chars = fmt(remaining).split('');
   m.querySelector('.t-parts').innerHTML =
-    '<span>종료시간까지</span><b class="t-remain">'
+    `<span>${m.dataset.tlabel || '종료시간까지'}</span><b class="t-remain">`
     + chars.map(c => c === ':' ? '<span class="colon">:</span>'
         : `<span class="dg"><span class="strip"><span>${c}</span></span></span>`).join('')
     + '</b><span>남음</span>';
@@ -553,7 +578,7 @@ if (DIFF) {
   /* 정지 렌더: Figma 시안값 고정 (12:36:10, fill 256/343) — 롤링 마크업 없이 플레인 텍스트 */
   modules.forEach(m => {
     m.querySelector('.t-parts').innerHTML =
-      `<span>종료시간까지</span><b>${fmt(remaining)}</b><span>남음</span>`;
+      `<span>${m.dataset.tlabel || '종료시간까지'}</span><b>${fmt(remaining)}</b><span>남음</span>`;
     paintGaugeFor(m, 256 / 343 * 100);
   });
 } else {
