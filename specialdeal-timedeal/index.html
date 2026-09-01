@@ -84,6 +84,12 @@
   body.pin-on .gauge .pin { display:block; }
   .timer { display:flex; gap:4px; align-items:center; font-size:14px; line-height:18px; font-weight:600;
     color:var(--accent-red); font-variant-numeric:tabular-nums; }
+  /* 숫자 슬롯머신 롤링 */
+  .t-remain { display:inline-flex; }
+  .dg { position:relative; width:8.6px; height:18px; overflow:hidden; }
+  .dg .strip { position:absolute; left:0; top:0; display:flex; flex-direction:column; }
+  .dg .strip.anim { transition:transform .28s cubic-bezier(0.4, 0, 0.2, 1); }
+  .dg .strip span { height:18px; line-height:18px; display:block; text-align:center; }
   .timer .clock-ic { width:16px; height:16px; flex:none; color:var(--badge-red); }
   .timer .t-parts { display:flex; gap:2px; align-items:center; }
 
@@ -171,6 +177,9 @@
   <div class="ctrl-group">
     <span class="ctrl-label">게이지 핀 (협의중)</span>
     <button class="ctrl-btn pin-toggle">OFF</button>
+  </div>
+  <div class="ctrl-group">
+    <button class="ctrl-btn replay-btn">↻ 로딩 테스트</button>
   </div>
   <div class="clock" id="global-clock"></div>
 </div>
@@ -419,19 +428,50 @@ document.querySelector('.stage').addEventListener('click', e => {
 });
 
 /* ══ 카운트다운 ══
-   진입 모션: 게이지 100% 꽉 찬 상태 → 남은시간 지점까지 1.6s로 감소 후 실시간 카운트 시작 */
+   진입 모션: 모듈이 뷰포트에 30% 이상 보일 때, 게이지 100% → 남은시간 지점까지 1.6s 감소 후 실시간 카운트 */
 const TOTAL = 24 * 3600;
-let remaining = 45370, speed = 1, ended = false, introRunning = false;
+let remaining = 45370, speed = 1, ended = false;
 const pad = n => String(n).padStart(2, '0');
 const fmt = s => `${pad(Math.floor(s/3600))}:${pad(Math.floor(s%3600/60))}:${pad(Math.floor(s%60))}`;
 const pct = () => Math.max(0, remaining / TOTAL * 100);
+const modules = [...document.querySelectorAll('.countdown-scope')];
 
+/* 숫자 슬롯머신 롤링: 변경된 자리만 세로 슬라이드 0.28s */
+function buildSlots(m) {
+  const chars = fmt(remaining).split('');
+  m.querySelector('.t-parts').innerHTML =
+    '<span>종료시간까지</span><b class="t-remain">'
+    + chars.map(c => c === ':' ? '<span class="colon">:</span>'
+        : `<span class="dg"><span class="strip"><span>${c}</span></span></span>`).join('')
+    + '</b><span>남음</span>';
+  m._digits = chars;
+  m._slots = [...m.querySelectorAll('.t-remain .dg')];
+}
+function rollDigit(dgEl, from, to) {
+  const strip = dgEl.firstChild;
+  strip.classList.remove('anim');
+  strip.innerHTML = `<span>${from}</span><span>${to}</span>`;
+  strip.style.transform = 'translateY(0)';
+  void strip.offsetHeight;
+  strip.classList.add('anim');
+  strip.style.transform = 'translateY(-18px)';
+}
 function paintTimer() {
-  document.querySelectorAll('.countdown-scope').forEach(m => {
+  const chars = fmt(remaining).split('');
+  modules.forEach(m => {
     m.classList.toggle('ended', ended);
-    m.querySelector('.t-parts').innerHTML = ended
-      ? '<span>오늘 딜 종료</span>'
-      : `<span>종료시간까지</span><b class="t-remain">${fmt(remaining)}</b><span>남음</span>`;
+    if (ended) {
+      m.querySelector('.t-parts').innerHTML = '<span>오늘 딜 종료</span>';
+      m._digits = null;
+      return;
+    }
+    if (!m._digits) buildSlots(m);
+    let slot = 0;
+    chars.forEach((c, i) => {
+      if (c === ':') return;
+      if (m._digits[i] !== c) { rollDigit(m._slots[slot], m._digits[i], c); m._digits[i] = c; }
+      slot++;
+    });
   });
   document.querySelectorAll('.rise-badge').forEach(b => {
     b.textContent = ended ? '오늘 딜 종료' : `내일 ${b.dataset.rise}원 더 비싸져요`;
@@ -439,27 +479,24 @@ function paintTimer() {
   const gc = document.getElementById('global-clock');
   if (gc) gc.textContent = ended ? '딜 종료' : `남은시간 ${fmt(remaining)}`;
 }
-function paintGauge(widthPct) {
-  document.querySelectorAll('.countdown-scope').forEach(m => {
-    m.querySelector('.gauge .fill').style.width = widthPct + '%';
-    m.querySelector('.gauge .pin').style.left = widthPct + '%';
-  });
+function paintGaugeFor(m, widthPct) {
+  m.querySelector('.gauge .fill').style.width = widthPct + '%';
+  m.querySelector('.gauge .pin').style.left = widthPct + '%';
 }
 
-/* 진입 모션: 100% → 현재 남은시간 비율 (rAF 미의존 — 백그라운드 로드에도 안전) */
-let introTimer = null;
-function runIntro() {
-  const els = document.querySelectorAll('.gauge .fill, .gauge .pin');
-  introRunning = true;
+/* 진입 모션 (rAF 미의존 — 백그라운드 로드에도 안전). 모듈별 독립 재생 */
+function runIntroFor(m) {
+  const els = m.querySelectorAll('.gauge .fill, .gauge .pin');
+  m._introRunning = true;
   els.forEach(el => el.classList.remove('intro'));
-  paintGauge(100);
+  paintGaugeFor(m, 100);
   void document.body.offsetWidth; /* 강제 reflow — 100%가 먼저 커밋되도록 */
   els.forEach(el => el.classList.add('intro'));
-  paintGauge(pct());
-  clearTimeout(introTimer);
-  introTimer = setTimeout(() => {
+  paintGaugeFor(m, pct());
+  clearTimeout(m._introTimer);
+  m._introTimer = setTimeout(() => {
     els.forEach(el => el.classList.remove('intro'));
-    introRunning = false;
+    m._introRunning = false;
   }, 1650);
 }
 
@@ -471,17 +508,32 @@ function tick() {
     remaining -= dt * speed;
     if (remaining <= 0) { remaining = 0; ended = true; }
     paintTimer();
-    if (!introRunning) paintGauge(pct());
+    modules.forEach(m => {
+      if (m._introPlayed && !m._introRunning) paintGaugeFor(m, pct());
+    });
   }
 }
 
 if (DIFF) {
-  /* 정지 렌더: Figma 시안값 고정 (12:36:10, fill 256/343) */
-  paintTimer();
-  paintGauge(256 / 343 * 100);
+  /* 정지 렌더: Figma 시안값 고정 (12:36:10, fill 256/343) — 롤링 마크업 없이 플레인 텍스트 */
+  modules.forEach(m => {
+    m.querySelector('.t-parts').innerHTML =
+      `<span>종료시간까지</span><b>${fmt(remaining)}</b><span>남음</span>`;
+    paintGaugeFor(m, 256 / 343 * 100);
+  });
 } else {
   paintTimer();
-  runIntro();
+  /* 노출 전에는 100% 대기 → 30% 이상 보이면 1회 재생 */
+  modules.forEach(m => paintGaugeFor(m, 100));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.intersectionRatio >= 0.3 && !e.target._introPlayed) {
+        e.target._introPlayed = true;
+        runIntroFor(e.target);
+      }
+    });
+  }, { threshold: [0.3] });
+  modules.forEach(m => io.observe(m));
   setInterval(tick, 100);
 }
 
@@ -493,8 +545,19 @@ function bindGroup(sel, fn) {
     fn(b);
   }));
 }
-bindGroup('.preset', b => { remaining = Number(b.dataset.sec); ended = false; paintTimer(); runIntro(); });
+bindGroup('.preset', b => {
+  remaining = Number(b.dataset.sec); ended = false;
+  modules.forEach(m => { m._digits = null; });
+  paintTimer();
+  modules.forEach(m => { m._introPlayed = true; runIntroFor(m); });
+});
 bindGroup('.speed', b => { speed = Number(b.dataset.x); });
+
+/* 로딩(진입 모션) 테스트: 30% 노출 조건을 다시 밟은 것처럼 재생 */
+const replayBtn = document.querySelector('.replay-btn');
+if (replayBtn) replayBtn.addEventListener('click', () => {
+  modules.forEach(m => { m._introPlayed = true; runIntroFor(m); });
+});
 
 const pinBtn = document.querySelector('.pin-toggle');
 if (pinBtn) pinBtn.addEventListener('click', () => {
