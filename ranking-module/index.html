@@ -842,9 +842,16 @@ function updatePanel(){
 function fillShell(){
   /* 특가 칩 */
   const chipLabels = ['전체','가구','가전·디지털','패브릭','주방용품','드레스룸'];
-  const chipsHTML = chipLabels.map((l,i)=>`<span class="fchip ${i===0?'is-selected':''}">${l}</span>`).join('');
+  const chipLabelsAll = [...chipLabels,'생활용품','수납·정리','조명','인테리어소품'];
+  const chipsHTML = chipLabelsAll.map((l,i)=>`<button class="fchip ${i===0?'is-selected':''}">${l}</button>`).join('');
   $('hotdealChips').innerHTML = chipsHTML;
   $('liveChips').innerHTML = chipsHTML;
+  /* 지면 내 다른 모듈 칩도 동일 인터랙션(선택 칩 중앙 정렬) — 전 모듈 공통 규칙 */
+  const wireChips = el => el.querySelectorAll('button').forEach(b => b.onclick = () => {
+    el.querySelectorAll('.is-selected').forEach(x => x.classList.remove('is-selected'));
+    b.classList.add('is-selected'); scrollChipToCenter(el);
+  });
+  wireChips($('hotdealChips')); wireChips($('liveChips'));
 
   /* 특가 상품: 328 컬럼 × 3행 × 2컬럼 */
   const hdName = '한샘몰pick 눕 데일리 구스 아쿠아텍스 패브릭 모듈 소파 4인용 4colors';
@@ -910,9 +917,10 @@ function fillShell(){
     `<div class="cal-cell ${i===1?'is-selected':''}"><span class="cc-dow">${d}</span><span class="cc-day">${n}</span></div>`).join('');
 
   /* 브랜드 칩 */
-  const brands = ['한샘','식물을기르기엔난너무게을러','플랫포인트','일광전구'];
+  const brands = ['한샘','식물을기르기엔난너무게을러','플랫포인트','일광전구','레어로우','시몬스','데스커'];
   $('brandChips').innerHTML = brands.map((b,i) =>
-    `<span class="bchip ${i===0?'is-selected':''}"><span class="bc-thumb"><img src="${thumbAt(i)}" alt=""></span>${b}</span>`).join('');
+    `<button class="bchip ${i===0?'is-selected':''}"><span class="bc-thumb"><img src="${thumbAt(i)}" alt=""></span>${b}</button>`).join('');
+  wireChips($('brandChips'));
 
   /* 할인 일정 상품 카드 */
   const schedNames = [
