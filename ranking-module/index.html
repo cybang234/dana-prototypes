@@ -779,16 +779,16 @@ function transitionList(){
   }
 }
 
-/* 선택 chip을 스트립 좌측(패딩 16px 안쪽)으로 자동 스크롤 — 끝 chip은 최대 스크롤로 클램프.
+/* 선택 chip을 스트립 중앙으로 자동 스크롤 — 양 끝 chip은 0 / 최대 스크롤로 클램프.
    네이티브 smooth scrollTo가 innerHTML 교체 직후/일부 환경에서 무시되는 이슈가 있어
    rAF 기반 자체 애니메이션(easeOutCubic, 280ms)으로 구현 */
 const chipScrollAnim = new WeakMap();
-function scrollChipToLeft(container){
+function scrollChipToCenter(container){
   requestAnimationFrame(() => requestAnimationFrame(() => {
     const chip = container.querySelector('.is-selected');
     if (!chip) return;
     const max = container.scrollWidth - container.clientWidth;
-    const target = Math.min(Math.max(0, chip.offsetLeft - 16), max);
+    const target = Math.min(Math.max(0, chip.offsetLeft + chip.offsetWidth/2 - container.clientWidth/2), max);
     const from = container.scrollLeft;
     if (Math.abs(target - from) < 1) return;
     cancelAnimationFrame(chipScrollAnim.get(container));
@@ -807,15 +807,15 @@ function selectCat1(id){
   if (state.cat1 === id) return;
   state.cat1 = id; state.cat2 = null; state.override = null;
   renderChips1(); renderChips2(); transitionList();
-  scrollChipToLeft(chips1El);
-  scrollChipToLeft(chips2El);
+  scrollChipToCenter(chips1El);
+  scrollChipToCenter(chips2El);
 }
 function selectCat2(id){
   /* 선택된 chip 재탭 = 해제 → '전체'로 복귀 */
   if (state.cat2 === id) { if (id === null) return; id = null; }
   state.cat2 = id; state.override = null;
   renderChips2(); transitionList();
-  scrollChipToLeft(chips2El);
+  scrollChipToCenter(chips2El);
 }
 
 /* ── 프로토 컨트롤 패널 ── */
