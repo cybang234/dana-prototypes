@@ -258,7 +258,6 @@
       · 양 끝 항목은 스크롤 0 / 최대값으로 클램프 (빈 여백 없음)<br>
       · 280ms · easeOutCubic<br>
       · 1Depth 변경 → 2Depth '전체'로 리셋 후 두 스트립 모두 정렬<br>
-      · 2Depth 선택 칩 재탭 = 해제 → '전체'<br>
       · 날짜 탭(ODS Tab)·브랜드 칩(원형)도 같은 엔진 적용
     </div>
     <div class="pp-state" id="ppState"></div>
@@ -352,8 +351,8 @@ const STRIP_TPL = {
   brand: it => `<button class="bchip"><span class="bc-ring"><span class="bc-thumb"><img src="${it.img}" alt=""></span></span><span class="bc-name">${it.label}</span></button>`,
 };
 class Strip {
-  constructor({ el, type, items, value, onChange, toggleable }){
-    Object.assign(this, { el, type, items, value, onChange, toggleable });
+  constructor({ el, type, items, value, onChange }){
+    Object.assign(this, { el, type, items, value, onChange });
     this.render();
   }
   render(){
@@ -366,10 +365,7 @@ class Strip {
   }
   setItems(items, value){ this.items = items; this.value = value; this.render(); }
   select(id, byUser){
-    if (this.value === id){
-      if (!(this.toggleable && byUser) || id === this.items[0].id) return;  /* 2Depth: 재탭 = 해제 → 전체 */
-      id = this.items[0].id;
-    }
+    if (this.value === id) return;
     this.value = id; this.render();
     scrollSelected(this.el);
     this.onChange && this.onChange(id, byUser);
@@ -416,7 +412,7 @@ function mount2Depth({ strip1El, wrapEl, strip2El, items1, value1, onBody }){
   const s1 = new Strip({ el:strip1El, type:'pill', items:items1, value:st.cat1, onChange:id => {
     st.cat1 = id; st.cat2 = 'all'; sync2(); scrollSelected(strip2El); onBody(st); updateState();
   }});
-  s2 = new Strip({ el:strip2El, type:'text', items:[{id:'all',label:'전체'}], value:'all', toggleable:true, onChange:id => { st.cat2 = id; onBody(st); updateState(); }});
+  s2 = new Strip({ el:strip2El, type:'text', items:[{id:'all',label:'전체'}], value:'all', onChange:id => { st.cat2 = id; onBody(st); updateState(); }});
   sync2();
   return st;
 }

@@ -811,8 +811,7 @@ function selectCat1(id){
   scrollChipToCenter(chips2El);
 }
 function selectCat2(id){
-  /* 선택된 chip 재탭 = 해제 → '전체'로 복귀 */
-  if (state.cat2 === id) { if (id === null) return; id = null; }
+  if (state.cat2 === id) return;
   state.cat2 = id; state.override = null;
   renderChips2(); transitionList();
   scrollChipToCenter(chips2El);
